@@ -1,0 +1,19 @@
+{
+    "$schema": "http://json.schemastore.org/template",
+    "author": "Pac-Dessert1436",
+    "classifications": [
+        "GameDev",
+        "MonoGame",
+        "VB.NET",
+        "C#"
+    ],
+    "name": "MonoGame StartKit VB.NET",
+    "identity": "PacDessert1436.MonoGame.StartKitVB",
+    "shortName": "mgstartkit-vb",
+    "tags": {
+        "language": "VB",
+        "type": "project"
+    },
+    "sourceName": "MonoGameStartKitVB",
+    "preferNameDirectory": true
+}

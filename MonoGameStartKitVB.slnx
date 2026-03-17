@@ -1,0 +1,7 @@
+﻿<Solution>
+  <Project Path="MonoGameStartKitVB.Core\MonoGameStartKitVB.Core.vbproj"/>
+  <Project Path="MonoGameStartKitVB.WindowsDX\MonoGameStartKitVB.WindowsDX.csproj"/>
+  <Project Path="MonoGameStartKitVB.DesktopGL\MonoGameStartKitVB.DesktopGL.csproj"/>
+  <Project Path="MonoGameStartKitVB.Android\MonoGameStartKitVB.Android.csproj"/>
+  <Project Path="MonoGameStartKitVB.iOS\MonoGameStartKitVB.iOS.csproj"/>
+</Solution>
