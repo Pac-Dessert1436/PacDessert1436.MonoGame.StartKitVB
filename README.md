@@ -1,87 +1,106 @@
-# PacDessert1436.MonoGame.StartKitVB - Devour-Man: Eat Seeds & Plant a Forest!
+# Devour-Man - MonoGame StartKit (VB.NET)
+
+**Version 1.0.1** - A minimal viable game template built with **VB.NET** for [MonoGame](https://www.monogame.net/), inspired by Pac-Man.
 
 ## Overview
 
-**Devour-Man** is a minimal viable game template built with **VB.NET** for [MonoGame](https://www.monogame.net/), inspired by Pac-Man. Players collect seeds to grow a forest and dodge patrolling insects.
+_Devour-Man_ is a simple yet functional game template that demonstrates core MonoGame concepts in VB.NET. Players collect seeds to grow a forest while dodging patrolling insects.
 
-This project offers a working starting point for making MonoGame games in VB.NET - with a clean structure, event-driven states, and super-simple geometric placeholder art - ideal for rapid prototyping, learning, and extending. _The template is an "early spring planting" - a community-starter seed for learning and exploring MonoGame with VB.NET._
+This project serves as an excellent starting point for developers looking to build 2D games with MonoGame, using Visual Basic .NET for the core game logic.
 
-> **Note:** This is a **minimal viable** template, currently supporting only the **MonoGame DesktopGL** platform. It is unfinished and intended for education or prototyping - not for shipping production games as-is!
+> **Note**: This game template is still a **minimal viable product** (MVP). It is not a complete game with all features implemented - stay tuned for version 1.1.0!
+
+## Getting Started
+
+### Prerequisites
+- Visual Studio 2026 or later
+- [.NET 10.0](https://dotnet.microsoft.com/download/dotnet/10.0) or later
+- MonoGame 3.8+ installation
+- VB.NET development tools
 
 ## Features
 
-- **Pac-Man-like Gameplay**: Collect seeds for points, grow a forest, avoid hazards
-- **Simple Controls**: Arrow keys or WASD for movement, Enter to start/retry
-- **Basic Score System**: Tracks score, seeds, and trees planted
-- **Game States**: Title, running game, and game over/restart support
-- **Procedural Level**: Seeds and enemies spawned randomly every game
-- **Minimalist Graphics**: Circles/squares - easy to replace/skin with your own sprites later!
-- **Clean Source**: Code organized for easy extension. Modern event/state management for beginners.
+### Version 1.0.1 Updates
+- ✅ **Sound Effects**: Added immersive audio feedback for game actions
+- ✅ **Sprite Assets**: Implemented visual elements for characters and environment
+- ✅ **UWP Support**: Fully functional on Universal Windows Platform
+- ✅ **DesktopGL Support**: Basic functionality on Desktop OpenGL (with limitations)
+
+### Core Gameplay
+- Player character movement and controls
+- Seed collection mechanics
+- Enemy AI with patrolling behavior
+- Forest growth progression system
+- Basic collision detection
 
 ## Platform Support
 
-- **Tested and designed for:** MonoGame DesktopGL (Windows/Linux/Mac)
-  - Mobile and UWP are **not** supported out-of-the-box (host layers are C#; core gameplay is VB.NET).
-  - For mobile or other platform adaptations, **additional work** is required!
+### ✅ Universal Windows Platform (UWP)
+- **Status**: Fully Supported
+- **Features**: All game features work perfectly
+- **Audio**: Background music and sound effects function correctly
+- **Assets**: All sprite and font assets load properly
 
-## Installation (as a .NET Template)
+### ⚠️ DesktopGL (OpenGL)
+- **Status**: Limited Support
+- **Known Limitations**:
+  - Background music files cannot be synchronized
+  - Font files have loading/synchronization issues
 
-1. **Install from NuGet:**
-    ```bash
-    dotnet new install PacDessert1436.MonoGame.StartKitVB::1.0.0
-    ```
-    Or, if you have the `.nupkg` locally:
-    ```bash
-    dotnet new install ./PacDessert1436.MonoGame.StartKitVB.1.0.0.nupkg
-    ```
+### Building and Running
 
-2. **Create a new project:**
-    ```bash
-    dotnet new mgstartkit-vb -n MyDevourManGame
-    cd MyDevourManGame
-    ```
+1. **Clone or download** the project
+2. **Open** the solution in Visual Studio
+3. **Restore NuGet packages** if prompted
+4. **Set target platform**:
+   - For full functionality: Choose **UWP**
+   - For Desktop testing: Choose **DesktopGL** (with limitations)
+5. **Build and run** the project
 
-3. **Build & Run:**
-    ```bash
-    dotnet build
-    dotnet run
-    ```
+### Recommended Development Workflow
 
-> _If you run into path or .NET SDK issues, see the MonoGame and .NET CLI [documentation](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-new) or check dependencies listed on the [MonoGame website](https://www.monogame.net/downloads/)._
+1. **Primary Development**: Use UWP target for full feature testing
+2. **Cross-Platform Testing**: Test with DesktopGL to identify platform-specific issues
+3. **Asset Management**: Ensure audio and font files are properly configured for both platforms
 
-## How to Play
+## Technical Notes
 
-1. **Press ENTER** at the title screen
-2. **Move**: Arrow keys or WASD (desktop keyboard)
-3. **Collect Seeds** (green): For every 10, plant a tree!
-4. **Avoid Insects** (red): Touching them ends your run
-5. **Earn Points**: Seeds and trees both increase your score
-6. **Restart**: Press ENTER after Game Over
+### Asset Synchronization Issues
 
-## Project Structure
+The DesktopGL platform has known limitations with certain asset types:
 
-- `GameMain.vb` - Game loop & main logic
-- `Actor.vb` - Entity base classes (Player, Enemy, Seed, Tree)
-- `Essentials.vb` - Game constants, config, and state management
-- `Content/Fonts/GameFont.spritefont` - Only required asset (UI font)
-- `LICENSE` - BSD 3-Clause License and usage terms
+- **Audio Files**: Background music synchronization issues
+- **Font Files**: Loading and rendering inconsistencies
+- **Workarounds**: Consider using alternative asset formats or platform-specific content pipelines
 
-## Customization & Extending
+### Content Pipeline
 
-You can easily:
-- **Change Colors/Sprites:** Swap geometric drawing for your own images, update sprite fonts, etc.
-- **Tweak Difficulty:** Adjust constants in `Essentials.vb` (player speed, enemy speed, size, etc.)
-- **Add Features:** More enemy types, powerups, sound, high-score system - start building your arcade!
-- **Port to Other Platforms:** Advanced users can rework the host/deployment layer for mobile if desired (requires C# interop).
+Ensure all assets are properly processed through the MonoGame Content Pipeline:
+- Sprites should be in supported formats (PNG recommended)
+- Audio files should use compatible formats
+- Fonts require proper Content Pipeline processing
+
+## Future Enhancements
+
+Planned improvements for upcoming versions:
+- Resolve DesktopGL asset synchronization issues
+- Add more enemy types and behaviors
+- Implement power-up system
+- Add level progression
+- Improve visual effects and animations
 
 ## Contributing
 
-Contributions are welcome! Open issues or PRs to:
-- Improve art/assets or add new sprites/UI
-- Generalize the template for other platforms
-- Clean up/documentation help
-- Bug fixes and suggestions
+This project welcomes contributions! Areas that need attention:
+- DesktopGL platform compatibility fixes
+- Additional game features
+- Performance optimizations
+- Bug fixes and testing
 
 ## License
 
-This project is licensed under the **BSD 3-Clause License**. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the BSD-3-Clause License. See the [LICENSE](LICENSE) file for details.
+
+---
+
+**Happy coding!** Build amazing games with MonoGame and VB.NET!

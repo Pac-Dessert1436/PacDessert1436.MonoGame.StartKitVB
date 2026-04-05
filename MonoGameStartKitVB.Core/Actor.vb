@@ -13,11 +13,18 @@ Public MustInherit Class Actor
     End Sub
 
     Public Function GetBounds() As Rectangle
-        Return New Rectangle(CInt(Position.X - Size / 2), CInt(Position.Y - Size / 2), Size, Size)
+        Return New Rectangle(
+            CInt(Position.X - Size / 2), 
+            CInt(Position.Y - Size / 2), 
+            Size * 2 \ 3, 
+            Size
+        )
     End Function
 
     Public NotInheritable Class Player
         Inherits Actor
+
+        Public Const IMAGE_PATH As String = "Images/player"
         Public Property Score As Integer = 0
         Public Property SeedsCollected As Integer = 0
         Public Property IsAlive As Boolean = True
@@ -29,6 +36,8 @@ Public MustInherit Class Actor
 
     Public NotInheritable Class Enemy
         Inherits Actor
+
+        Public Const IMAGE_PATH As String = "Images/beetle"
         Public Property Direction As Vector2
         Private random As New Random()
 
@@ -50,6 +59,8 @@ Public MustInherit Class Actor
 
     Public NotInheritable Class Seed
         Inherits Actor
+
+        Public Const IMAGE_PATH As String = "Images/acorn_seed"
         Public Property IsConsumable As Boolean = True
 
         Public Sub New(position As Vector2)
