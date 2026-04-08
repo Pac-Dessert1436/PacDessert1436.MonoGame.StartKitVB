@@ -23,6 +23,11 @@ Public Module Essentials
 
 #Region "Events"
     Public Event GameStateChanged(newState As GameState)
+    Public Event PlayerScoreChanged(score As Integer)
+    Public Event SeedCollected(seed As Actor.Seed)
+    Public Event TreePlanted(tree As Actor.Tree)
+    Public Event PlayerDied()
+    Public Event EnemyKilled(enemy As Actor.Enemy)
 #End Region
 
 #Region "Functions"

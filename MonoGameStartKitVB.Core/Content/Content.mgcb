@@ -140,6 +140,12 @@
 /processorParam:TextureFormat=Color
 /build:Images/player.png
 
+#begin Sounds/BGM/main_theme.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sounds/BGM/main_theme.mp3
+
 #begin Sounds/enemy_killed.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor

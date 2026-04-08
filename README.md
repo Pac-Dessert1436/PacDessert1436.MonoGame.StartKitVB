@@ -1,12 +1,12 @@
 # Devour-Man - MonoGame StartKit (VB.NET)
 
-**Version 1.0.1** - A minimal viable game template built with **VB.NET** for [MonoGame](https://www.monogame.net/), inspired by Pac-Man.
+**Version 1.0.2** - A minimal viable game template built with **VB.NET** for [MonoGame](https://www.monogame.net/), inspired by Pac-Man.
 
 ## Overview
 
 _Devour-Man_ is a simple yet functional game template that demonstrates core MonoGame concepts in VB.NET. Players collect seeds to grow a forest while dodging patrolling insects.
 
-This project serves as an excellent starting point for developers looking to build 2D games with MonoGame, using Visual Basic .NET for the core game logic.
+This project serves as an excellent starting point for developers looking to build 2D games with MonoGame, using Visual Basic .NET for the core game logic. Version 1.0.2 introduces a true object-oriented architecture with improved code organization and maintainability.
 
 > **Note**: This game template is still a **minimal viable product** (MVP). It is not a complete game with all features implemented - stay tuned for version 1.1.0!
 
@@ -19,6 +19,11 @@ This project serves as an excellent starting point for developers looking to bui
 - VB.NET development tools
 
 ## Features
+
+### Version 1.0.2 Updates
+- ✅ **Object-Oriented Architecture**: Refactored to true object-oriented patterns for better code organization, like `GameManager`, `Renderer`, `SoundManager`, etc.
+- ✅ **Improved Code Structure**: Enhanced maintainability and extensibility
+- ✅ **Event-Driven Design**: Better separation of concerns with event handling
 
 ### Version 1.0.1 Updates
 - ✅ **Sound Effects**: Added immersive audio feedback for game actions
