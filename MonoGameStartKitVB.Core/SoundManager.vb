@@ -6,25 +6,30 @@ Imports Microsoft.Xna.Framework.Content
 ''' Manages all audio playback including background music and sound effects.
 ''' </summary>
 Public NotInheritable Class SoundManager
+    Implements IDisposable
+
     Private ReadOnly _content As ContentManager
-    
+
     ' Sound effects
     Private _sndSeedPacket As SoundEffect
+#Disable Warning IDE0052   ' Suppress warning for unused fields
     Private _sndGameStart As SoundEffect
     Private _sndGameOver As SoundEffect
     Private _sndLevelCleared As SoundEffect
     Private _sndLifeLost As SoundEffect
-    
+#Enable Warning IDE0052
+
     ' Background music
     Private _bgmMainTheme As Song
     Private _isMusicPlaying As Boolean = False
-    
+    Private disposedValue As Boolean
+
     Public Sub New(content As ContentManager)
         _content = content
         LoadSounds()
         SetupEventHandlers()
     End Sub
-    
+
     ''' <summary>
     ''' Loads all sound assets.
     ''' </summary>
@@ -35,11 +40,11 @@ Public NotInheritable Class SoundManager
         _sndGameOver = _content.Load(Of SoundEffect)("Sounds/game_over")
         _sndLevelCleared = _content.Load(Of SoundEffect)("Sounds/level_cleared")
         _sndLifeLost = _content.Load(Of SoundEffect)("Sounds/life_lost")
-        
+
         ' Load background music
         _bgmMainTheme = _content.Load(Of Song)("Sounds/BGM/main_theme")
     End Sub
-    
+
     ''' <summary>
     ''' Sets up event handlers for game events.
     ''' </summary>
@@ -49,20 +54,20 @@ Public NotInheritable Class SoundManager
         AddHandler TreePlanted, AddressOf OnTreePlanted
         AddHandler PlayerDied, AddressOf OnPlayerDied
     End Sub
-    
+
     ''' <summary>
     ''' Handles game state changes for audio.
     ''' </summary>
     Private Sub OnGameStateChanged(newState As GameState)
         Select Case newState
             Case GameState.Playing
-                _sndGameStart.Play()
+                '_sndGameStart.Play()
                 PlayBackgroundMusic()
-                
+
             Case GameState.GameOver
                 _sndGameOver.Play()
                 StopBackgroundMusic()
-                
+
             Case GameState.Title
                 StopBackgroundMusic()
         End Select
@@ -79,16 +84,16 @@ Public NotInheritable Class SoundManager
     ''' Handles tree planting sound.
     ''' </summary>
     Private Sub OnTreePlanted(tree As Actor.Tree)
-        _sndLevelCleared.Play()
+        '_sndLevelCleared.Play()
     End Sub
 
     ''' <summary>
     ''' Handles player death sound.
     ''' </summary>
     Private Sub OnPlayerDied()
-        _sndLifeLost.Play()
+        '_sndLifeLost.Play()
     End Sub
-    
+
     ''' <summary>
     ''' Starts playing background music.
     ''' </summary>
@@ -99,7 +104,7 @@ Public NotInheritable Class SoundManager
             _isMusicPlaying = True
         End If
     End Sub
-    
+
     ''' <summary>
     ''' Stops background music.
     ''' </summary>
@@ -109,16 +114,37 @@ Public NotInheritable Class SoundManager
             _isMusicPlaying = False
         End If
     End Sub
-    
+
     ''' <summary>
     ''' Disposes of sound resources.
     ''' </summary>
-    Public Sub Dispose()
-        RemoveHandler GameStateChanged, AddressOf OnGameStateChanged
-        RemoveHandler SeedCollected, AddressOf OnSeedCollected
-        RemoveHandler TreePlanted, AddressOf OnTreePlanted
-        RemoveHandler PlayerDied, AddressOf OnPlayerDied
-        
-        StopBackgroundMusic()
+    Private Sub Dispose(disposing As Boolean)
+        If Not disposedValue Then
+            If disposing Then
+                RemoveHandler GameStateChanged, AddressOf OnGameStateChanged
+                RemoveHandler SeedCollected, AddressOf OnSeedCollected
+                RemoveHandler TreePlanted, AddressOf OnTreePlanted
+                RemoveHandler PlayerDied, AddressOf OnPlayerDied
+
+                StopBackgroundMusic()
+            End If
+
+            ' TODO: free unmanaged resources (unmanaged objects) and override finalizer
+            ' TODO: set large fields to null
+            disposedValue = True
+        End If
+    End Sub
+
+    ' ' TODO: override finalizer only if 'Dispose(disposing As Boolean)' has code to free unmanaged resources
+    ' Protected Overrides Sub Finalize()
+    '     ' Do not change this code. Put cleanup code in 'Dispose(disposing As Boolean)' method
+    '     Dispose(disposing:=False)
+    '     MyBase.Finalize()
+    ' End Sub
+
+    Public Sub Dispose() Implements IDisposable.Dispose
+        ' Do not change this code. Put cleanup code in 'Dispose(disposing As Boolean)' method
+        Dispose(disposing:=True)
+        GC.SuppressFinalize(Me)
     End Sub
 End Class

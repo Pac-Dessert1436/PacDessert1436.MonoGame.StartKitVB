@@ -6,30 +6,33 @@ Imports Microsoft.Xna.Framework.Content
 ''' Handles all rendering operations for the game.
 ''' </summary>
 Public NotInheritable Class Renderer
+    Implements IDisposable
+
     Private ReadOnly _spriteBatch As SpriteBatch
     Private ReadOnly _content As ContentManager
     Private ReadOnly _pixelTexture As Texture2D
-    
+
     ' Textures
     Private _playerTexture As Texture2D
     Private _seedTexture As Texture2D
     Private _enemyTexture As Texture2D
     Private _treeTexture As Texture2D
-    
+
     ' Font
     Private _gameFont As SpriteFont
-    
+    Private disposedValue As Boolean
+
     Public Sub New(graphicsDevice As GraphicsDevice, content As ContentManager)
         _spriteBatch = New SpriteBatch(graphicsDevice)
         _content = content
-        
+
         ' Create pixel texture for simple shapes
         _pixelTexture = New Texture2D(graphicsDevice, 1, 1)
         _pixelTexture.SetData(New Color() {Color.White})
-        
+
         LoadContent()
     End Sub
-    
+
     ''' <summary>
     ''' Loads all graphical assets.
     ''' </summary>
@@ -39,33 +42,33 @@ Public NotInheritable Class Renderer
         _seedTexture = _content.Load(Of Texture2D)("Images/acorn_packet")
         _enemyTexture = _content.Load(Of Texture2D)("Images/beetle")
         _treeTexture = _content.Load(Of Texture2D)("Images/oak_tree")
-        
+
         ' Load font
         _gameFont = _content.Load(Of SpriteFont)("Fonts/GameFont")
     End Sub
-    
+
     ''' <summary>
     ''' Renders the entire game based on the current game state.
     ''' </summary>
     Public Sub Render(gameManager As GameManager, gameState As GameState)
         _spriteBatch.GraphicsDevice.Clear(Color.Black)
         _spriteBatch.Begin(samplerState:=SamplerState.PointClamp)
-        
+
         Select Case gameState
             Case GameState.Title
                 DrawTitleScreen()
-                
+
             Case GameState.Playing
                 DrawGame(gameManager)
-                
+
             Case GameState.GameOver
                 DrawGame(gameManager)
                 DrawGameOverScreen(gameManager)
         End Select
-        
+
         _spriteBatch.End()
     End Sub
-    
+
     ''' <summary>
     ''' Draws the title screen.
     ''' </summary>
@@ -75,7 +78,7 @@ Public NotInheritable Class Renderer
         DrawCenteredText("Press ENTER to start", 80, Color.White)
         DrawCenteredText("Arrow Keys or WASD to move", 120, Color.Gray)
     End Sub
-    
+
     ''' <summary>
     ''' Draws the main game scene.
     ''' </summary>
@@ -86,14 +89,14 @@ Public NotInheritable Class Renderer
         DrawTrees(gameManager.Trees)
         DrawHUD(gameManager.Player, gameManager.Trees.Count)
     End Sub
-    
+
     ''' <summary>
     ''' Draws the game over screen overlay.
     ''' </summary>
     Private Sub DrawGameOverScreen(gameManager As GameManager)
         Dim overlayRect As New Rectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
         _spriteBatch.Draw(_pixelTexture, overlayRect, New Color(0, 0, 0, 150))
-        
+
         DrawCenteredText("GAME OVER", -30, Color.Red, 2.0F)
         DrawCenteredText($"Final Score: {gameManager.Player.Score}", 20, Color.White)
         DrawCenteredText($"Trees Planted: {gameManager.Trees.Count}", 50, Color.ForestGreen)
@@ -157,7 +160,7 @@ Public NotInheritable Class Renderer
     Private Sub DrawText(text As String, position As Vector2, color As Color)
         _spriteBatch.DrawString(_gameFont, text, position, color)
     End Sub
-    
+
     ''' <summary>
     ''' Draws centered text with optional vertical offset and scale.
     ''' </summary>
@@ -169,12 +172,34 @@ Public NotInheritable Class Renderer
         )
         _spriteBatch.DrawString(_gameFont, text, position, color, 0, Vector2.Zero, scale, SpriteEffects.None, 0)
     End Sub
-    
+
     ''' <summary>
     ''' Disposes of graphical resources.
     ''' </summary>
-    Public Sub Dispose()
-        _spriteBatch?.Dispose()
-        _pixelTexture?.Dispose()
+    Private Sub Dispose(disposing As Boolean)
+        If Not disposedValue Then
+            If disposing Then
+                ' TODO: dispose managed state (managed objects)
+                _spriteBatch?.Dispose()
+                _pixelTexture?.Dispose()
+            End If
+
+            ' TODO: free unmanaged resources (unmanaged objects) and override finalizer
+            ' TODO: set large fields to null
+            disposedValue = True
+        End If
+    End Sub
+
+    ' ' TODO: override finalizer only if 'Dispose(disposing As Boolean)' has code to free unmanaged resources
+    ' Protected Overrides Sub Finalize()
+    '     ' Do not change this code. Put cleanup code in 'Dispose(disposing As Boolean)' method
+    '     Dispose(disposing:=False)
+    '     MyBase.Finalize()
+    ' End Sub
+
+    Public Sub Dispose() Implements IDisposable.Dispose
+        ' Do not change this code. Put cleanup code in 'Dispose(disposing As Boolean)' method
+        Dispose(disposing:=True)
+        GC.SuppressFinalize(Me)
     End Sub
 End Class

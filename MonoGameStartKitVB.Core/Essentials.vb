@@ -33,9 +33,4 @@ Public Module Essentials
 #Region "Functions"
 
 #End Region
-
-#Region "Assets"
-    
-#End Region
-
 End Module
