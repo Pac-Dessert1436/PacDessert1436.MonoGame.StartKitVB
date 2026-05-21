@@ -118,7 +118,8 @@ Public MustInherit Class Actor
         Public Const IMAGE_PATH As String = "Images/beetle"
         Public Property Direction As Vector2
         Public Property Speed As Single = ENEMY_SPEED
-        Private ReadOnly random As New Random()
+        Public Property IsVulnerable As Boolean = False
+        Private ReadOnly random As New Random
 
         Public Sub New(position As Vector2)
             MyBase.New(position, ENEMY_SIZE, Color.Red)

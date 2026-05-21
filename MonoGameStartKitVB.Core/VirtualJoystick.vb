@@ -9,8 +9,14 @@ Public NotInheritable Class VirtualJoystick
     ' Required fields
     Private ReadOnly _baseTexture As Texture2D
     Private ReadOnly _knobTexture As Texture2D
-    Public Property Position As Vector2 ' Center of the joystick base
-    Public Property Value As Vector2    ' (-1 to 1 range X/Y, thumb offset)
+    ''' <summary>
+    ''' Center of the joystick base.
+    ''' </summary>
+    Public Property Position As Vector2
+    ''' <summary>
+    ''' Current value of the joystick.
+    ''' </summary>
+    Public Property Value As Vector2
 
     Public Sub New(baseTexture As Texture2D, knobTexture As Texture2D, center As Vector2)
         _baseTexture = baseTexture

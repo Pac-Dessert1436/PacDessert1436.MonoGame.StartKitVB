@@ -11,6 +11,7 @@ Public NotInheritable Class Renderer
     Private ReadOnly _spriteBatch As SpriteBatch
     Private ReadOnly _content As ContentManager
     Private ReadOnly _pixelTexture As Texture2D
+    Private ReadOnly _renderTarget As RenderTarget2D
 
     ' Textures
     Private _playerTexture As Texture2D
@@ -83,11 +84,13 @@ Public NotInheritable Class Renderer
     ''' Draws the main game scene.
     ''' </summary>
     Private Sub DrawGame(gameManager As GameManager)
-        DrawPlayer(gameManager.Player)
-        DrawSeeds(gameManager.Seeds)
-        DrawEnemies(gameManager.Enemies)
-        DrawTrees(gameManager.Trees)
-        DrawHUD(gameManager.Player, gameManager.Trees.Count)
+        With gameManager
+            DrawPlayer(.Player)
+            DrawSeeds(.Seeds)
+            DrawEnemies(.Enemies)
+            DrawTrees(.Trees)
+            DrawHUD(.Player, .Trees.Count)
+        End With
     End Sub
 
     ''' <summary>
@@ -179,23 +182,13 @@ Public NotInheritable Class Renderer
     Private Sub Dispose(disposing As Boolean)
         If Not disposedValue Then
             If disposing Then
-                ' TODO: dispose managed state (managed objects)
                 _spriteBatch?.Dispose()
                 _pixelTexture?.Dispose()
+                _renderTarget?.Dispose()
             End If
-
-            ' TODO: free unmanaged resources (unmanaged objects) and override finalizer
-            ' TODO: set large fields to null
             disposedValue = True
         End If
     End Sub
-
-    ' ' TODO: override finalizer only if 'Dispose(disposing As Boolean)' has code to free unmanaged resources
-    ' Protected Overrides Sub Finalize()
-    '     ' Do not change this code. Put cleanup code in 'Dispose(disposing As Boolean)' method
-    '     Dispose(disposing:=False)
-    '     MyBase.Finalize()
-    ' End Sub
 
     Public Sub Dispose() Implements IDisposable.Dispose
         ' Do not change this code. Put cleanup code in 'Dispose(disposing As Boolean)' method
