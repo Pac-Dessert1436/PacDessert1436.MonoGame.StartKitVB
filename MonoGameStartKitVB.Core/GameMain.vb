@@ -48,9 +48,8 @@ Public NotInheritable Class GameMain
     End Sub
 
     Protected Overrides Sub Draw(gameTime As GameTime)
-        ' Delegate rendering to the Renderer class
-        _renderer.Render(_gameManager, _gameManager.GameState)
-        ' Critical: Raise all scheduled events
+        Dim deltaTime As Single = CSng(gameTime.ElapsedGameTime.TotalSeconds)
+        _renderer.Render(_gameManager, _gameManager.GameState, deltaTime)
         RaiseScheduledEvents()
         MyBase.Draw(gameTime)
     End Sub

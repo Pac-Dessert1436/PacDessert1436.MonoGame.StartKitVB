@@ -6,15 +6,18 @@ Imports System.Runtime.CompilerServices
 ''' </summary>
 Public Module Essentials
 #Region "Constants"
-    Public Const SCREEN_WIDTH As Integer = 800
-    Public Const SCREEN_HEIGHT As Integer = 600
+    ' Aspect Ratio: 9:16
+    Public Const SCREEN_WIDTH As Integer = 540
+    Public Const SCREEN_HEIGHT As Integer = 960
 
     Public Const COLLISION_THRESHOLD As Single = 0.8F
-    Public Const GRID_WIDTH As Integer = 10
-    Public Const GRID_HEIGHT As Integer = 10
+    Public Const GRID_WIDTH As Integer = 25
+    Public Const GRID_HEIGHT As Integer = 35
     Public Const CELL_SIZE As Integer = 24
     Public Const PLAYER_SPEED As Single = 200.0F
     Public Const ENEMY_SPEED As Single = 100.0F
+
+    Public ReadOnly Property PlayerStartingPoint As New Point(GRID_WIDTH \ 2, GRID_HEIGHT - 2)
 #End Region
 
 #Region "Enums"
@@ -40,6 +43,7 @@ Public Module Essentials
         Sapling = 3
         Tree = 4
         Fence = 5
+        Enemy = 6
     End Enum
 
     ''' <summary>
@@ -106,22 +110,84 @@ Public Module Essentials
     End Function
 
     ''' <summary>
-    ''' Creates a maze layout without collectibles, using a specific algorithm.
+    ''' Creates a maze layout with everything needed, using a specific algorithm.
     ''' </summary>
-    ''' <returns>A maze layout without collectibles.</returns>
-    Public Function CreateMazeLayoutWithoutCollectibles() As MazeTile(,)
+    ''' <param name="level">The current level number.</param>
+    ''' <returns>A complete maze layout.</returns>
+    Public Function CreateMazeLayout(level As Integer) As MazeTile(,)
         Dim maze(GRID_WIDTH - 1, GRID_HEIGHT - 1) As MazeTile
-        Dim maxRowIndex As Integer = GRID_WIDTH - 1
-        Dim maxColIndex As Integer = GRID_HEIGHT - 1
+        Dim maxRowIndex = GRID_WIDTH - 1
+        Dim maxColIndex = GRID_HEIGHT - 1
+        Dim saplingCount = 0
+
+        ' Create a Pac-Man style maze with:
+        '   - Fences (5) around the perimeter
+        '   - Walkable tiles (0) forming continuous paths
+        '   - Saplings (3) in a checkerboard pattern
+        '   - No dead ends or enclosed spaces
 
         For i As Integer = 0 To maxRowIndex
             For j As Integer = 0 To maxColIndex
-                Dim isFence As Boolean =
-                    i = 0 OrElse i = maxRowIndex OrElse j = 0 OrElse j = maxColIndex
-                maze(i, j) = If(isFence, MazeTile.Fence, MazeTile.Walkable)
-                ' TODO: Add farmland to the maze using the specific algorithm.
+                ' Fences around the perimeter
+                If i = 0 OrElse i = maxRowIndex OrElse j = 0 OrElse j = maxColIndex Then
+                    maze(i, j) = MazeTile.Fence
+                    Continue For
+                End If
+
+                ' Second and second-to-last rows are all walkable (border paths)
+                If i = 1 OrElse i = maxRowIndex - 1 Then
+                    maze(i, j) = MazeTile.Walkable
+                    Continue For
+                End If
+                ' First and last columns of inner area are walkable (border paths)
+                If j = 1 OrElse j = maxColIndex - 1 Then
+                    maze(i, j) = MazeTile.Walkable
+                    Continue For
+                End If
+
+                If i Mod 2 = 0 AndAlso j Mod 2 = 1 Then
+                    maze(i, j) = MazeTile.Sapling
+                    saplingCount += 1
+                Else
+                    maze(i, j) = MazeTile.Walkable
+                End If
             Next j
         Next i
+
+        Dim enemyCount = Math.Clamp(level, 3, 8)
+        Dim rnd = Random.Shared
+        Dim pesticideCount = 3
+
+        Dim ManhattanDistance =
+            Function(pt1 As Point, pt2 As Point) As Integer
+                Return Math.Abs(pt1.X - pt2.X) + Math.Abs(pt1.Y - pt2.Y)
+            End Function
+
+        Dim playerStart = PlayerStartingPoint
+        Dim walkableTiles As New List(Of Point)
+        For i As Integer = 0 To maxRowIndex
+            For j As Integer = 0 To maxColIndex
+                If maze(i, j) = MazeTile.Walkable AndAlso
+                    Not (i = playerStart.X AndAlso j = playerStart.Y) Then
+                    walkableTiles.Add(New Point(i, j))
+                End If
+            Next j
+        Next i
+
+        Dim enemyTiles = From wt In walkableTiles
+                         Where ManhattanDistance(wt, playerStart) > 5
+                         Order By rnd.Next() Take enemyCount
+        For Each tile In enemyTiles
+            maze(tile.X, tile.Y) = MazeTile.Enemy
+        Next tile
+
+        Dim farTiles = From wt In walkableTiles
+                       Where ManhattanDistance(wt, playerStart) > 5
+                       Order By rnd.Next() Take pesticideCount
+        For Each tile In farTiles
+            maze(tile.X, tile.Y) = MazeTile.Pesticide
+        Next tile
+
         Return maze
     End Function
 #End Region
