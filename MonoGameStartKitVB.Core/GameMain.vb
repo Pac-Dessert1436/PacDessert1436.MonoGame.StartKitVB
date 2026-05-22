@@ -21,7 +21,7 @@ Public NotInheritable Class GameMain
         }
         _graphics.ApplyChanges()
         Content.RootDirectory = "Content"
-        IsMouseVisible = False
+        IsMouseVisible = True
     End Sub
 
     Protected Overrides Sub Initialize()
@@ -36,7 +36,13 @@ Public NotInheritable Class GameMain
     Protected Overrides Sub Update(gameTime As GameTime)
         ' Handle exit condition
         If GamePad.GetState(PlayerIndex.One).Buttons.Back = ButtonState.Pressed OrElse
-           Keyboard.GetState().IsKeyDown(Keys.Escape) Then [Exit]()
+           Keyboard.GetState().IsKeyDown(Keys.Escape) Then
+            If _gameManager.GameState <> GameState.Title Then
+                ' Let the game manager handle escape key for pause functionality
+            Else
+                [Exit]()
+            End If
+        End If
 
         ' Handle input for game state transitions
         _gameManager.HandleInput()
@@ -50,7 +56,6 @@ Public NotInheritable Class GameMain
     Protected Overrides Sub Draw(gameTime As GameTime)
         Dim deltaTime As Single = CSng(gameTime.ElapsedGameTime.TotalSeconds)
         _renderer.Render(_gameManager, _gameManager.GameState, deltaTime)
-        RaiseScheduledEvents()
         MyBase.Draw(gameTime)
     End Sub
 

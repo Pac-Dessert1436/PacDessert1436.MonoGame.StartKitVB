@@ -12,12 +12,13 @@ Public NotInheritable Class SoundManager
 
     ' Sound effects
     Private _sndSeedPacket As SoundEffect
-#Disable Warning IDE0052   ' Suppress warning for unused fields
+    Private _sndPesticide As SoundEffect
+    Private _sndEnemyKilled As SoundEffect
+    Private _sndEnemyReappear As SoundEffect
     Private _sndGameStart As SoundEffect
+    Private _sndAtNextLevel As SoundEffect
     Private _sndGameOver As SoundEffect
-    Private _sndLevelCleared As SoundEffect
     Private _sndLifeLost As SoundEffect
-#Enable Warning IDE0052
 
     ' Background music
     Private _bgmMainTheme As Song
@@ -36,9 +37,12 @@ Public NotInheritable Class SoundManager
     Private Sub LoadSounds()
         ' Load sound effects
         _sndSeedPacket = _content.Load(Of SoundEffect)("Sounds/seed_packet")
+        _sndPesticide = _content.Load(Of SoundEffect)("Sounds/pesticide")
+        _sndEnemyKilled = _content.Load(Of SoundEffect)("Sounds/enemy_killed")
+        _sndEnemyReappear = _content.Load(Of SoundEffect)("Sounds/enemy_reappear")
         _sndGameStart = _content.Load(Of SoundEffect)("Sounds/game_start")
+        _sndAtNextLevel = _content.Load(Of SoundEffect)("Sounds/at_next_level")
         _sndGameOver = _content.Load(Of SoundEffect)("Sounds/game_over")
-        _sndLevelCleared = _content.Load(Of SoundEffect)("Sounds/level_cleared")
         _sndLifeLost = _content.Load(Of SoundEffect)("Sounds/life_lost")
 
         ' Load background music
@@ -51,8 +55,15 @@ Public NotInheritable Class SoundManager
     Private Sub SetupEventHandlers()
         AddHandler GameStateChanged, AddressOf OnGameStateChanged
         AddHandler SeedCollected, AddressOf OnSeedCollected
-        AddHandler TreePlanted, AddressOf OnTreePlanted
+        AddHandler PesticideCollected, AddressOf OnPesticideCollected
+        AddHandler EnemyKilled, AddressOf OnEnemyKilled
+        AddHandler EnemyRespawned, AddressOf OnEnemyRespawned
         AddHandler PlayerDied, AddressOf OnPlayerDied
+        AddHandler LifeLost, AddressOf OnLifeLost
+        AddHandler LevelCleared, AddressOf OnLevelCleared
+        AddHandler GetReadyMessage, AddressOf OnGetReadyMessage
+        AddHandler GameStart, AddressOf OnGameStart
+        AddHandler NextLevel, AddressOf OnNextLevel
     End Sub
 
     ''' <summary>
@@ -61,7 +72,6 @@ Public NotInheritable Class SoundManager
     Private Sub OnGameStateChanged(newState As GameState)
         Select Case newState
             Case GameState.Playing
-                '_sndGameStart.Play()
                 PlayBackgroundMusic()
 
             Case GameState.GameOver
@@ -70,7 +80,36 @@ Public NotInheritable Class SoundManager
 
             Case GameState.Title
                 StopBackgroundMusic()
+                
+            Case GameState.Paused
+                MediaPlayer.Pause()
+                
+            Case GameState.LevelCleared
+                ' Continue playing music
         End Select
+    End Sub
+
+    ''' <summary>
+    ''' Handles get ready message for audio.
+    ''' </summary>
+    Private Sub OnGetReadyMessage()
+        If MediaPlayer.State = MediaState.Paused Then
+            MediaPlayer.Resume()
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' Handles game start sound.
+    ''' </summary>
+    Private Sub OnGameStart()
+        _sndGameStart.Play()
+    End Sub
+
+    ''' <summary>
+    ''' Handles next level sound.
+    ''' </summary>
+    Private Sub OnNextLevel()
+        _sndAtNextLevel.Play()
     End Sub
 
     ''' <summary>
@@ -81,17 +120,46 @@ Public NotInheritable Class SoundManager
     End Sub
 
     ''' <summary>
-    ''' Handles tree planting sound.
+    ''' Handles pesticide collection sound.
     ''' </summary>
-    Private Sub OnTreePlanted(tree As Actor.Tree)
-        '_sndLevelCleared.Play()
+    Private Sub OnPesticideCollected()
+        _sndPesticide.Play()
+    End Sub
+
+    ''' <summary>
+    ''' Handles enemy killed sound.
+    ''' </summary>
+    Private Sub OnEnemyKilled(enemy As Actor.Enemy)
+        _sndEnemyKilled.Play()
+    End Sub
+
+    ''' <summary>
+    ''' Handles enemy respawned sound.
+    ''' </summary>
+    Private Sub OnEnemyRespawned(enemy As Actor.Enemy)
+        _sndEnemyReappear.Play()
     End Sub
 
     ''' <summary>
     ''' Handles player death sound.
     ''' </summary>
     Private Sub OnPlayerDied()
-        '_sndLifeLost.Play()
+        _sndGameOver.Play()
+        StopBackgroundMusic()
+    End Sub
+
+    ''' <summary>
+    ''' Handles life lost sound.
+    ''' </summary>
+    Private Sub OnLifeLost()
+        _sndLifeLost.Play()
+    End Sub
+
+    ''' <summary>
+    ''' Handles level cleared sound.
+    ''' </summary>
+    Private Sub OnLevelCleared()
+        _sndAtNextLevel.Play()
     End Sub
 
     ''' <summary>
@@ -102,6 +170,8 @@ Public NotInheritable Class SoundManager
             MediaPlayer.Play(_bgmMainTheme)
             MediaPlayer.IsRepeating = True
             _isMusicPlaying = True
+        ElseIf MediaPlayer.State = MediaState.Paused Then
+            MediaPlayer.Resume()
         End If
     End Sub
 
@@ -123,27 +193,24 @@ Public NotInheritable Class SoundManager
             If disposing Then
                 RemoveHandler GameStateChanged, AddressOf OnGameStateChanged
                 RemoveHandler SeedCollected, AddressOf OnSeedCollected
-                RemoveHandler TreePlanted, AddressOf OnTreePlanted
+                RemoveHandler PesticideCollected, AddressOf OnPesticideCollected
+                RemoveHandler EnemyKilled, AddressOf OnEnemyKilled
+                RemoveHandler EnemyRespawned, AddressOf OnEnemyRespawned
                 RemoveHandler PlayerDied, AddressOf OnPlayerDied
+                RemoveHandler LifeLost, AddressOf OnLifeLost
+                RemoveHandler LevelCleared, AddressOf OnLevelCleared
+                RemoveHandler GetReadyMessage, AddressOf OnGetReadyMessage
+                RemoveHandler GameStart, AddressOf OnGameStart
+                RemoveHandler NextLevel, AddressOf OnNextLevel
 
                 StopBackgroundMusic()
             End If
 
-            ' TODO: free unmanaged resources (unmanaged objects) and override finalizer
-            ' TODO: set large fields to null
             disposedValue = True
         End If
     End Sub
 
-    ' ' TODO: override finalizer only if 'Dispose(disposing As Boolean)' has code to free unmanaged resources
-    ' Protected Overrides Sub Finalize()
-    '     ' Do not change this code. Put cleanup code in 'Dispose(disposing As Boolean)' method
-    '     Dispose(disposing:=False)
-    '     MyBase.Finalize()
-    ' End Sub
-
     Public Sub Dispose() Implements IDisposable.Dispose
-        ' Do not change this code. Put cleanup code in 'Dispose(disposing As Boolean)' method
         Dispose(disposing:=True)
         GC.SuppressFinalize(Me)
     End Sub

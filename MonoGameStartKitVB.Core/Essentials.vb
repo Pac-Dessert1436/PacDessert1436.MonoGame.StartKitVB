@@ -6,18 +6,29 @@ Imports System.Runtime.CompilerServices
 ''' </summary>
 Public Module Essentials
 #Region "Constants"
-    ' Aspect Ratio: 9:16
     Public Const SCREEN_WIDTH As Integer = 540
     Public Const SCREEN_HEIGHT As Integer = 960
-
-    Public Const COLLISION_THRESHOLD As Single = 0.8F
-    Public Const GRID_WIDTH As Integer = 25
-    Public Const GRID_HEIGHT As Integer = 35
+    Public Const MAZE_WIDTH As Integer = 19
+    Public Const MAZE_HEIGHT As Integer = 21
     Public Const CELL_SIZE As Integer = 24
-    Public Const PLAYER_SPEED As Single = 200.0F
-    Public Const ENEMY_SPEED As Single = 100.0F
+    Public Const ICON_SIZE As Integer = 12
+    Public Const PLAYER_SIZE As Integer = 20
+    Public Const SEED_SIZE As Integer = 12
+    Public Const ENEMY_SIZE As Integer = 20
+    Public Const PLAYER_SPEED As Single = 100.0F
+    Public Const ENEMY_SPEED As Single = 80.0F
+    Public Const VULNERABLE_DURATION As Single = 8.0F
+    Public Const ENEMY_RESPAWN_TIME As Single = 5.0F
+    Public Const ENEMY_GRACE_PERIOD As Single = 2.0F
+    Public Const GET_READY_DURATION As Single = 3.0F
+    Public Const DEATH_ANIMATION_DURATION As Single = 2.0F
 
-    Public ReadOnly Property PlayerStartingPoint As New Point(GRID_WIDTH \ 2, GRID_HEIGHT - 2)
+    Public Const STARTING_LIVES As Integer = 3
+    Public Const SEED_POINTS As Integer = 10
+    Public Const ENEMY_POINTS As Integer = 50
+    Public Const PESTICIDE_POINTS As Integer = 15
+
+    Public ReadOnly Property PlayerStartingPoint As New Point(MAZE_WIDTH \ 2, MAZE_HEIGHT - 2)
 #End Region
 
 #Region "Enums"
@@ -33,6 +44,9 @@ Public Module Essentials
         LevelCleared = 5
     End Enum
 
+    ''' <summary>
+    ''' Represents the type of a tile in the maze.
+    ''' </summary>
     ''' <summary>
     ''' Represents the type of a tile in the maze.
     ''' </summary>
@@ -72,24 +86,43 @@ Public Module Essentials
         Beetle = 0
         Caterpillar = 1
     End Enum
-#End Region
 
-    ' NOTE: These constants are obsolete and should be removed.
-    Public Const PLAYER_SIZE As Integer = 60
-    Public Const SEED_SIZE As Integer = 30
-    Public Const ENEMY_SIZE As Integer = 50
-    Public Const SEEDS_TO_PLANT_TREE As Integer = 15
+    Public Enum EnemyStatus As Integer
+        Active = 0
+        Frightened = 1
+        Eaten = 2
+    End Enum
+#End Region
 
 #Region "Events / Signals"
     Public Event GameStateChanged(newState As GameState)
     Public Event PlayerScoreChanged(score As Integer)
+    Public Event HighScoreChanged(highScore As Integer)
+    Public Event LivesChanged(lives As Integer)
+    Public Event LevelChanged(level As Integer)
     Public Event SeedCollected(seed As Actor.Seed)
-    Public Event TreePlanted(tree As Actor.Tree)
-    Public Event PlayerDied()
+    Public Event PesticideCollected()
     Public Event EnemyKilled(enemy As Actor.Enemy)
+    Public Event EnemyRespawned(enemy As Actor.Enemy)
+    Public Event PlayerDied()
+    Public Event LifeLost()
+    Public Event LevelCleared()
+    Public Event GetReadyMessage()
+    Public Event GameStart()
+    Public Event NextLevel()
 #End Region
 
 #Region "Functions"
+    ''' <summary>
+    ''' Calculates the Manhattan distance between two points.
+    ''' </summary>
+    ''' <param name="pt1">The first point.</param>
+    ''' <param name="pt2">The second point.</param>
+    ''' <returns>The Manhattan distance between the two points.</returns>
+    Public Function ManhattanDistance(pt1 As Point, pt2 As Point) As Integer
+        Return Math.Abs(pt1.X - pt2.X) + Math.Abs(pt1.Y - pt2.Y)
+    End Function
+
     ''' <summary>
     ''' Calculates the Jaccard distance between two rectangles.
     ''' </summary>
@@ -129,19 +162,22 @@ Public Module Essentials
     ''' <summary>
     ''' Creates a maze layout with everything needed, using a specific algorithm.
     ''' </summary>
+    ''' <remarks>
+    ''' <para>The maze layout is a Pac-Man style maze with:</para>
+    ''' <list type="number">
+    ''' <item><description>Fences (5) around the perimeter</description></item>
+    ''' <item><description>Walkable tiles (0) forming continuous paths</description></item>
+    ''' <item><description>Saplings (3) in a checkerboard pattern</description></item>
+    ''' <item><description>No dead ends or enclosed spaces</description></item>
+    ''' </list>
+    ''' </remarks>
     ''' <param name="level">The current level number.</param>
     ''' <returns>A complete maze layout.</returns>
     Public Function CreateMazeLayout(level As Integer) As MazeTile(,)
-        Dim maze(GRID_WIDTH - 1, GRID_HEIGHT - 1) As MazeTile
-        Dim maxRowIndex = GRID_WIDTH - 1
-        Dim maxColIndex = GRID_HEIGHT - 1
+        Dim maze(MAZE_WIDTH - 1, MAZE_HEIGHT - 1) As MazeTile
+        Dim maxRowIndex = MAZE_WIDTH - 1
+        Dim maxColIndex = MAZE_HEIGHT - 1
         Dim saplingCount = 0
-
-        ' Create a Pac-Man style maze with:
-        '   - Fences (5) around the perimeter
-        '   - Walkable tiles (0) forming continuous paths
-        '   - Saplings (3) in a checkerboard pattern
-        '   - No dead ends or enclosed spaces
 
         For i As Integer = 0 To maxRowIndex
             For j As Integer = 0 To maxColIndex
@@ -207,5 +243,30 @@ Public Module Essentials
 
         Return maze
     End Function
+    Private Function GetSeedTypeForLevel(level As Integer) As SeedType
+        Select Case (level - 1) Mod 6
+            Case 0, 3
+                Return SeedType.Acorn
+            Case 1, 4
+                Return SeedType.Berry
+            Case 2, 5
+                Return SeedType.Nut
+            Case Else
+                Return SeedType.Acorn
+        End Select
+    End Function
+
+    Public Function GetEnemyTypeForLevel(level As Integer) As EnemyType
+        Select Case (level - 1) Mod 6
+            Case 0, 2, 4
+                Return EnemyType.Beetle
+            Case 1, 3, 5
+                Return EnemyType.Caterpillar
+            Case Else
+                Return EnemyType.Beetle
+        End Select
+    End Function
+
+    ' Note: Event scheduling methods generated using ModuleEventRaiser.Generator.
 #End Region
 End Module

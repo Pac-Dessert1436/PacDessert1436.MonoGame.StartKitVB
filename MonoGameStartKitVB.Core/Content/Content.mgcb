@@ -20,30 +20,6 @@
 /processorParam:TextureFormat=Compressed
 /build:Fonts/GameFont.spritefont
 
-#begin Images/acorn_packet.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Images/acorn_packet.png
-
-#begin Images/beetle.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Images/beetle.png
-
 #begin Images/title_card.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -116,7 +92,7 @@
 /processorParam:TextureFormat=Color
 /build:Images/object_sheet.png
 
-#begin Images/oak_tree.png
+#begin Images/icon_sheet.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -126,19 +102,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Images/oak_tree.png
-
-#begin Images/player.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Images/player.png
+/build:Images/icon_sheet.png
 
 #begin Images/general_button.png
 /importer:TextureImporter
@@ -206,11 +170,11 @@
 /processorParam:Quality=Best
 /build:Sounds/pesticide.wav
 
-#begin Sounds/proceeding.wav
+#begin Sounds/at_next_level.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
-/build:Sounds/proceeding.wav
+/build:Sounds/at_next_level.wav
 
 #begin Sounds/seed_packet.wav
 /importer:WavImporter
@@ -218,3 +182,8 @@
 /processorParam:Quality=Best
 /build:Sounds/seed_packet.wav
 
+#begin Sounds/enemy_reappear.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/enemy_reappear.wav

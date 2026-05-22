@@ -2,21 +2,24 @@ Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Input
 
 Public MustInherit Class Actor
-    Public Property Position As Vector2
+    Public Property GridPosition As Point
+    Public Property PixelPosition As Vector2
     Public Property Size As Integer
-    Public Property Color As Color
     Public Property IsActive As Boolean = True
 
-    Public Sub New(position As Vector2, size As Integer, color As Color)
-        Me.Position = position
+    Public Sub New(gridPosition As Point, size As Integer)
+        Me.GridPosition = gridPosition
+        Me.PixelPosition = New Vector2(
+            gridPosition.X * CELL_SIZE + CELL_SIZE \ 2,
+            gridPosition.Y * CELL_SIZE + CELL_SIZE \ 2
+        )
         Me.Size = size
-        Me.Color = color
     End Sub
 
     Public Overridable Function GetBounds() As Rectangle
         Return New Rectangle(
-            CInt(Position.X - Size / 2),
-            CInt(Position.Y - Size / 2),
+            CInt(PixelPosition.X - Size / 2),
+            CInt(PixelPosition.Y - Size / 2),
             Size,
             Size
         )
@@ -30,68 +33,102 @@ Public MustInherit Class Actor
 
         Public Const IMAGE_PATH As String = "Images/player_sheet"
         Public Property Score As Integer = 0
-        Public Property SeedsCollected As Integer = 0
+        Public Property Lives As Integer = STARTING_LIVES
         Public Property IsAlive As Boolean = True
         Public Property Speed As Single = PLAYER_SPEED
         Public Property CurrentDirection As Direction = Direction.Right
+        Public Property NextDirection As Direction = Direction.Right
         Public Property IsMoving As Boolean = False
+        Public Property IsInDeathAnimation As Boolean = False
+        Public Property DeathAnimationTimer As Single = 0.0F
 
-        Public Sub New(position As Vector2)
-            MyBase.New(position, PLAYER_SIZE, Color.Yellow)
+        Public Sub New(gridPosition As Point)
+            MyBase.New(gridPosition, PLAYER_SIZE)
         End Sub
 
         Public Overrides Sub Update(deltaTime As Single)
             If Not IsAlive Then Return
+
+            If IsInDeathAnimation Then
+                DeathAnimationTimer += deltaTime
+                If DeathAnimationTimer >= DEATH_ANIMATION_DURATION Then
+                    IsInDeathAnimation = False
+                    DeathAnimationTimer = 0.0F
+                End If
+                Return
+            End If
 
             Dim keyboardState = Keyboard.GetState()
             Dim movement As Vector2 = Vector2.Zero
             IsMoving = False
 
             If keyboardState.IsKeyDown(Keys.Left) OrElse keyboardState.IsKeyDown(Keys.A) Then
-                movement.X -= 1
-                CurrentDirection = Direction.Left
+                NextDirection = Direction.Left
                 IsMoving = True
             End If
             If keyboardState.IsKeyDown(Keys.Right) OrElse keyboardState.IsKeyDown(Keys.D) Then
-                movement.X += 1
-                CurrentDirection = Direction.Right
+                NextDirection = Direction.Right
                 IsMoving = True
             End If
             If keyboardState.IsKeyDown(Keys.Up) OrElse keyboardState.IsKeyDown(Keys.W) Then
-                movement.Y -= 1
-                CurrentDirection = Direction.Up
+                NextDirection = Direction.Up
                 IsMoving = True
             End If
             If keyboardState.IsKeyDown(Keys.Down) OrElse keyboardState.IsKeyDown(Keys.S) Then
-                movement.Y += 1
-                CurrentDirection = Direction.Down
+                NextDirection = Direction.Down
                 IsMoving = True
             End If
 
-            If movement <> Vector2.Zero Then
-                movement.Normalize()
-                Position += movement * Speed * deltaTime
-                Position = New Vector2(
-                    Math.Max(Size / 2.0F, Math.Min(SCREEN_WIDTH - Size / 2.0F, Position.X)),
-                    Math.Max(Size / 2.0F, Math.Min(SCREEN_HEIGHT - Size / 2.0F, Position.Y))
+            If IsMoving Then
+                CurrentDirection = NextDirection
+                movement = CurrentDirection.ToVector2()
+                PixelPosition += movement * Speed * deltaTime
+                GridPosition = New Point(
+                    CInt(PixelPosition.X / CELL_SIZE),
+                    CInt(PixelPosition.Y / CELL_SIZE)
                 )
             End If
         End Sub
 
-        Public Sub CollectSeed(seed As Seed)
-            Score += 10
-            SeedsCollected += 1
+        Public Sub CollectSeed(seedType As SeedType)
+            Score += SEED_POINTS
             ScheduleEvent_PlayerScoreChanged(Score)
-            ScheduleEvent_SeedCollected(seed)
+            ScheduleEvent_SeedCollected(New Actor.Seed(GridPosition, seedType))
         End Sub
 
-        Public Sub PlantTree()
-            SeedsCollected = 0
+        Public Sub CollectPesticide()
+            Score += PESTICIDE_POINTS
+            ScheduleEvent_PlayerScoreChanged(Score)
+            ScheduleEvent_PesticideCollected()
         End Sub
 
-        Public Sub Die()
-            IsAlive = False
-            ScheduleEvent_PlayerDied()
+        Public Sub KillEnemy()
+            Score += ENEMY_POINTS
+            ScheduleEvent_PlayerScoreChanged(Score)
+        End Sub
+
+        Public Sub LoseLife()
+            Lives -= 1
+            ScheduleEvent_LivesChanged(Lives)
+            ScheduleEvent_LifeLost()
+            
+            If Lives <= 0 Then
+                IsAlive = False
+                ScheduleEvent_PlayerDied()
+            Else
+                IsInDeathAnimation = True
+                ResetPosition()
+            End If
+        End Sub
+
+        Public Sub ResetPosition()
+            GridPosition = PlayerStartingPoint
+            PixelPosition = New Vector2(
+                GridPosition.X * CELL_SIZE + CELL_SIZE \ 2,
+                GridPosition.Y * CELL_SIZE + CELL_SIZE \ 2
+            )
+            CurrentDirection = Direction.Right
+            NextDirection = Direction.Right
         End Sub
     End Class
 
@@ -99,51 +136,138 @@ Public MustInherit Class Actor
         Inherits Actor
 
         Public Const IMAGE_PATH As String = "Images/enemy_sheet"
-        Public Property Direction As Vector2
+        Public Property Direction As Direction
         Public Property Speed As Single = ENEMY_SPEED
         Public Property IsVulnerable As Boolean = False
+        Public Property VulnerableTimer As Single = 0.0F
         Public Property EnemyType As EnemyType = EnemyType.Beetle
-        Private ReadOnly random As New Random
+        Public Property IsRespawning As Boolean = False
+        Public Property RespawnTimer As Single = 0.0F
+        Public Property GracePeriodTimer As Single = 0.0F
 
-        Public Sub New(position As Vector2, Optional enemyType As EnemyType = EnemyType.Beetle)
-            MyBase.New(position, ENEMY_SIZE, Color.Red)
+        Private ReadOnly random As New Random
+        Private _previousDirection As Direction
+
+        Public Sub New(gridPosition As Point, Optional enemyType As EnemyType = EnemyType.Beetle)
+            MyBase.New(gridPosition, ENEMY_SIZE)
             Me.EnemyType = enemyType
             SetRandomDirection()
+            _previousDirection = Direction
+            IsActive = True
         End Sub
 
         Public Overrides Sub Update(deltaTime As Single)
-            Position += Direction * Speed * deltaTime
+            If Not IsActive Then Return
 
-            Dim newDir As Vector2 = Direction
-            Dim newPos As Vector2 = Position
-
-            If Position.X <= Size / 2 OrElse Position.X >= SCREEN_WIDTH - Size / 2 Then
-                newDir.X *= -1
-                newPos.X = Math.Max(Size / 2.0F, Math.Min(SCREEN_WIDTH - Size / 2.0F, Position.X))
+            If IsRespawning Then
+                RespawnTimer += deltaTime
+                If RespawnTimer >= ENEMY_RESPAWN_TIME Then
+                    IsRespawning = False
+                    RespawnTimer = 0.0F
+                    IsActive = True
+                    GracePeriodTimer = ENEMY_GRACE_PERIOD
+                    ScheduleEvent_EnemyRespawned(Me)
+                End If
+                Return
             End If
-            If Position.Y <= Size / 2 OrElse Position.Y >= SCREEN_HEIGHT - Size / 2 Then
-                newDir.Y *= -1
-                newPos.Y = Math.Max(Size / 2.0F, Math.Min(SCREEN_HEIGHT - Size / 2.0F, Position.Y))
+
+            If GracePeriodTimer > 0 Then
+                GracePeriodTimer -= deltaTime
+                If GracePeriodTimer < 0 Then GracePeriodTimer = 0
             End If
 
-            If random.Next(0, 100) < 1 Then SetRandomDirection()
-            Direction = newDir
-            Position = newPos
+            If IsVulnerable Then
+                VulnerableTimer -= deltaTime
+                If VulnerableTimer <= 0 Then
+                    IsVulnerable = False
+                    VulnerableTimer = 0
+                End If
+            End If
+
+            Dim movement = Direction.ToVector2()
+            PixelPosition += movement * Speed * deltaTime
+
+            GridPosition = New Point(
+                CInt(PixelPosition.X / CELL_SIZE),
+                CInt(PixelPosition.Y / CELL_SIZE)
+            )
+
+            If random.Next(0, 100) < 2 Then
+                ChangeDirection()
+            End If
+
+            _previousDirection = Direction
         End Sub
 
         Public Sub SetRandomDirection()
-            Dim directions As Vector2() = {
-                New Vector2(1, 0),
-                New Vector2(-1, 0),
-                New Vector2(0, 1),
-                New Vector2(0, -1)
+            Dim directions As Direction() = {
+                Direction.Up,
+                Direction.Down,
+                Direction.Left,
+                Direction.Right
             }
-            Direction = directions(random.Next(directions.Length))
+            Dim validDirections = directions.Where(Function(d) d <> GetOppositeDirection(_previousDirection)).ToArray()
+            
+            If validDirections.Length > 0 Then
+                Direction = validDirections(random.Next(validDirections.Length))
+            Else
+                Direction = directions(random.Next(directions.Length))
+            End If
+        End Sub
+
+        Private Sub ChangeDirection()
+            Dim directions As Direction() = {
+                Direction.Up,
+                Direction.Down,
+                Direction.Left,
+                Direction.Right
+            }
+            
+            Dim validDirections = directions.Where(Function(d) d <> GetOppositeDirection(Direction)).ToArray()
+            
+            If validDirections.Length > 0 Then
+                Direction = validDirections(random.Next(validDirections.Length))
+            End If
+        End Sub
+
+        Private Function GetOppositeDirection(dir As Direction) As Direction
+            Select Case dir
+                Case Direction.Up
+                    Return Direction.Down
+                Case Direction.Down
+                    Return Direction.Up
+                Case Direction.Left
+                    Return Direction.Right
+                Case Direction.Right
+                    Return Direction.Left
+                Case Else
+                    Return Direction.Down
+            End Select
+        End Function
+
+        Public Sub MakeVulnerable()
+            IsVulnerable = True
+            VulnerableTimer = VULNERABLE_DURATION
         End Sub
 
         Public Sub Die()
             IsActive = False
+            IsRespawning = True
+            RespawnTimer = 0.0F
             ScheduleEvent_EnemyKilled(Me)
+        End Sub
+
+        Public Sub RespawnAt(newPosition As Point)
+            GridPosition = newPosition
+            PixelPosition = New Vector2(
+                newPosition.X * CELL_SIZE + CELL_SIZE \ 2,
+                newPosition.Y * CELL_SIZE + CELL_SIZE \ 2
+            )
+            IsActive = True
+            IsRespawning = False
+            IsVulnerable = False
+            GracePeriodTimer = ENEMY_GRACE_PERIOD
+            SetRandomDirection()
         End Sub
     End Class
 
@@ -151,36 +275,11 @@ Public MustInherit Class Actor
         Inherits Actor
 
         Public Const IMAGE_PATH As String = "Images/object_sheet"
-        Public Property IsConsumable As Boolean = True
         Public Property SeedType As SeedType = SeedType.Acorn
 
-        Public Sub New(position As Vector2, Optional seedType As SeedType = SeedType.Acorn)
-            MyBase.New(position, SEED_SIZE, Color.Green)
+        Public Sub New(gridPosition As Point, Optional seedType As SeedType = SeedType.Acorn)
+            MyBase.New(gridPosition, SEED_SIZE)
             Me.SeedType = seedType
-        End Sub
-    End Class
-
-    Public NotInheritable Class Tree
-        Inherits Actor
-        Public Property GrowthStage As Integer = 0
-        Public Property TreeType As TreeType = TreeType.Oak
-
-        Public Sub New(position As Vector2, Optional treeType As TreeType = TreeType.Oak)
-            MyBase.New(position, 40, Color.ForestGreen)
-            Me.TreeType = treeType
-        End Sub
-
-        Public Overrides Sub Update(deltaTime As Single)
-        End Sub
-    End Class
-
-    Public NotInheritable Class Pesticide
-        Inherits Actor
-
-        Public Const IMAGE_PATH As String = "Images/object_sheet"
-
-        Public Sub New(position As Vector2)
-            MyBase.New(position, 30, Color.Blue)
         End Sub
     End Class
 End Class
