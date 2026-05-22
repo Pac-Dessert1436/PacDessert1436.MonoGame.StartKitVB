@@ -113,7 +113,7 @@ Public NotInheritable Class GameManager
     End Sub
 
     Private Sub SpawnSeeds(count As Integer)
-        Dim seedTypes As Actor.SeedType() = {Actor.SeedType.Acorn, Actor.SeedType.Berry, Actor.SeedType.Nut}
+        Dim seedTypes As SeedType() = {SeedType.Acorn, SeedType.Berry, SeedType.Nut}
         
         For i As Integer = 0 To count - 1
             Dim position As New Vector2(
@@ -126,7 +126,7 @@ Public NotInheritable Class GameManager
     End Sub
 
     Private Sub SpawnEnemies(count As Integer)
-        Dim enemyTypes As Actor.EnemyType() = {Actor.EnemyType.Beetle, Actor.EnemyType.Caterpillar}
+        Dim enemyTypes As EnemyType() = {EnemyType.Beetle, EnemyType.Caterpillar}
         
         For i As Integer = 0 To count - 1
             Dim position As New Vector2(
@@ -149,13 +149,12 @@ Public NotInheritable Class GameManager
     End Sub
 
     Private Sub PlantTree()
-        Dim treeTypes As Actor.TreeType() = {Actor.TreeType.Oak, Actor.TreeType.Pine, Actor.TreeType.Fruit}
+        Dim treeTypes As TreeType() = {TreeType.Oak, TreeType.Pine, TreeType.Fruit}
         Dim treePosition As New Vector2(
             _random.Next(50, SCREEN_WIDTH - 50),
             _random.Next(50, SCREEN_HEIGHT - 50)
         )
-        Dim treeType = treeTypes(_random.Next(treeTypes.Length))
-        Dim tree As New Actor.Tree(treePosition, treeType)
+        Dim tree As New Actor.Tree(treePosition, treeTypes(_random.Next(treeTypes.Length)))
         Trees.Add(tree)
         ScheduleEvent_TreePlanted(tree)
     End Sub

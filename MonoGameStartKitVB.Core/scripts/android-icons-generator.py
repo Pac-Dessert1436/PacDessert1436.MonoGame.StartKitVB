@@ -49,7 +49,7 @@ def main() -> None:
     SCRIPTS_DIR = path.dirname(path.abspath(__file__))
 
     # Declare constant variables
-    RESOURCES_BASE_PATH = path.join(SCRIPTS_DIR, "..", "MonoGameStartKitVB.Android/Resources")
+    RESOURCES_BASE_PATH = path.join(SCRIPTS_DIR, "..\\..", "MonoGameStartKitVB.Android\\Resources")
     DRAWABLE_RESOURCES_PATH = path.join(RESOURCES_BASE_PATH, "drawable-")
     CONTENT_DIR = path.join(SCRIPTS_DIR, "..", "Content")
     
@@ -85,7 +85,7 @@ def main() -> None:
     }
     
     for density, size in icon_sizes.items():
-        output_path = f"{DRAWABLE_RESOURCES_PATH}{density.value}/icon.png"
+        output_path = f"{DRAWABLE_RESOURCES_PATH}{density.value}\\icon.png"
         if resize_image(ICON_SOURCE_PATH, output_path, size):
             print(f"Generated icon: {output_path}")
         else:
@@ -102,7 +102,7 @@ def main() -> None:
     }
     
     for density, size in splash_sizes.items():
-        output_path = f"{DRAWABLE_RESOURCES_PATH}{density.value}/splash.png"
+        output_path = f"{DRAWABLE_RESOURCES_PATH}{density.value}\\splash.png"
         if resize_image(SPLASH_SOURCE_PATH, output_path, size):
             print(f"Generated splash: {output_path}")
         else:

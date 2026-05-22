@@ -147,11 +147,6 @@ Public MustInherit Class Actor
         End Sub
     End Class
 
-    Public Enum EnemyType
-        Beetle
-        Caterpillar
-    End Enum
-
     Public NotInheritable Class Seed
         Inherits Actor
 
@@ -164,12 +159,6 @@ Public MustInherit Class Actor
             Me.SeedType = seedType
         End Sub
     End Class
-
-    Public Enum SeedType
-        Acorn
-        Berry
-        Nut
-    End Enum
 
     Public NotInheritable Class Tree
         Inherits Actor
@@ -184,12 +173,6 @@ Public MustInherit Class Actor
         Public Overrides Sub Update(deltaTime As Single)
         End Sub
     End Class
-
-    Public Enum TreeType
-        Pine
-        Fruit
-        Oak
-    End Enum
 
     Public NotInheritable Class Pesticide
         Inherits Actor

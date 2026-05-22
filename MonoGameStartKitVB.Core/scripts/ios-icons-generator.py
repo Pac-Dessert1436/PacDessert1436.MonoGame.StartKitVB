@@ -52,7 +52,7 @@ def main() -> None:
     SCRIPTS_DIR = path.dirname(path.abspath(__file__))
     
     # Declare constant variables
-    TOP_LEVEL_PATH = path.join(SCRIPTS_DIR, "..", "MonoGameStartKitVB.iOS/AppIcon.xcassets")
+    TOP_LEVEL_PATH = path.join(SCRIPTS_DIR, "..\\..", "MonoGameStartKitVB.iOS\\AppIcon.xcassets")
     XCASSETS_PATH = path.join(TOP_LEVEL_PATH, "AppIcon.appiconset")
     CONTENT_DIR = path.join(SCRIPTS_DIR, "..", "Content")
     
@@ -228,7 +228,7 @@ def main() -> None:
         }
     }
     
-    contents_path = f"{XCASSETS_PATH}/Contents.json"
+    contents_path = path.join(XCASSETS_PATH, "Contents.json")
     try:
         with open(contents_path, 'w') as f:
             json.dump(contents_json, f, indent=2)

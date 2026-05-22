@@ -18,7 +18,7 @@ Public NotInheritable Class Renderer
 
     Private _playerAnimations As Dictionary(Of Direction, Animation)
     Private _playerDeathAnimation As Animation
-    Private _enemyAnimations As Dictionary(Of Tuple(Of Actor.EnemyType, Direction), Animation)
+    Private _enemyAnimations As Dictionary(Of Tuple(Of EnemyType, Direction), Animation)
     Private _objectFrames As Dictionary(Of ObjectType, Rectangle)
 
     Public Enum ObjectType
@@ -56,15 +56,15 @@ Public NotInheritable Class Renderer
             {Direction.Down, New Animation(_playerSpriteSheet, {7, 8}, 0.1F)}
         }
         _playerDeathAnimation = New Animation(_playerSpriteSheet, Enumerable.Range(9, 8).ToArray(), 0.1F)
-        _enemyAnimations = New Dictionary(Of Tuple(Of Actor.EnemyType, Direction), Animation) From {
-            {Tuple.Create(Actor.EnemyType.Beetle, Direction.Left), New Animation(_enemySpriteSheet, {1, 2}, 0.1F)},
-            {Tuple.Create(Actor.EnemyType.Beetle, Direction.Right), New Animation(_enemySpriteSheet, {3, 4}, 0.1F)},
-            {Tuple.Create(Actor.EnemyType.Beetle, Direction.Up), New Animation(_enemySpriteSheet, {5, 6}, 0.1F)},
-            {Tuple.Create(Actor.EnemyType.Beetle, Direction.Down), New Animation(_enemySpriteSheet, {7, 8}, 0.1F)},
-            {Tuple.Create(Actor.EnemyType.Caterpillar, Direction.Left), New Animation(_enemySpriteSheet, {9, 10}, 0.1F)},
-            {Tuple.Create(Actor.EnemyType.Caterpillar, Direction.Right), New Animation(_enemySpriteSheet, {11, 12}, 0.1F)},
-            {Tuple.Create(Actor.EnemyType.Caterpillar, Direction.Up), New Animation(_enemySpriteSheet, {13, 14}, 0.1F)},
-            {Tuple.Create(Actor.EnemyType.Caterpillar, Direction.Down), New Animation(_enemySpriteSheet, {15, 16}, 0.1F)}
+        _enemyAnimations = New Dictionary(Of Tuple(Of EnemyType, Direction), Animation) From {
+            {Tuple.Create(EnemyType.Beetle, Direction.Left), New Animation(_enemySpriteSheet, {1, 2}, 0.1F)},
+            {Tuple.Create(EnemyType.Beetle, Direction.Right), New Animation(_enemySpriteSheet, {3, 4}, 0.1F)},
+            {Tuple.Create(EnemyType.Beetle, Direction.Up), New Animation(_enemySpriteSheet, {5, 6}, 0.1F)},
+            {Tuple.Create(EnemyType.Beetle, Direction.Down), New Animation(_enemySpriteSheet, {7, 8}, 0.1F)},
+            {Tuple.Create(EnemyType.Caterpillar, Direction.Left), New Animation(_enemySpriteSheet, {9, 10}, 0.1F)},
+            {Tuple.Create(EnemyType.Caterpillar, Direction.Right), New Animation(_enemySpriteSheet, {11, 12}, 0.1F)},
+            {Tuple.Create(EnemyType.Caterpillar, Direction.Up), New Animation(_enemySpriteSheet, {13, 14}, 0.1F)},
+            {Tuple.Create(EnemyType.Caterpillar, Direction.Down), New Animation(_enemySpriteSheet, {15, 16}, 0.1F)}
         }
 
         _objectFrames = New Dictionary(Of ObjectType, Rectangle) From {
@@ -170,13 +170,13 @@ Public NotInheritable Class Renderer
         Next
     End Sub
 
-    Private Function GetSeedFrame(seedType As Actor.SeedType) As Rectangle
+    Private Function GetSeedFrame(seedType As SeedType) As Rectangle
         Select Case seedType
-            Case Actor.SeedType.Acorn
+            Case SeedType.Acorn
                 Return _objectFrames(ObjectType.AcornSeed)
-            Case Actor.SeedType.Berry
+            Case SeedType.Berry
                 Return _objectFrames(ObjectType.BerrySeed)
-            Case Actor.SeedType.Nut
+            Case SeedType.Nut
                 Return _objectFrames(ObjectType.NutSeed)
             Case Else
                 Return _objectFrames(ObjectType.AcornSeed)
@@ -213,13 +213,13 @@ Public NotInheritable Class Renderer
         Next
     End Sub
 
-    Private Function GetTreeFrame(treeType As Actor.TreeType) As Rectangle
+    Private Function GetTreeFrame(treeType As TreeType) As Rectangle
         Select Case treeType
-            Case Actor.TreeType.Pine
+            Case TreeType.Pine
                 Return _objectFrames(ObjectType.PineTree)
-            Case Actor.TreeType.Fruit
+            Case TreeType.Fruit
                 Return _objectFrames(ObjectType.FruitTree)
-            Case Actor.TreeType.Oak
+            Case TreeType.Oak
                 Return _objectFrames(ObjectType.OakTree)
             Case Else
                 Return _objectFrames(ObjectType.OakTree)

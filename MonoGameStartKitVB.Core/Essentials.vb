@@ -55,6 +55,23 @@ Public Module Essentials
         Left = 2
         Right = 3
     End Enum
+
+    Public Enum TreeType As Integer
+        Pine = 0
+        Fruit = 1
+        Oak = 2
+    End Enum
+
+    Public Enum SeedType As Integer
+        Acorn = 0
+        Berry = 1
+        Nut = 2
+    End Enum
+
+    Public Enum EnemyType As Integer
+        Beetle = 0
+        Caterpillar = 1
+    End Enum
 #End Region
 
     ' NOTE: These constants are obsolete and should be removed.
