@@ -1,3 +1,4 @@
+Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Audio
 Imports Microsoft.Xna.Framework.Media
 Imports Microsoft.Xna.Framework.Content
@@ -64,6 +65,7 @@ Public NotInheritable Class SoundManager
         AddHandler GetReadyMessage, AddressOf OnGetReadyMessage
         AddHandler GameStart, AddressOf OnGameStart
         AddHandler NextLevel, AddressOf OnNextLevel
+        AddHandler TreeGrown, AddressOf OnTreeGrown
     End Sub
 
     ''' <summary>
@@ -163,6 +165,13 @@ Public NotInheritable Class SoundManager
     End Sub
 
     ''' <summary>
+    ''' Handles tree grown sound.
+    ''' </summary>
+    Private Sub OnTreeGrown(position As Point)
+        _sndSeedPacket.Play(0.5F, 0.0F, 0.0F)
+    End Sub
+
+    ''' <summary>
     ''' Starts playing background music.
     ''' </summary>
     Private Sub PlayBackgroundMusic()
@@ -202,6 +211,7 @@ Public NotInheritable Class SoundManager
                 RemoveHandler GetReadyMessage, AddressOf OnGetReadyMessage
                 RemoveHandler GameStart, AddressOf OnGameStart
                 RemoveHandler NextLevel, AddressOf OnNextLevel
+                RemoveHandler TreeGrown, AddressOf OnTreeGrown
 
                 StopBackgroundMusic()
             End If

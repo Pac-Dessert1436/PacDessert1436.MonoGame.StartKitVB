@@ -25,7 +25,7 @@ Public MustInherit Class Actor
         )
     End Function
 
-    Public Overridable Sub Update(deltaTime As Single)
+    Public Overridable Sub Update(deltaTime As Single, Optional maze As MazeTile(,) = Nothing)
     End Sub
 
     Public NotInheritable Class Player
@@ -46,7 +46,7 @@ Public MustInherit Class Actor
             MyBase.New(gridPosition, PLAYER_SIZE)
         End Sub
 
-        Public Overrides Sub Update(deltaTime As Single)
+        Public Overrides Sub Update(deltaTime As Single, Optional maze As MazeTile(,) = Nothing)
             If Not IsAlive Then Return
 
             If IsInDeathAnimation Then
@@ -81,14 +81,26 @@ Public MustInherit Class Actor
 
             If IsMoving Then
                 CurrentDirection = NextDirection
-                movement = CurrentDirection.ToVector2()
-                PixelPosition += movement * Speed * deltaTime
-                GridPosition = New Point(
-                    CInt(PixelPosition.X / CELL_SIZE),
-                    CInt(PixelPosition.Y / CELL_SIZE)
+                Dim newPosition = PixelPosition + CurrentDirection.ToVector2() * Speed * deltaTime
+                Dim newGridPos = New Point(
+                    CInt(newPosition.X / CELL_SIZE),
+                    CInt(newPosition.Y / CELL_SIZE)
                 )
+
+                If IsValidPosition(newGridPos, maze) Then
+                    PixelPosition = newPosition
+                    GridPosition = newGridPos
+                End If
             End If
         End Sub
+
+        Private Shared Function IsValidPosition(gridPos As Point, maze As MazeTile(,)) As Boolean
+            If gridPos.X < 0 OrElse gridPos.X >= MAZE_WIDTH OrElse
+               gridPos.Y < 0 OrElse gridPos.Y >= MAZE_HEIGHT Then
+                Return False
+            End If
+            Return maze(gridPos.X, gridPos.Y) <> MazeTile.Fence
+        End Function
 
         Public Sub CollectSeed(seedType As SeedType)
             Score += SEED_POINTS
@@ -156,7 +168,7 @@ Public MustInherit Class Actor
             IsActive = True
         End Sub
 
-        Public Overrides Sub Update(deltaTime As Single)
+        Public Overrides Sub Update(deltaTime As Single, Optional maze As MazeTile(,) = Nothing)
             If Not IsActive Then Return
 
             If IsRespawning Then
@@ -185,19 +197,33 @@ Public MustInherit Class Actor
             End If
 
             Dim movement = Direction.ToVector2()
-            PixelPosition += movement * Speed * deltaTime
-
-            GridPosition = New Point(
-                CInt(PixelPosition.X / CELL_SIZE),
-                CInt(PixelPosition.Y / CELL_SIZE)
+            Dim newPosition = PixelPosition + movement * Speed * deltaTime
+            Dim newGridPos = New Point(
+                CInt(newPosition.X / CELL_SIZE),
+                CInt(newPosition.Y / CELL_SIZE)
             )
 
-            If random.Next(0, 100) < 2 Then
+            If maze IsNot Nothing AndAlso IsValidPosition(newGridPos, maze) Then
+                PixelPosition = newPosition
+                GridPosition = newGridPos
+            Else
+                ChangeDirection()
+            End If
+
+            If random.Next(0, 100) < 3 Then
                 ChangeDirection()
             End If
 
             _previousDirection = Direction
         End Sub
+
+        Private Shared Function IsValidPosition(gridPos As Point, maze As MazeTile(,)) As Boolean
+            If gridPos.X < 0 OrElse gridPos.X >= MAZE_WIDTH OrElse
+               gridPos.Y < 0 OrElse gridPos.Y >= MAZE_HEIGHT Then
+                Return False
+            End If
+            Return maze(gridPos.X, gridPos.Y) <> MazeTile.Fence
+        End Function
 
         Public Sub SetRandomDirection()
             Dim directions As Direction() = {
@@ -230,7 +256,7 @@ Public MustInherit Class Actor
             End If
         End Sub
 
-        Private Function GetOppositeDirection(dir As Direction) As Direction
+        Private Shared Function GetOppositeDirection(dir As Direction) As Direction
             Select Case dir
                 Case Direction.Up
                     Return Direction.Down

@@ -9,6 +9,8 @@ Public NotInheritable Class GameManager
     Public ReadOnly Seeds As New List(Of Actor.Seed)
     Public ReadOnly Enemies As New List(Of Actor.Enemy)
     Public ReadOnly Pesticides As New List(Of Point)
+    Public ReadOnly Saplings As New List(Of Point)
+    Public ReadOnly Trees As New List(Of Point)
 
     Public Property GameState As GameState = GameState.Title
     Private _previousGameState As GameState = GameState.Title
@@ -37,6 +39,8 @@ Public NotInheritable Class GameManager
         Seeds.Clear()
         Enemies.Clear()
         Pesticides.Clear()
+        Saplings.Clear()
+        Trees.Clear()
         
         ParseMaze()
         
@@ -64,6 +68,9 @@ Public NotInheritable Class GameManager
                     Case MazeTile.Pesticide
                         Pesticides.Add(pos)
                         Maze(x, y) = MazeTile.Walkable
+                        
+                    Case MazeTile.Sapling
+                        Saplings.Add(pos)
                 End Select
             Next y
         Next x
@@ -106,10 +113,10 @@ Public NotInheritable Class GameManager
                 Return
             End If
 
-            Player.Update(deltaTime)
+            Player.Update(deltaTime, Maze)
 
             For Each enemy In Enemies
-                enemy.Update(deltaTime)
+                enemy.Update(deltaTime, Maze)
             Next
 
             If PesticideActive Then
@@ -174,6 +181,7 @@ Public NotInheritable Class GameManager
             If seed.GridPosition = playerGridPos Then
                 seed.IsActive = False
                 Player.CollectSeed(seed.SeedType)
+                GrowSaplingToTree()
             End If
         Next
 
@@ -212,6 +220,17 @@ Public NotInheritable Class GameManager
                 enemy.MakeVulnerable()
             End If
         Next
+    End Sub
+
+    Private Sub GrowSaplingToTree()
+        If Saplings.Count > 0 Then
+            Dim saplingIndex = _random.Next(Saplings.Count)
+            Dim saplingPos = Saplings(saplingIndex)
+            Saplings.RemoveAt(saplingIndex)
+            Trees.Add(saplingPos)
+            Maze(saplingPos.X, saplingPos.Y) = MazeTile.Tree
+            ScheduleEvent_TreeGrown(saplingPos)
+        End If
     End Sub
 
     Private Sub ResetPositionsAfterDeath()

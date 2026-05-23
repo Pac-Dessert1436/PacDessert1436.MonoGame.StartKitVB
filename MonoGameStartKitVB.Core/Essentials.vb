@@ -110,6 +110,7 @@ Public Module Essentials
     Public Event GetReadyMessage()
     Public Event GameStart()
     Public Event NextLevel()
+    Public Event TreeGrown(position As Point)
 #End Region
 
 #Region "Functions"
@@ -133,10 +134,10 @@ Public Module Essentials
         If rectA.IsEmpty OrElse rectB.IsEmpty Then Return 0F
         Dim overlapArea As Integer
         With Rectangle.Intersect(rectA, rectB)
-            overlapArea = If(.IsEmpty, 0, .width * .height)
+            overlapArea = If(.IsEmpty, 0, .Width * .Height)
         End With
-        Dim areaA As Integer = rectA.width * rectA.height
-        Dim areaB As Integer = rectB.width * rectB.height
+        Dim areaA As Integer = rectA.Width * rectA.Height
+        Dim areaB As Integer = rectB.Width * rectB.Height
         Dim unionArea As Integer = areaA + areaB - overlapArea
         Return 1.0F - If(unionArea <= 0, 0F, CSng(overlapArea / unionArea))
     End Function
@@ -177,7 +178,7 @@ Public Module Essentials
         Dim maze(MAZE_WIDTH - 1, MAZE_HEIGHT - 1) As MazeTile
         Dim maxRowIndex = MAZE_WIDTH - 1
         Dim maxColIndex = MAZE_HEIGHT - 1
-        Dim saplingCount = 0
+        Dim saplingCount = 0, seedCount = 0
 
         For i As Integer = 0 To maxRowIndex
             For j As Integer = 0 To maxColIndex
@@ -201,6 +202,7 @@ Public Module Essentials
                 If i Mod 2 = 0 AndAlso j Mod 2 = 1 Then
                     maze(i, j) = MazeTile.Sapling
                     saplingCount += 1
+                    seedCount += 1
                 Else
                     maze(i, j) = MazeTile.Walkable
                 End If
@@ -227,11 +229,18 @@ Public Module Essentials
             Next j
         Next i
 
+        Dim seedTiles = From wt In walkableTiles
+                       Where ManhattanDistance(wt, playerStart) > 1
+                       Order By rnd.Next() Take seedCount
+        For Each tile In seedTiles
+            maze(tile.X, tile.Y) = MazeTile.Collectible
+        Next tile
+
         Dim enemyTiles = From wt In walkableTiles
                          Where ManhattanDistance(wt, playerStart) > 5
                          Order By rnd.Next() Take enemyCount
         For Each tile In enemyTiles
-            maze(tile.X, tile.Y) = MazeTile.Enemy
+            maze(tile.X, tile.Y) = MazeTile.Walkable
         Next tile
 
         Dim farTiles = From wt In walkableTiles

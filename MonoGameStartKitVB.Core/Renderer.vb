@@ -18,7 +18,7 @@ Public NotInheritable Class Renderer
     Private _playerSpriteSheet As SpriteSheet
     Private _enemySpriteSheet As SpriteSheet
     Private _objectSpriteSheet As SpriteSheet
-    Private _iconSheet As Texture2D
+    Private _iconSpriteSheet As Texture2D
     Private _titleCard As Texture2D
     Private _joystickBase As Texture2D
     Private _joystickKnob As Texture2D
@@ -28,20 +28,11 @@ Public NotInheritable Class Renderer
     Private _playerAnimations As Dictionary(Of Direction, Animation)
     Private _playerDeathAnimation As Animation
     Private _enemyAnimations As Dictionary(Of Tuple(Of EnemyType, Direction), Animation)
-    Private _enemyVulnerableAnimations As Dictionary(Of Tuple(Of EnemyType, Direction), Animation)
 
     Private ReadOnly _hudOffset As Integer = 60
     Private _mazeOffsetX As Integer
     Private _mazeOffsetY As Integer
     Private _joystick As VirtualJoystick
-
-    Public Enum ObjectType
-        Fence
-        AcornSeed
-        BerrySeed
-        NutSeed
-        Pesticide
-    End Enum
 
     Public Sub New(graphicsDevice As GraphicsDevice, content As ContentManager)
         _graphicsDevice = graphicsDevice
@@ -49,9 +40,10 @@ Public NotInheritable Class Renderer
         _content = content
 
         _pixelTexture = New Texture2D(graphicsDevice, 1, 1)
-        _pixelTexture.SetData(New Color() {Color.White})
-
-        _renderTarget = New RenderTarget2D(graphicsDevice, MAZE_WIDTH * CELL_SIZE, MAZE_HEIGHT * CELL_SIZE)
+        _pixelTexture.SetData({Color.White})
+        _renderTarget = New RenderTarget2D(
+            graphicsDevice, MAZE_WIDTH * CELL_SIZE, MAZE_HEIGHT * CELL_SIZE
+        )
 
         CalculateMazeOffset()
         LoadContent()
@@ -64,9 +56,9 @@ Public NotInheritable Class Renderer
 
     <CodeAnalysis.SuppressMessage("Performance", "CA1861")>
     Private Sub LoadContent()
-        _playerSpriteSheet = New SpriteSheet(_content, "Images/player_sheet", 64, 64)
-        _enemySpriteSheet = New SpriteSheet(_content, "Images/enemy_sheet", 64, 64)
-        _objectSpriteSheet = New SpriteSheet(_content, "Images/object_sheet", 64, 64)
+        _playerSpriteSheet = New SpriteSheet(_content, "Images/player_sheet", 32, 32)
+        _enemySpriteSheet = New SpriteSheet(_content, "Images/enemy_sheet", 32, 32)
+        _objectSpriteSheet = New SpriteSheet(_content, "Images/object_sheet", 32, 32)
 
         _playerAnimations = New Dictionary(Of Direction, Animation) From {
             {Direction.Left, New Animation(_playerSpriteSheet, {1, 2}, 0.1F)},
@@ -87,18 +79,7 @@ Public NotInheritable Class Renderer
             {Tuple.Create(EnemyType.Caterpillar, Direction.Down), New Animation(_enemySpriteSheet, {15, 16}, 0.1F)}
         }
 
-        _enemyVulnerableAnimations = New Dictionary(Of Tuple(Of EnemyType, Direction), Animation) From {
-            {Tuple.Create(EnemyType.Beetle, Direction.Left), New Animation(_enemySpriteSheet, {17, 18}, 0.2F)},
-            {Tuple.Create(EnemyType.Beetle, Direction.Right), New Animation(_enemySpriteSheet, {19, 20}, 0.2F)},
-            {Tuple.Create(EnemyType.Beetle, Direction.Up), New Animation(_enemySpriteSheet, {21, 22}, 0.2F)},
-            {Tuple.Create(EnemyType.Beetle, Direction.Down), New Animation(_enemySpriteSheet, {23, 24}, 0.2F)},
-            {Tuple.Create(EnemyType.Caterpillar, Direction.Left), New Animation(_enemySpriteSheet, {25, 26}, 0.2F)},
-            {Tuple.Create(EnemyType.Caterpillar, Direction.Right), New Animation(_enemySpriteSheet, {27, 28}, 0.2F)},
-            {Tuple.Create(EnemyType.Caterpillar, Direction.Up), New Animation(_enemySpriteSheet, {29, 30}, 0.2F)},
-            {Tuple.Create(EnemyType.Caterpillar, Direction.Down), New Animation(_enemySpriteSheet, {31, 32}, 0.2F)}
-        }
-
-        _iconSheet = _content.Load(Of Texture2D)("Images/icon_sheet")
+        _iconSpriteSheet = _content.Load(Of Texture2D)("Images/icon_sheet")
         _titleCard = _content.Load(Of Texture2D)("Images/title_card")
         _joystickBase = _content.Load(Of Texture2D)("Images/joystick_base")
         _joystickKnob = _content.Load(Of Texture2D)("Images/joystick_knob")
@@ -116,12 +97,12 @@ Public NotInheritable Class Renderer
 
         Select Case gameState
             Case GameState.Title
-                DrawTitleScreen(gameManager)
+                DrawTitleScreen()
 
             Case GameState.Playing, GameState.Paused
                 DrawHUD(gameManager)
                 DrawGameArea(gameManager, deltaTime)
-                DrawJoystick(gameManager)
+                DrawJoystick()
                 DrawPauseButton()
 
                 If gameState = GameState.Paused Then
@@ -131,14 +112,14 @@ Public NotInheritable Class Renderer
             Case GameState.GameOver
                 DrawHUD(gameManager)
                 DrawGameArea(gameManager, deltaTime)
-                DrawJoystick(gameManager)
+                DrawJoystick()
                 DrawPauseButton()
                 DrawGameOverScreen(gameManager)
 
             Case GameState.LevelCleared
                 DrawHUD(gameManager)
                 DrawGameArea(gameManager, deltaTime)
-                DrawJoystick(gameManager)
+                DrawJoystick()
                 DrawPauseButton()
                 DrawLevelClearedScreen(gameManager)
         End Select
@@ -146,7 +127,7 @@ Public NotInheritable Class Renderer
         _spriteBatch.End()
     End Sub
 
-    Private Sub DrawTitleScreen(gameManager As GameManager)
+    Private Sub DrawTitleScreen()
         Dim titleRect As New Rectangle(
             (SCREEN_WIDTH - _titleCard.Width) \ 2,
             100,
@@ -182,19 +163,19 @@ Public NotInheritable Class Renderer
 
         Dim textSize As Vector2 = _gameFont.MeasureString(text)
         Dim textPos As New Vector2(
-            centerX - textSize.X / 2F,
-            y + _generalButton.Height / 2F - textSize.Y / 2F
+            centerX - textSize.X / 2.0F,
+            y + _generalButton.Height / 2.0F - textSize.Y / 2.0F
         )
         _spriteBatch.DrawString(_gameFont, text, textPos, Color.Black)
     End Sub
 
     Private Sub DrawHUD(gameManager As GameManager)
-        DrawText($"1UP: {gameManager.Player.Score:D6}", New Vector2(10, 10), Color.White)
-        DrawText($"HI: {gameManager.HighScore:D6}", New Vector2(SCREEN_WIDTH - 150, 10), Color.White)
+        DrawText($"1UP: {gameManager.Player.Score:D5}", New Vector2(10, 10), Color.White)
+        DrawText($"HI: {gameManager.HighScore:D5}", New Vector2(SCREEN_WIDTH \ 2 + 10, 10), Color.White)
 
         Dim lifeIconRect = New Rectangle(0, 0, ICON_SIZE, ICON_SIZE)
         For i As Integer = 0 To gameManager.Player.Lives - 1
-            _spriteBatch.Draw(_iconSheet, New Vector2(10 + i * (ICON_SIZE + 4), 35), lifeIconRect, Color.White)
+            _spriteBatch.Draw(_iconSpriteSheet, New Vector2(10 + i * (ICON_SIZE + 4), 30), lifeIconRect, Color.White)
         Next
 
         Dim seedType = gameManager.GetSeedTypeForCurrentLevel()
@@ -203,12 +184,12 @@ Public NotInheritable Class Renderer
 
         Dim seasonText = $"SEASON {gameManager.CurrentLevel}"
         Dim seasonSize = _gameFont.MeasureString(seasonText)
-        Dim seasonX = SCREEN_WIDTH - seasonSize.X - ICON_SIZE - 10
-        _spriteBatch.DrawString(_gameFont, seasonText, New Vector2(seasonX, 35), Color.White)
-        _spriteBatch.Draw(_iconSheet, New Vector2(seasonX + seasonSize.X + 4, 35), seedIconRect, Color.White)
+        Dim seasonX = SCREEN_WIDTH \ 2 + 10
+        _spriteBatch.DrawString(_gameFont, seasonText, New Vector2(seasonX, 30), Color.White)
+        _spriteBatch.Draw(_iconSpriteSheet, New Vector2(seasonX + seasonSize.X + 4, 30), seedIconRect, Color.White)
     End Sub
 
-    Private Function GetSeedIconIndex(seedType As SeedType) As Integer
+    Private Shared Function GetSeedIconIndex(seedType As SeedType) As Integer
         Select Case seedType
             Case SeedType.Acorn
                 Return 1
@@ -227,7 +208,7 @@ Public NotInheritable Class Renderer
         _graphicsDevice.Clear(Color.Black)
         _spriteBatch.Begin(samplerState:=SamplerState.PointClamp)
 
-        DrawMaze(gameManager.Maze)
+        DrawMaze(gameManager.Maze, gameManager.CurrentLevel)
         DrawSeeds(gameManager.Seeds)
         DrawPesticides(gameManager.Pesticides)
         DrawPlayer(gameManager.Player, deltaTime)
@@ -247,107 +228,149 @@ Public NotInheritable Class Renderer
         _spriteBatch.Begin(samplerState:=SamplerState.PointClamp)
     End Sub
 
-    Private Sub DrawMaze(maze As MazeTile(,))
+    Private Sub DrawMaze(maze As MazeTile(,), currentLevel As Integer)
         For x As Integer = 0 To MAZE_WIDTH - 1
             For y As Integer = 0 To MAZE_HEIGHT - 1
                 If maze(x, y) = MazeTile.Fence Then
                     Dim rect As New Rectangle(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
-                    _spriteBatch.Draw(_pixelTexture, rect, Color.Blue)
+                    DrawFence(rect)
+                ElseIf maze(x, y) = MazeTile.Sapling OrElse maze(x, y) = MazeTile.Tree Then
+                    DrawVegetation(x, y, maze(x, y), currentLevel)
                 End If
             Next y
         Next x
     End Sub
 
+    Private Sub DrawVegetation(x As Integer, y As Integer, tileType As MazeTile, Optional currentLevel As Integer = 1)
+        Dim frameIndex As Integer
+        If tileType = MazeTile.Sapling Then
+            frameIndex = 7
+        Else
+            Dim seedType As SeedType
+            Select Case (currentLevel - 1) Mod 6
+                Case 0, 3
+                    seedType = SeedType.Acorn
+                Case 1, 4
+                    seedType = SeedType.Berry
+                Case 2, 5
+                    seedType = SeedType.Nut
+                Case Else
+                    seedType = SeedType.Acorn
+            End Select
+            Select Case seedType
+                Case SeedType.Acorn
+                    frameIndex = 4
+                Case SeedType.Berry
+                    frameIndex = 5
+                Case SeedType.Nut
+                    frameIndex = 6
+                Case Else
+                    frameIndex = 4
+            End Select
+        End If
+
+        Dim scale = CSng(CELL_SIZE / _objectSpriteSheet.FrameWidth)
+        Dim drawPos = New Vector2(x * CELL_SIZE, y * CELL_SIZE)
+        _objectSpriteSheet.DrawFrame(_spriteBatch, frameIndex, drawPos, scale, Color.White)
+    End Sub
+
+    Private Sub DrawFence(rect As Rectangle)
+        Dim scale = CSng(CELL_SIZE / _objectSpriteSheet.FrameWidth)
+        _objectSpriteSheet.DrawFrame(_spriteBatch, 0, New Vector2(rect.X, rect.Y), scale, Color.White)
+    End Sub
+
     Private Sub DrawSeeds(seeds As List(Of Actor.Seed))
         For Each seed In seeds.Where(Function(s) s.IsActive)
-            Dim color = GetSeedColor(seed.SeedType)
-            Dim rect As New Rectangle(
-                seed.GridPosition.X * CELL_SIZE + CELL_SIZE \ 2 - SEED_SIZE \ 2,
-                seed.GridPosition.Y * CELL_SIZE + CELL_SIZE \ 2 - SEED_SIZE \ 2,
-                SEED_SIZE,
-                SEED_SIZE
+            Dim frameIndex = GetSeedFrameIndex(seed.SeedType)
+            Dim baseScale As Single = CSng(SEED_SIZE) / _objectSpriteSheet.FrameWidth
+            Dim pulseOffset = CSng(Math.Sin(Date.Now.Millisecond / 200.0)) * 0.1F
+            Dim scale = baseScale * (1.0F + pulseOffset)
+
+            Dim offsetX = (CELL_SIZE - SEED_SIZE) \ 2
+            Dim offsetY = (CELL_SIZE - SEED_SIZE) \ 2
+            Dim drawPos = New Vector2(
+                seed.GridPosition.X * CELL_SIZE + offsetX,
+                seed.GridPosition.Y * CELL_SIZE + offsetY
             )
-            _spriteBatch.Draw(_pixelTexture, rect, color)
+
+            ' Draw glow effect
+            _objectSpriteSheet.DrawFrame(_spriteBatch, frameIndex, drawPos, baseScale * 1.5F, New Color(255, 255, 255, 30))
+
+            ' Draw actual seed
+            _objectSpriteSheet.DrawFrame(_spriteBatch, frameIndex, drawPos, scale, Color.White)
         Next
     End Sub
 
-    Private Function GetSeedColor(seedType As SeedType) As Color
+    Private Shared Function GetSeedFrameIndex(seedType As SeedType) As Integer
         Select Case seedType
             Case SeedType.Acorn
-                Return Color.Brown
+                Return 1
             Case SeedType.Berry
-                Return Color.Red
+                Return 2
             Case SeedType.Nut
-                Return Color.SandyBrown
+                Return 3
             Case Else
-                Return Color.Brown
+                Return 1
         End Select
     End Function
 
     Private Sub DrawPesticides(pesticides As List(Of Point))
         For Each pos In pesticides
-            Dim rect As New Rectangle(
-                pos.X * CELL_SIZE + CELL_SIZE \ 2 - SEED_SIZE \ 2,
-                pos.Y * CELL_SIZE + CELL_SIZE \ 2 - SEED_SIZE \ 2,
-                SEED_SIZE,
-                SEED_SIZE
+            Dim baseScale = CSng(SEED_SIZE / _objectSpriteSheet.FrameWidth)
+            Dim pulseOffset = CSng(Math.Sin(Date.Now.Millisecond / 150.0)) * 0.15F
+            Dim scale = baseScale * (1.1F + pulseOffset)
+            Dim drawPos = New Vector2(
+                pos.X * CELL_SIZE + (CELL_SIZE - SEED_SIZE) \ 2,
+                pos.Y * CELL_SIZE + (CELL_SIZE - SEED_SIZE) \ 2
             )
-            _spriteBatch.Draw(_pixelTexture, rect, Color.Cyan)
+            _objectSpriteSheet.DrawFrame(_spriteBatch, 8, drawPos, scale, Color.White)
         Next
     End Sub
 
     Private Sub DrawPlayer(player As Actor.Player, deltaTime As Single)
-        If Not player.IsAlive Then Return
-
-        Dim animation As Animation
-        Dim frameRect As Rectangle
+        If Not player.IsAlive Then Exit Sub
+        Dim animation As Animation, frameIndex As Integer
 
         If player.IsInDeathAnimation Then
             animation = _playerDeathAnimation
             animation.Update(deltaTime)
-            frameRect = animation.CurrentFrame
+            frameIndex = animation.CurrentFrameIndex
         Else
             animation = _playerAnimations(player.CurrentDirection)
-            If player.IsMoving Then
-                animation.Update(deltaTime)
-            Else
-                animation.Reset()
-            End If
-            frameRect = animation.CurrentFrame
+            If player.IsMoving Then animation.Update(deltaTime) Else animation.Reset()
+            frameIndex = animation.CurrentFrameIndex
         End If
 
+        Dim scale As Single = CSng(PLAYER_SIZE / animation.SpriteSheet.FrameWidth)
         Dim drawPos = New Vector2(
-            player.PixelPosition.X - _mazeOffsetX,
-            player.PixelPosition.Y - _mazeOffsetY
+            player.PixelPosition.X - PLAYER_SIZE \ 2,
+            player.PixelPosition.Y - PLAYER_SIZE \ 2
         )
 
-        Dim origin As New Vector2(frameRect.Width / 2.0F, frameRect.Height / 2.0F)
-        Dim scale As Single = PLAYER_SIZE / MathF.Max(frameRect.Width, frameRect.Height)
-        _spriteBatch.Draw(animation.SpriteSheet.Texture, drawPos, frameRect, Color.Yellow, 0.0F, origin, scale, SpriteEffects.None, 0.0F)
+        Dim playerColor As Color
+        If player.IsInDeathAnimation Then
+            playerColor = New Color(255, 100, 100)
+        Else
+            playerColor = Color.Yellow
+        End If
+
+        ' Draw actual player
+        animation.SpriteSheet.DrawFrame(_spriteBatch, frameIndex, drawPos, scale, playerColor)
     End Sub
 
     Private Sub DrawEnemies(enemies As List(Of Actor.Enemy), deltaTime As Single)
-        For Each enemy In enemies.Where(Function(e) e.IsActive)
+        For Each enemy In From e In enemies Where e.IsActive
             Dim direction = enemy.Direction
             Dim key = Tuple.Create(enemy.EnemyType, direction)
-
-            Dim animation As Animation
-            If enemy.IsVulnerable Then
-                animation = _enemyVulnerableAnimations(key)
-            Else
-                animation = _enemyAnimations(key)
-            End If
-
+            Dim animation = _enemyAnimations(key)
             animation.Update(deltaTime)
-            Dim frameRect = animation.CurrentFrame
+            Dim frameIndex = animation.CurrentFrameIndex
 
-            Dim drawPos = New Vector2(
-                enemy.PixelPosition.X - _mazeOffsetX,
-                enemy.PixelPosition.Y - _mazeOffsetY
+            Dim scale = CSng(ENEMY_SIZE / animation.SpriteSheet.FrameWidth)
+            Dim drawPos As New Vector2(
+                enemy.PixelPosition.X - ENEMY_SIZE \ 2,
+                enemy.PixelPosition.Y - ENEMY_SIZE \ 2
             )
-
-            Dim origin As New Vector2(frameRect.Width / 2.0F, frameRect.Height / 2.0F)
-            Dim scale As Single = ENEMY_SIZE / MathF.Max(frameRect.Width, frameRect.Height)
 
             Dim enemyColor = Color.White
             If enemy.IsVulnerable Then
@@ -356,16 +379,7 @@ Public NotInheritable Class Renderer
                 enemyColor = New Color(200, 200, 255, 128)
             End If
 
-            _spriteBatch.Draw(
-                animation.SpriteSheet.Texture,
-                drawPos,
-                frameRect,
-                enemyColor,
-                0.0F,
-                origin,
-                scale,
-                SpriteEffects.None,
-                0.0F)
+            animation.SpriteSheet.DrawFrame(_spriteBatch, frameIndex, drawPos, scale, enemyColor)
         Next
     End Sub
 
@@ -380,7 +394,7 @@ Public NotInheritable Class Renderer
         _spriteBatch.DrawString(_gameFont, text, position, Color.Yellow)
     End Sub
 
-    Private Sub DrawJoystick(gameManager As GameManager)
+    Private Sub DrawJoystick()
         Dim keyboardState = Keyboard.GetState()
         Dim joystickValue = Vector2.Zero
 

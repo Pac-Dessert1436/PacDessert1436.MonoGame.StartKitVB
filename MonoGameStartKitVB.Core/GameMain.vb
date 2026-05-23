@@ -56,6 +56,7 @@ Public NotInheritable Class GameMain
     Protected Overrides Sub Draw(gameTime As GameTime)
         Dim deltaTime As Single = CSng(gameTime.ElapsedGameTime.TotalSeconds)
         _renderer.Render(_gameManager, _gameManager.GameState, deltaTime)
+        RaiseScheduledEvents()
         MyBase.Draw(gameTime)
     End Sub
 
