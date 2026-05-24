@@ -1,18 +1,18 @@
 # MonoGame 2D StartKit VB.NET (`PacDessert1436.MonoGame.StartKitVB`)
 
-A multi-platform game template built with **VB.NET** for [MonoGame](https://www.monogame.net/), featuring the game **Devour-Man** — inspired by Pac-Man.
+A multi-platform game template built with **VB.NET** for [MonoGame](https://www.monogame.net/), featuring the game **Devour-Man** - inspired by Pac-Man.
+
+> **Important Note:** _This project is still in active development - currently a few steps away from feature completeness. Additionaly, the template's short name has already been changed since version 1.1.0._
 
 ---
 
 ## Overview
 
-**Project Name:** PacDessert1436.MonoGame.StartKitVB
-**Template Short Name**: `mgstartkit-vb`
-**Game Name:** Devour-Man
+- **Project Name:** PacDessert1436.MonoGame.StartKitVB
+- **Template Short Name**: `mg2dstartkitvb` (formerly `mgstartkit-vb`)
+- **Game Name:** Devour-Man
 
 _PacDessert1436.MonoGame.StartKitVB_ is an **actively developed** game template demonstrating modern MonoGame development practices using VB.NET. The included game, **Devour-Man**, is a Pac-Man inspired arcade game where players collect seeds to grow a forest while dodging patrolling insects.
-
-**Note:** This project is still in **active development** and is a few steps away from feature completeness.
 
 ---
 
