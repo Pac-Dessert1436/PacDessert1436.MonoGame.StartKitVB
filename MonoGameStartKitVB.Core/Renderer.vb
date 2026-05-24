@@ -128,23 +128,23 @@ Public NotInheritable Class Renderer
 
     Private Sub DrawTitleScreen()
         Dim titleRect As New Rectangle(
-            (SCREEN_WIDTH - _titleCard.Width) \ 2,
+            (SCREEN_WIDTH - _titleCard.Width * 2) \ 2,
             100,
-            _titleCard.Width,
-            _titleCard.Height
+            _titleCard.Width * 2,
+            _titleCard.Height * 2
         )
         _spriteBatch.Draw(_titleCard, titleRect, Color.White)
 
         DrawButton("START", SCREEN_WIDTH \ 2, 400, True)
-        DrawButton("EXIT", SCREEN_WIDTH \ 2, 480, False)
+        DrawButton("EXIT", SCREEN_WIDTH \ 2, 520, False)
     End Sub
 
     Private Sub DrawButton(text As String, centerX As Integer, y As Integer, isStart As Boolean)
         Dim buttonRect As New Rectangle(
-            centerX - _generalButton.Width \ 2,
+            centerX - _generalButton.Width,
             y,
-            _generalButton.Width,
-            _generalButton.Height
+            _generalButton.Width * 2,
+            _generalButton.Height * 2
         )
 
         Dim keyboardState = Keyboard.GetState()
@@ -157,35 +157,44 @@ Public NotInheritable Class Renderer
         End If
 
         Dim buttonColor = If(isPressed, Color.LightGray, Color.White)
-
         _spriteBatch.Draw(_generalButton, buttonRect, buttonColor)
 
         Dim textSize As Vector2 = _gameFont.MeasureString(text)
         Dim textPos As New Vector2(
             centerX - textSize.X / 2.0F,
-            y + _generalButton.Height / 2.0F - textSize.Y / 2.0F
+            y + _generalButton.Height - textSize.Y / 2.0F
         )
-        _spriteBatch.DrawString(_gameFont, text, textPos, Color.Black)
+        _spriteBatch.DrawString(
+            _gameFont,
+            text,
+            textPos,
+            Color.Wheat
+        )
     End Sub
 
     Private Sub DrawHUD(gameManager As GameManager)
         DrawText($"1UP: {gameManager.Player.Score:D5}", New Vector2(10, 10), Color.White)
         DrawText($"HI: {gameManager.HighScore:D5}", New Vector2(SCREEN_WIDTH \ 2 + 10, 10), Color.White)
 
-        Dim lifeIconRect = New Rectangle(0, 0, ICON_SIZE, ICON_SIZE)
+        Dim lifeIconRect As New Rectangle(0, 0, ICON_SIZE, ICON_SIZE)
         For i As Integer = 0 To gameManager.Player.Lives - 1
-            _spriteBatch.Draw(_iconSpriteSheet, New Vector2(10 + i * (ICON_SIZE + 4), 30), lifeIconRect, Color.White)
+            _spriteBatch.Draw(
+                _iconSpriteSheet,
+                New Rectangle(10 + i * (ICON_SIZE * 2 + 4), 30, ICON_SIZE * 2, ICON_SIZE * 2),
+                lifeIconRect,
+                Color.White
+            )
         Next
 
-        Dim seedType = gameManager.GetSeedTypeForCurrentLevel()
+        Dim seedType = SeedTypeForLevel(gameManager.CurrentLevel)
         Dim seedIconIndex = GetSeedIconIndex(seedType)
-        Dim seedIconRect = New Rectangle(seedIconIndex * ICON_SIZE, 0, ICON_SIZE, ICON_SIZE)
+        Dim seedIconRect As New Rectangle(seedIconIndex * ICON_SIZE, 0, ICON_SIZE, ICON_SIZE)
 
         Dim seasonText = $"SEASON {gameManager.CurrentLevel}"
         Dim seasonSize = _gameFont.MeasureString(seasonText)
         Dim seasonX = SCREEN_WIDTH \ 2 + 10
         _spriteBatch.DrawString(_gameFont, seasonText, New Vector2(seasonX, 30), Color.White)
-        _spriteBatch.Draw(_iconSpriteSheet, New Vector2(seasonX + seasonSize.X + 4, 30), seedIconRect, Color.White)
+        _spriteBatch.Draw(_iconSpriteSheet, New Rectangle(seasonX + CInt(seasonSize.X) + 8, 30, ICON_SIZE * 2, ICON_SIZE * 2), seedIconRect, Color.White)
     End Sub
 
     Private Shared Function GetSeedIconIndex(seedType As SeedType) As Integer
@@ -273,7 +282,7 @@ Public NotInheritable Class Renderer
         End If
 
         Dim scale = CSng(CELL_SIZE / _objectSpriteSheet.FrameWidth)
-        Dim drawPos = New Vector2(x * CELL_SIZE, y * CELL_SIZE)
+        Dim drawPos As New Vector2(x * CELL_SIZE, y * CELL_SIZE)
         _objectSpriteSheet.DrawFrame(_spriteBatch, frameIndex, drawPos, scale, Color.White)
     End Sub
 
@@ -284,22 +293,10 @@ Public NotInheritable Class Renderer
 
     Private Sub DrawSeeds(seeds As List(Of Actor.Seed))
         For Each seed In seeds.Where(Function(s) s.IsActive)
+            Dim scale = CSng(CELL_SIZE / _objectSpriteSheet.FrameWidth)
             Dim frameIndex = GetSeedFrameIndex(seed.SeedType)
-            Dim baseScale As Single = CSng(SEED_SIZE) / _objectSpriteSheet.FrameWidth
-            Dim pulseOffset = CSng(Math.Sin(Date.Now.Millisecond / 200.0)) * 0.1F
-            Dim scale = baseScale * (1.0F + pulseOffset)
-
-            Dim offsetX = (CELL_SIZE - SEED_SIZE) \ 2
-            Dim offsetY = (CELL_SIZE - SEED_SIZE) \ 2
-            Dim drawPos = New Vector2(
-                seed.GridPosition.X * CELL_SIZE + offsetX,
-                seed.GridPosition.Y * CELL_SIZE + offsetY
-            )
-
-            ' Draw glow effect
-            _objectSpriteSheet.DrawFrame(_spriteBatch, frameIndex, drawPos, baseScale * 1.5F, New Color(255, 255, 255, 30))
-
-            ' Draw actual seed
+            Dim gridPos As New Point(seed.GridPosition.X, seed.GridPosition.Y)
+            Dim drawPos As New Vector2(gridPos.X * CELL_SIZE, gridPos.Y * CELL_SIZE)
             _objectSpriteSheet.DrawFrame(_spriteBatch, frameIndex, drawPos, scale, Color.White)
         Next
     End Sub
@@ -318,14 +315,10 @@ Public NotInheritable Class Renderer
     End Function
 
     Private Sub DrawPesticides(pesticides As List(Of Point))
-        For Each pos In pesticides
-            Dim baseScale = CSng(SEED_SIZE / _objectSpriteSheet.FrameWidth)
-            Dim pulseOffset = CSng(Math.Sin(Date.Now.Millisecond / 150.0)) * 0.15F
-            Dim scale = baseScale * (1.1F + pulseOffset)
-            Dim drawPos = New Vector2(
-                pos.X * CELL_SIZE + (CELL_SIZE - SEED_SIZE) \ 2,
-                pos.Y * CELL_SIZE + (CELL_SIZE - SEED_SIZE) \ 2
-            )
+        For Each item In pesticides
+            Dim scale = CSng(CELL_SIZE / _objectSpriteSheet.FrameWidth)
+            Dim gridPos As New Point(item.X, item.Y)
+            Dim drawPos As New Vector2(gridPos.X * CELL_SIZE, gridPos.Y * CELL_SIZE)
             _objectSpriteSheet.DrawFrame(_spriteBatch, 8, drawPos, scale, Color.White)
         Next
     End Sub
@@ -345,7 +338,7 @@ Public NotInheritable Class Renderer
         End If
 
         Dim scale As Single = CSng(PLAYER_SIZE / animation.SpriteSheet.FrameWidth)
-        Dim drawPos = New Vector2(
+        Dim drawPos As New Vector2(
             player.PixelPosition.X - PLAYER_SIZE \ 2,
             player.PixelPosition.Y - PLAYER_SIZE \ 2
         )
@@ -392,6 +385,8 @@ Public NotInheritable Class Renderer
 
     Private Sub DrawJoystick()
         Dim keyboardState = Keyboard.GetState()
+        Dim touchCollection = Touch.TouchPanel.GetState()
+        Dim mouseState = Mouse.GetState()
         Dim joystickValue = Vector2.Zero
 
         If keyboardState.IsKeyDown(Keys.Left) OrElse keyboardState.IsKeyDown(Keys.A) Then
@@ -407,12 +402,40 @@ Public NotInheritable Class Renderer
             joystickValue.Y = 1
         End If
 
+        Dim maxRadius = CSng(_joystickBase.Width)
+        For Each touchLoc In touchCollection
+            If touchLoc.State = Touch.TouchLocationState.Pressed Then
+                Dim delta = touchLoc.Position - _joystick.Position
+                If delta.Length() <= maxRadius * 2 Then
+                    If delta.Length() > maxRadius Then
+                        delta.Normalize()
+                        delta *= maxRadius
+                    End If
+                    joystickValue = delta / maxRadius
+                End If
+            End If
+        Next
+
+        If mouseState.LeftButton = ButtonState.Pressed Then
+            Dim mousePos = New Vector2(mouseState.X, mouseState.Y)
+            Dim delta = mousePos - _joystick.Position
+            If delta.Length() <= maxRadius * 2 Then
+                If delta.Length() > maxRadius Then
+                    delta.Normalize()
+                    delta *= maxRadius
+                End If
+                joystickValue = delta / maxRadius
+            End If
+        End If
+
         _joystick.Value = joystickValue
         _joystick.Draw(_spriteBatch)
     End Sub
 
     Private Sub DrawPauseButton()
-        Dim buttonRect As New Rectangle(10, SCREEN_HEIGHT - 60, _pauseButton.Width, _pauseButton.Height)
+        Dim buttonRect As New Rectangle(
+            10, SCREEN_HEIGHT - 100, _pauseButton.Width * 2, _pauseButton.Height * 2
+        )
         _spriteBatch.Draw(_pauseButton, buttonRect, Color.White)
     End Sub
 
@@ -420,7 +443,7 @@ Public NotInheritable Class Renderer
         Dim overlayRect As New Rectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
         _spriteBatch.Draw(_pixelTexture, overlayRect, New Color(0, 0, 0, 150))
 
-        Dim text = "PAUSED"
+        Dim text As String = "PAUSED"
         Dim textSize As Vector2 = _gameFont.MeasureString(text)
         Dim position As New Vector2(
             (SCREEN_WIDTH - textSize.X) / 2,

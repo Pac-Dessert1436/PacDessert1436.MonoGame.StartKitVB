@@ -1,5 +1,6 @@
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Input
+Imports Microsoft.Xna.Framework.Input.Touch
 
 Public NotInheritable Class GameManager
     Private ReadOnly _random As New Random
@@ -14,7 +15,7 @@ Public NotInheritable Class GameManager
 
     Public Property GameState As GameState = GameState.Title
     Private _previousGameState As GameState = GameState.Title
-    
+
     Public Property CurrentLevel As Integer = 1
     Public Property HighScore As Integer = 0
     Public Property GetReadyTimer As Single = 0.0F
@@ -27,7 +28,7 @@ Public NotInheritable Class GameManager
     Public Sub New()
         InitializeGame()
     End Sub
-    
+
     Public Sub InitializeGame()
         Player = New Actor.Player(PlayerStartingPoint)
         CurrentLevel = 1
@@ -41,48 +42,45 @@ Public NotInheritable Class GameManager
         Pesticides.Clear()
         Saplings.Clear()
         Trees.Clear()
-        
-        ParseMaze()
-        
+        ParseMaze(CurrentLevel)
         Player.ResetPosition()
         GetReadyTimer = GET_READY_DURATION
         IsGetReadyActive = True
         PesticideActive = False
         PesticideTimer = 0.0F
-        
         ScheduleEvent_LevelChanged(CurrentLevel)
         ScheduleEvent_GetReadyMessage()
     End Sub
 
-    Private Sub ParseMaze()
+    Private Sub ParseMaze(level As Integer)
         For x As Integer = 0 To MAZE_WIDTH - 1
             For y As Integer = 0 To MAZE_HEIGHT - 1
                 Dim tile = Maze(x, y)
                 Dim pos = New Point(x, y)
-                
+
                 Select Case tile
                     Case MazeTile.Collectible
-                        Seeds.Add(New Actor.Seed(pos, SeedType.Acorn))
+                        Seeds.Add(New Actor.Seed(pos, SeedTypeForLevel(level)))
                         Maze(x, y) = MazeTile.Walkable
-                        
+
                     Case MazeTile.Pesticide
                         Pesticides.Add(pos)
                         Maze(x, y) = MazeTile.Walkable
-                        
+
                     Case MazeTile.Sapling
                         Saplings.Add(pos)
                 End Select
             Next y
         Next x
-        
+
         SpawnEnemies()
     End Sub
 
     Private Sub SpawnEnemies()
-        Dim enemyType = GetEnemyTypeForLevel(CurrentLevel)
+        Dim enemyType = EnemyTypeForLevel(CurrentLevel)
         Dim enemyCount = Math.Min(4 + CurrentLevel, 8)
         Dim spawnPoints = New List(Of Point)
-        
+
         For x As Integer = 0 To MAZE_WIDTH - 1
             For y As Integer = 0 To MAZE_HEIGHT - 1
                 If Maze(x, y) = MazeTile.Walkable AndAlso
@@ -91,7 +89,7 @@ Public NotInheritable Class GameManager
                 End If
             Next y
         Next x
-        
+
         For i As Integer = 0 To Math.Min(enemyCount - 1, spawnPoints.Count - 1)
             Dim index = _random.Next(spawnPoints.Count)
             Dim pos = spawnPoints(index)
@@ -138,7 +136,7 @@ Public NotInheritable Class GameManager
         If _previousGameState <> GameState Then
             Dim oldState = _previousGameState
             _previousGameState = GameState
-            
+
             Select Case GameState
                 Case GameState.Playing
                     If oldState = GameState.Title Then
@@ -154,20 +152,20 @@ Public NotInheritable Class GameManager
                         ScheduleEvent_NextLevel()
                         ScheduleEvent_GameStateChanged(GameState)
                     End If
-                    
+
                 Case GameState.GameOver
                     If Player.Score > HighScore Then
                         HighScore = Player.Score
                         ScheduleEvent_HighScoreChanged(HighScore)
                     End If
                     ScheduleEvent_GameStateChanged(GameState)
-                    
+
                 Case GameState.LevelCleared
                     ScheduleEvent_GameStateChanged(GameState)
-                    
+
                 Case GameState.Title
                     ScheduleEvent_GameStateChanged(GameState)
-                    
+
                 Case GameState.Paused
                     ScheduleEvent_GameStateChanged(GameState)
             End Select
@@ -175,10 +173,11 @@ Public NotInheritable Class GameManager
     End Sub
 
     Private Sub CheckCollisions()
-        Dim playerGridPos = Player.GridPosition
-        
+        Dim playerBounds = Player.GetBounds()
+
         For Each seed In Seeds.Where(Function(s) s.IsActive).ToList()
-            If seed.GridPosition = playerGridPos Then
+            Dim seedBounds = seed.GetBounds()
+            If playerBounds.Intersects(seedBounds) Then
                 seed.IsActive = False
                 Player.CollectSeed(seed.SeedType)
                 GrowSaplingToTree()
@@ -186,7 +185,13 @@ Public NotInheritable Class GameManager
         Next
 
         For Each pesticidePos In Pesticides.ToList()
-            If pesticidePos = playerGridPos Then
+            Dim pesticideBounds = New Rectangle(
+                pesticidePos.X * CELL_SIZE + (CELL_SIZE - SEED_SIZE) \ 2,
+                pesticidePos.Y * CELL_SIZE + (CELL_SIZE - SEED_SIZE) \ 2,
+                SEED_SIZE,
+                SEED_SIZE
+            )
+            If playerBounds.Intersects(pesticideBounds) Then
                 Pesticides.Remove(pesticidePos)
                 Player.CollectPesticide()
                 ActivatePesticide()
@@ -194,7 +199,8 @@ Public NotInheritable Class GameManager
         Next
 
         For Each enemy In Enemies.Where(Function(e) e.IsActive AndAlso Not e.IsRespawning).ToList()
-            If enemy.GridPosition = playerGridPos Then
+            Dim enemyBounds = enemy.GetBounds()
+            If playerBounds.Intersects(enemyBounds) Then
                 If enemy.IsVulnerable AndAlso enemy.GracePeriodTimer <= 0 Then
                     enemy.Die()
                     Player.KillEnemy()
@@ -214,7 +220,7 @@ Public NotInheritable Class GameManager
     Private Sub ActivatePesticide()
         PesticideActive = True
         PesticideTimer = VULNERABLE_DURATION
-        
+
         For Each enemy In Enemies
             If enemy.IsActive AndAlso Not enemy.IsRespawning Then
                 enemy.MakeVulnerable()
@@ -235,7 +241,7 @@ Public NotInheritable Class GameManager
 
     Private Sub ResetPositionsAfterDeath()
         Player.ResetPosition()
-        
+
         For Each enemy In Enemies
             If enemy.IsActive AndAlso Not enemy.IsRespawning Then
                 enemy.SetRandomDirection()
@@ -249,46 +255,98 @@ Public NotInheritable Class GameManager
             ScheduleEvent_LevelCleared()
         End If
     End Sub
-    
+
     Public Sub HandleInput()
         Dim keyboardState = Keyboard.GetState()
-        
+        Dim touchCollection = TouchPanel.GetState()
+        Dim mouseState = Mouse.GetState()
+
         Select Case GameState
             Case GameState.Title
                 If keyboardState.IsKeyDown(Keys.Enter) AndAlso Not _previousKeyboardState.IsKeyDown(Keys.Enter) Then
                     GameState = GameState.Playing
                 End If
-                
+
+                For Each touchLoc In touchCollection
+                    If touchLoc.State = TouchLocationState.Pressed Then
+                        Dim touchPos = touchLoc.Position
+                        If IsPointInRect(touchPos, New Rectangle(SCREEN_WIDTH \ 2 - 100, 400, 200, 80)) Then
+                            GameState = GameState.Playing
+                        ElseIf IsPointInRect(touchPos, New Rectangle(SCREEN_WIDTH \ 2 - 100, 520, 200, 80)) Then
+                            ScheduleEvent_GameStateChanged(GameState.Title)
+                            Environment.Exit(0)
+                        End If
+                    End If
+                Next
+
+                If mouseState.LeftButton = ButtonState.Pressed Then
+                    Dim mousePos = New Vector2(mouseState.X, mouseState.Y)
+                    If IsPointInRect(mousePos, New Rectangle(SCREEN_WIDTH \ 2 - 100, 400, 200, 80)) Then
+                        GameState = GameState.Playing
+                    ElseIf IsPointInRect(mousePos, New Rectangle(SCREEN_WIDTH \ 2 - 100, 520, 200, 80)) Then
+                        ScheduleEvent_GameStateChanged(GameState.Title)
+                        Environment.Exit(0)
+                    End If
+                End If
+
             Case GameState.GameOver
                 If keyboardState.IsKeyDown(Keys.Enter) AndAlso Not _previousKeyboardState.IsKeyDown(Keys.Enter) Then
                     GameState = GameState.Playing
                 End If
-                
+
+                For Each touchLoc In touchCollection
+                    If touchLoc.State = TouchLocationState.Pressed Then
+                        GameState = GameState.Playing
+                    End If
+                Next
+
+                If mouseState.LeftButton = ButtonState.Pressed Then
+                    GameState = GameState.Playing
+                End If
+
             Case GameState.Playing
                 If keyboardState.IsKeyDown(Keys.P) OrElse keyboardState.IsKeyDown(Keys.Escape) Then
                     GameState = GameState.Paused
                 End If
-                
+
+                For Each touchLoc In touchCollection
+                    If touchLoc.State = TouchLocationState.Pressed Then
+                        Dim touchPos = touchLoc.Position
+                        If IsPointInRect(touchPos, New Rectangle(10, SCREEN_HEIGHT - 100, 60, 60)) Then
+                            GameState = GameState.Paused
+                        End If
+                    End If
+                Next
+
+                If mouseState.LeftButton = ButtonState.Pressed Then
+                    Dim mousePos = New Vector2(mouseState.X, mouseState.Y)
+                    If IsPointInRect(mousePos, New Rectangle(10, SCREEN_HEIGHT - 100, 60, 60)) Then
+                        GameState = GameState.Paused
+                    End If
+                End If
+
             Case GameState.Paused
                 If keyboardState.IsKeyDown(Keys.P) OrElse keyboardState.IsKeyDown(Keys.Escape) OrElse
                    keyboardState.IsKeyDown(Keys.Enter) Then
                     GameState = GameState.Playing
                 End If
+
+                For Each touchLoc In touchCollection
+                    If touchLoc.State = TouchLocationState.Pressed Then
+                        GameState = GameState.Playing
+                    End If
+                Next
+
+                If mouseState.LeftButton = ButtonState.Pressed Then
+                    GameState = GameState.Playing
+                End If
         End Select
-        
+
         _previousKeyboardState = keyboardState
     End Sub
 
-    Public Function GetSeedTypeForCurrentLevel() As SeedType
-        Select Case (CurrentLevel - 1) Mod 6
-            Case 0, 3
-                Return SeedType.Acorn
-            Case 1, 4
-                Return SeedType.Berry
-            Case 2, 5
-                Return SeedType.Nut
-            Case Else
-                Return SeedType.Acorn
-        End Select
+    Private Shared Function IsPointInRect(point As Vector2, rect As Rectangle) As Boolean
+        Return point.X >= rect.X AndAlso point.X <= rect.X + rect.Width AndAlso
+               point.Y >= rect.Y AndAlso point.Y <= rect.Y + rect.Height
     End Function
 End Class

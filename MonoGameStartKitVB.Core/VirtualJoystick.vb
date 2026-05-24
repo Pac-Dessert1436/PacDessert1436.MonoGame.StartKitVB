@@ -39,8 +39,21 @@ Public NotInheritable Class VirtualJoystick
     End Sub
 
     Public Sub Draw(spriteBatch As SpriteBatch)
-        spriteBatch.Draw(_baseTexture, Position - New Vector2(_baseTexture.Width, _baseTexture.Height) / 2, Color.White)
-        Dim knobPos = Position + Value * (_baseTexture.Width / 2F)
-        spriteBatch.Draw(_knobTexture, knobPos - New Vector2(_knobTexture.Width, _knobTexture.Height) / 2, Color.White)
+        Dim baseRect = New Rectangle(
+            CInt(Position.X - _baseTexture.Width),
+            CInt(Position.Y - _baseTexture.Height),
+            _baseTexture.Width * 2,
+            _baseTexture.Height * 2
+        )
+        spriteBatch.Draw(_baseTexture, baseRect, Color.White)
+        
+        Dim knobPos = Position + Value * (_baseTexture.Width)
+        Dim knobRect = New Rectangle(
+            CInt(knobPos.X - _knobTexture.Width),
+            CInt(knobPos.Y - _knobTexture.Height),
+            _knobTexture.Width * 2,
+            _knobTexture.Height * 2
+        )
+        spriteBatch.Draw(_knobTexture, knobRect, Color.White)
     End Sub
 End Class

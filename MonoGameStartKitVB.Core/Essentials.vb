@@ -199,7 +199,7 @@ Public Module Essentials
                     Continue For
                 End If
 
-                If i Mod 2 = 0 AndAlso j Mod 2 = 1 Then
+                If i Mod 2 = 0 AndAlso j Mod 2 = 0 Then
                     maze(i, j) = MazeTile.Sapling
                     saplingCount += 1
                     seedCount += 1
@@ -213,37 +213,36 @@ Public Module Essentials
         Dim rnd = Random.Shared
         Dim pesticideCount = 3
 
-        Dim ManhattanDistance =
-            Function(pt1 As Point, pt2 As Point) As Integer
-                Return Math.Abs(pt1.X - pt2.X) + Math.Abs(pt1.Y - pt2.Y)
+        Dim playerStart = PlayerStartingPoint
+        Dim GetWalkableTiles =
+            Function()
+                Dim tiles As New List(Of Point)
+                For i As Integer = 0 To maxRowIndex
+                    For j As Integer = 0 To maxColIndex
+                        If maze(i, j) = MazeTile.Walkable AndAlso
+                            Not (i = playerStart.X AndAlso j = playerStart.Y) Then
+                            tiles.Add(New Point(i, j))
+                        End If
+                    Next j
+                Next i
+                Return tiles
             End Function
 
-        Dim playerStart = PlayerStartingPoint
-        Dim walkableTiles As New List(Of Point)
-        For i As Integer = 0 To maxRowIndex
-            For j As Integer = 0 To maxColIndex
-                If maze(i, j) = MazeTile.Walkable AndAlso
-                    Not (i = playerStart.X AndAlso j = playerStart.Y) Then
-                    walkableTiles.Add(New Point(i, j))
-                End If
-            Next j
-        Next i
-
-        Dim seedTiles = From wt In walkableTiles
-                       Where ManhattanDistance(wt, playerStart) > 1
-                       Order By rnd.Next() Take seedCount
+        Dim seedTiles = From wt In GetWalkableTiles()
+                        Where ManhattanDistance(wt, playerStart) > 1
+                        Order By rnd.Next() Take seedCount
         For Each tile In seedTiles
             maze(tile.X, tile.Y) = MazeTile.Collectible
         Next tile
 
-        Dim enemyTiles = From wt In walkableTiles
+        Dim enemyTiles = From wt In GetWalkableTiles()
                          Where ManhattanDistance(wt, playerStart) > 5
                          Order By rnd.Next() Take enemyCount
         For Each tile In enemyTiles
             maze(tile.X, tile.Y) = MazeTile.Walkable
         Next tile
 
-        Dim farTiles = From wt In walkableTiles
+        Dim farTiles = From wt In GetWalkableTiles()
                        Where ManhattanDistance(wt, playerStart) > 5
                        Order By rnd.Next() Take pesticideCount
         For Each tile In farTiles
@@ -252,29 +251,34 @@ Public Module Essentials
 
         Return maze
     End Function
-    Private Function GetSeedTypeForLevel(level As Integer) As SeedType
-        Select Case (level - 1) Mod 6
-            Case 0, 3
-                Return SeedType.Acorn
-            Case 1, 4
-                Return SeedType.Berry
-            Case 2, 5
-                Return SeedType.Nut
-            Case Else
-                Return SeedType.Acorn
-        End Select
-    End Function
 
-    Public Function GetEnemyTypeForLevel(level As Integer) As EnemyType
-        Select Case (level - 1) Mod 6
-            Case 0, 2, 4
-                Return EnemyType.Beetle
-            Case 1, 3, 5
-                Return EnemyType.Caterpillar
-            Case Else
-                Return EnemyType.Beetle
-        End Select
-    End Function
+    Public ReadOnly Property SeedTypeForLevel(level As Integer) As SeedType
+        Get
+            Select Case (level - 1) Mod 3
+                Case 0
+                    Return SeedType.Acorn
+                Case 1
+                    Return SeedType.Berry
+                Case 2
+                    Return SeedType.Nut
+                Case Else
+                    Return 0
+            End Select
+        End Get
+    End Property
+
+    Public ReadOnly Property EnemyTypeForLevel(level As Integer) As EnemyType
+        Get
+            Select Case (level - 1) Mod 2
+                Case 0
+                    Return EnemyType.Beetle
+                Case 1
+                    Return EnemyType.Caterpillar
+                Case Else
+                    Return 0
+            End Select
+        End Get
+    End Property
 
     ' Note: Event scheduling methods generated using ModuleEventRaiser.Generator.
 #End Region

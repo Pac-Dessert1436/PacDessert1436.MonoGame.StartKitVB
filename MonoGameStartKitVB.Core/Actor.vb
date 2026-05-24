@@ -28,6 +28,36 @@ Public MustInherit Class Actor
     Public Overridable Sub Update(deltaTime As Single, Optional maze As MazeTile(,) = Nothing)
     End Sub
 
+    Public Shared ReadOnly Property ValidDirections(currDir As Direction) As Direction()
+        Get
+            Dim directions As Direction() = {
+                Direction.Up,
+                Direction.Down,
+                Direction.Left,
+                Direction.Right
+            }
+            Return Aggregate dir As Direction In directions
+                   Where dir <> OppositeDirection(currDir) Into ToArray()
+        End Get
+    End Property
+
+    Public Shared ReadOnly Property OppositeDirection(currDir As Direction) As Direction
+        get
+            Select Case currDir
+                Case Direction.Up
+                    Return Direction.Down
+                Case Direction.Down
+                    Return Direction.Up
+                Case Direction.Left
+                    Return Direction.Right
+                Case Direction.Right
+                    Return Direction.Left
+                Case Else
+                    Return Direction.Down
+            End Select
+        End Get
+    End Property
+
     Public NotInheritable Class Player
         Inherits Actor
 
@@ -47,7 +77,7 @@ Public MustInherit Class Actor
         End Sub
 
         Public Overrides Sub Update(deltaTime As Single, Optional maze As MazeTile(,) = Nothing)
-            If Not IsAlive Then Return
+            If Not IsAlive Then Exit Sub
 
             If IsInDeathAnimation Then
                 DeathAnimationTimer += deltaTime
@@ -59,7 +89,8 @@ Public MustInherit Class Actor
             End If
 
             Dim keyboardState = Keyboard.GetState()
-            Dim movement As Vector2 = Vector2.Zero
+            Dim touchCollection = Touch.TouchPanel.GetState()
+            Dim mouseState = Mouse.GetState()
             IsMoving = False
 
             If keyboardState.IsKeyDown(Keys.Left) OrElse keyboardState.IsKeyDown(Keys.A) Then
@@ -79,6 +110,26 @@ Public MustInherit Class Actor
                 IsMoving = True
             End If
 
+            Dim joystickCenter = New Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 100)
+            Dim maxRadius = 60.0F
+
+            For Each touchLoc In touchCollection
+                If touchLoc.State = Touch.TouchLocationState.Pressed Then
+                    Dim delta = touchLoc.Position - joystickCenter
+                    If delta.Length() <= maxRadius * 2 Then
+                        HandleJoystickInput(delta)
+                    End If
+                End If
+            Next
+
+            If mouseState.LeftButton = ButtonState.Pressed Then
+                Dim mousePos = New Vector2(mouseState.X, mouseState.Y)
+                Dim delta = mousePos - joystickCenter
+                If delta.Length() <= maxRadius * 2 Then
+                    HandleJoystickInput(delta)
+                End If
+            End If
+
             If IsMoving Then
                 CurrentDirection = NextDirection
                 Dim newPosition = PixelPosition + CurrentDirection.ToVector2() * Speed * deltaTime
@@ -91,6 +142,23 @@ Public MustInherit Class Actor
                     )
                 End If
             End If
+        End Sub
+
+        Private Sub HandleJoystickInput(delta As Vector2)
+            If Math.Abs(delta.X) > Math.Abs(delta.Y) Then
+                If delta.X < 0 Then
+                    NextDirection = Direction.Left
+                Else
+                    NextDirection = Direction.Right
+                End If
+            Else
+                If delta.Y < 0 Then
+                    NextDirection = Direction.Up
+                Else
+                    NextDirection = Direction.Down
+                End If
+            End If
+            IsMoving = True
         End Sub
 
         Private Function IsValidPosition(newPosition As Vector2, maze As MazeTile(,)) As Boolean
@@ -108,11 +176,12 @@ Public MustInherit Class Actor
 
             For tileX = startTileX To endTileX
                 For tileY = startTileY To endTileY
-                    If maze(tileX, tileY) = MazeTile.Fence Then
-                        Return False
-                    End If
-                Next
-            Next
+                    Dim tile As MazeTile = maze(tileX, tileY)
+                    If tile = MazeTile.Fence OrElse 
+                       tile = MazeTile.Sapling OrElse 
+                       tile = MazeTile.Tree Then Return False
+                Next tileY
+            Next tileX
 
             Return True
         End Function
@@ -138,7 +207,7 @@ Public MustInherit Class Actor
             Lives -= 1
             ScheduleEvent_LivesChanged(Lives)
             ScheduleEvent_LifeLost()
-            
+
             If Lives <= 0 Then
                 IsAlive = False
                 ScheduleEvent_PlayerDied()
@@ -246,7 +315,8 @@ Public MustInherit Class Actor
 
             For tileX = startTileX To endTileX
                 For tileY = startTileY To endTileY
-                    If maze(tileX, tileY) = MazeTile.Fence Then
+                    Dim tile = maze(tileX, tileY)
+                    If tile = MazeTile.Fence OrElse tile = MazeTile.Sapling OrElse tile = MazeTile.Tree Then
                         Return False
                     End If
                 Next
@@ -256,17 +326,17 @@ Public MustInherit Class Actor
         End Function
 
         Public Sub SetRandomDirection()
-            Dim directions As Direction() = {
-                Direction.Up,
-                Direction.Down,
-                Direction.Left,
-                Direction.Right
-            }
-            Dim validDirections = directions.Where(Function(d) d <> GetOppositeDirection(_previousDirection)).ToArray()
-            
+            Dim validDirections = Actor.ValidDirections(_previousDirection)
+
             If validDirections.Length > 0 Then
                 Direction = validDirections(random.Next(validDirections.Length))
             Else
+                Dim directions As Direction() = {
+                    Direction.Up,
+                    Direction.Down,
+                    Direction.Left,
+                    Direction.Right
+                }
                 Direction = directions(random.Next(directions.Length))
             End If
         End Sub
@@ -278,28 +348,12 @@ Public MustInherit Class Actor
                 Direction.Left,
                 Direction.Right
             }
-            
-            Dim validDirections = directions.Where(Function(d) d <> GetOppositeDirection(Direction)).ToArray()
-            
+
+            Dim validDirections = Actor.ValidDirections(Direction)
             If validDirections.Length > 0 Then
                 Direction = validDirections(random.Next(validDirections.Length))
             End If
         End Sub
-
-        Private Shared Function GetOppositeDirection(dir As Direction) As Direction
-            Select Case dir
-                Case Direction.Up
-                    Return Direction.Down
-                Case Direction.Down
-                    Return Direction.Up
-                Case Direction.Left
-                    Return Direction.Right
-                Case Direction.Right
-                    Return Direction.Left
-                Case Else
-                    Return Direction.Down
-            End Select
-        End Function
 
         Public Sub MakeVulnerable()
             IsVulnerable = True
