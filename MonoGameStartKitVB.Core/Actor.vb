@@ -82,24 +82,39 @@ Public MustInherit Class Actor
             If IsMoving Then
                 CurrentDirection = NextDirection
                 Dim newPosition = PixelPosition + CurrentDirection.ToVector2() * Speed * deltaTime
-                Dim newGridPos = New Point(
-                    CInt(newPosition.X / CELL_SIZE),
-                    CInt(newPosition.Y / CELL_SIZE)
-                )
 
-                If IsValidPosition(newGridPos, maze) Then
+                If IsValidPosition(newPosition, maze) Then
                     PixelPosition = newPosition
-                    GridPosition = newGridPos
+                    GridPosition = New Point(
+                        CInt(PixelPosition.X / CELL_SIZE),
+                        CInt(PixelPosition.Y / CELL_SIZE)
+                    )
                 End If
             End If
         End Sub
 
-        Private Shared Function IsValidPosition(gridPos As Point, maze As MazeTile(,)) As Boolean
-            If gridPos.X < 0 OrElse gridPos.X >= MAZE_WIDTH OrElse
-               gridPos.Y < 0 OrElse gridPos.Y >= MAZE_HEIGHT Then
-                Return False
-            End If
-            Return maze(gridPos.X, gridPos.Y) <> MazeTile.Fence
+        Private Function IsValidPosition(newPosition As Vector2, maze As MazeTile(,)) As Boolean
+            Dim bounds = New Rectangle(
+                CInt(newPosition.X - Size / 2),
+                CInt(newPosition.Y - Size / 2),
+                Size,
+                Size
+            )
+
+            Dim startTileX = Math.Max(0, bounds.Left \ CELL_SIZE)
+            Dim endTileX = Math.Min(MAZE_WIDTH - 1, bounds.Right \ CELL_SIZE)
+            Dim startTileY = Math.Max(0, bounds.Top \ CELL_SIZE)
+            Dim endTileY = Math.Min(MAZE_HEIGHT - 1, bounds.Bottom \ CELL_SIZE)
+
+            For tileX = startTileX To endTileX
+                For tileY = startTileY To endTileY
+                    If maze(tileX, tileY) = MazeTile.Fence Then
+                        Return False
+                    End If
+                Next
+            Next
+
+            Return True
         End Function
 
         Public Sub CollectSeed(seedType As SeedType)
@@ -198,14 +213,13 @@ Public MustInherit Class Actor
 
             Dim movement = Direction.ToVector2()
             Dim newPosition = PixelPosition + movement * Speed * deltaTime
-            Dim newGridPos = New Point(
-                CInt(newPosition.X / CELL_SIZE),
-                CInt(newPosition.Y / CELL_SIZE)
-            )
 
-            If maze IsNot Nothing AndAlso IsValidPosition(newGridPos, maze) Then
+            If maze IsNot Nothing AndAlso IsValidPosition(newPosition, maze) Then
                 PixelPosition = newPosition
-                GridPosition = newGridPos
+                GridPosition = New Point(
+                    CInt(PixelPosition.X / CELL_SIZE),
+                    CInt(PixelPosition.Y / CELL_SIZE)
+                )
             Else
                 ChangeDirection()
             End If
@@ -217,12 +231,28 @@ Public MustInherit Class Actor
             _previousDirection = Direction
         End Sub
 
-        Private Shared Function IsValidPosition(gridPos As Point, maze As MazeTile(,)) As Boolean
-            If gridPos.X < 0 OrElse gridPos.X >= MAZE_WIDTH OrElse
-               gridPos.Y < 0 OrElse gridPos.Y >= MAZE_HEIGHT Then
-                Return False
-            End If
-            Return maze(gridPos.X, gridPos.Y) <> MazeTile.Fence
+        Private Function IsValidPosition(newPosition As Vector2, maze As MazeTile(,)) As Boolean
+            Dim bounds = New Rectangle(
+                CInt(newPosition.X - Size / 2),
+                CInt(newPosition.Y - Size / 2),
+                Size,
+                Size
+            )
+
+            Dim startTileX = Math.Max(0, bounds.Left \ CELL_SIZE)
+            Dim endTileX = Math.Min(MAZE_WIDTH - 1, bounds.Right \ CELL_SIZE)
+            Dim startTileY = Math.Max(0, bounds.Top \ CELL_SIZE)
+            Dim endTileY = Math.Min(MAZE_HEIGHT - 1, bounds.Bottom \ CELL_SIZE)
+
+            For tileX = startTileX To endTileX
+                For tileY = startTileY To endTileY
+                    If maze(tileX, tileY) = MazeTile.Fence Then
+                        Return False
+                    End If
+                Next
+            Next
+
+            Return True
         End Function
 
         Public Sub SetRandomDirection()

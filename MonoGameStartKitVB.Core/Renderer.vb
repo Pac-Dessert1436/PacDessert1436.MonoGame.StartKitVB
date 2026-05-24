@@ -27,11 +27,7 @@ Public NotInheritable Class Renderer
 
     Private _playerAnimations As Dictionary(Of Direction, Animation)
     Private _playerDeathAnimation As Animation
-    Private _enemyAnimations As Dictionary(Of Tuple(Of EnemyType, Direction), Animation)
-
-    Private ReadOnly _hudOffset As Integer = 60
-    Private _mazeOffsetX As Integer
-    Private _mazeOffsetY As Integer
+    Private _enemyAnimations As Dictionary(Of (EnemyType, Direction), Animation)
     Private _joystick As VirtualJoystick
 
     Public Sub New(graphicsDevice As GraphicsDevice, content As ContentManager)
@@ -45,38 +41,41 @@ Public NotInheritable Class Renderer
             graphicsDevice, MAZE_WIDTH * CELL_SIZE, MAZE_HEIGHT * CELL_SIZE
         )
 
-        CalculateMazeOffset()
         LoadContent()
     End Sub
 
-    Private Sub CalculateMazeOffset()
-        _mazeOffsetX = (SCREEN_WIDTH - MAZE_WIDTH * CELL_SIZE) \ 2
-        _mazeOffsetY = _hudOffset + (SCREEN_HEIGHT - _hudOffset - MAZE_HEIGHT * CELL_SIZE - 150) \ 2
-    End Sub
+    ''' <summary>
+    ''' Returns an array of 1-based indices from start to stop, inclusive.
+    ''' </summary>
+    ''' <param name="start">The 1-based start index.</param>
+    ''' <param name="stop">The 1-based stop index.</param>
+    ''' <returns>An array of 1-based indices from start to stop, inclusive.</returns>
+    Private Shared Function OneBasedIndices(start As Integer, [stop] As Integer) As Integer()
+        Return Enumerable.Range(start - 1, [stop] - start + 1).ToArray()
+    End Function
 
-    <CodeAnalysis.SuppressMessage("Performance", "CA1861")>
     Private Sub LoadContent()
-        _playerSpriteSheet = New SpriteSheet(_content, "Images/player_sheet", 32, 32)
-        _enemySpriteSheet = New SpriteSheet(_content, "Images/enemy_sheet", 32, 32)
-        _objectSpriteSheet = New SpriteSheet(_content, "Images/object_sheet", 32, 32)
+        _playerSpriteSheet = New SpriteSheet(_content, "Images/player_sheet", CELL_SIZE, CELL_SIZE)
+        _enemySpriteSheet = New SpriteSheet(_content, "Images/enemy_sheet", CELL_SIZE, CELL_SIZE)
+        _objectSpriteSheet = New SpriteSheet(_content, "Images/object_sheet", CELL_SIZE, CELL_SIZE)
 
         _playerAnimations = New Dictionary(Of Direction, Animation) From {
-            {Direction.Left, New Animation(_playerSpriteSheet, {1, 2}, 0.1F)},
-            {Direction.Right, New Animation(_playerSpriteSheet, {3, 4}, 0.1F)},
-            {Direction.Up, New Animation(_playerSpriteSheet, {5, 6}, 0.1F)},
-            {Direction.Down, New Animation(_playerSpriteSheet, {7, 8}, 0.1F)}
+            {Direction.Left, New Animation(_playerSpriteSheet, OneBasedIndices(1, 2), 0.1F)},
+            {Direction.Right, New Animation(_playerSpriteSheet, OneBasedIndices(3, 4), 0.1F)},
+            {Direction.Up, New Animation(_playerSpriteSheet, OneBasedIndices(5, 6), 0.1F)},
+            {Direction.Down, New Animation(_playerSpriteSheet, OneBasedIndices(7, 8), 0.1F)}
         }
-        _playerDeathAnimation = New Animation(_playerSpriteSheet, Enumerable.Range(9, 8).ToArray(), 0.1F)
+        _playerDeathAnimation = New Animation(_playerSpriteSheet, OneBasedIndices(9, 16), 0.1F)
 
-        _enemyAnimations = New Dictionary(Of Tuple(Of EnemyType, Direction), Animation) From {
-            {Tuple.Create(EnemyType.Beetle, Direction.Left), New Animation(_enemySpriteSheet, {1, 2}, 0.1F)},
-            {Tuple.Create(EnemyType.Beetle, Direction.Right), New Animation(_enemySpriteSheet, {3, 4}, 0.1F)},
-            {Tuple.Create(EnemyType.Beetle, Direction.Up), New Animation(_enemySpriteSheet, {5, 6}, 0.1F)},
-            {Tuple.Create(EnemyType.Beetle, Direction.Down), New Animation(_enemySpriteSheet, {7, 8}, 0.1F)},
-            {Tuple.Create(EnemyType.Caterpillar, Direction.Left), New Animation(_enemySpriteSheet, {9, 10}, 0.1F)},
-            {Tuple.Create(EnemyType.Caterpillar, Direction.Right), New Animation(_enemySpriteSheet, {11, 12}, 0.1F)},
-            {Tuple.Create(EnemyType.Caterpillar, Direction.Up), New Animation(_enemySpriteSheet, {13, 14}, 0.1F)},
-            {Tuple.Create(EnemyType.Caterpillar, Direction.Down), New Animation(_enemySpriteSheet, {15, 16}, 0.1F)}
+        _enemyAnimations = New Dictionary(Of (EnemyType, Direction), Animation) From {
+            {(EnemyType.Beetle, Direction.Left), New Animation(_enemySpriteSheet, OneBasedIndices(1, 2), 0.1F)},
+            {(EnemyType.Beetle, Direction.Right), New Animation(_enemySpriteSheet, OneBasedIndices(3, 4), 0.1F)},
+            {(EnemyType.Beetle, Direction.Up), New Animation(_enemySpriteSheet, OneBasedIndices(5, 6), 0.1F)},
+            {(EnemyType.Beetle, Direction.Down), New Animation(_enemySpriteSheet, OneBasedIndices(7, 8), 0.1F)},
+            {(EnemyType.Caterpillar, Direction.Left), New Animation(_enemySpriteSheet, OneBasedIndices(9, 10), 0.1F)},
+            {(EnemyType.Caterpillar, Direction.Right), New Animation(_enemySpriteSheet, OneBasedIndices(11, 12), 0.1F)},
+            {(EnemyType.Caterpillar, Direction.Up), New Animation(_enemySpriteSheet, OneBasedIndices(13, 14), 0.1F)},
+            {(EnemyType.Caterpillar, Direction.Down), New Animation(_enemySpriteSheet, OneBasedIndices(15, 16), 0.1F)}
         }
 
         _iconSpriteSheet = _content.Load(Of Texture2D)("Images/icon_sheet")
@@ -100,8 +99,8 @@ Public NotInheritable Class Renderer
                 DrawTitleScreen()
 
             Case GameState.Playing, GameState.Paused
-                DrawHUD(gameManager)
                 DrawGameArea(gameManager, deltaTime)
+                DrawHUD(gameManager)
                 DrawJoystick()
                 DrawPauseButton()
 
@@ -110,15 +109,15 @@ Public NotInheritable Class Renderer
                 End If
 
             Case GameState.GameOver
-                DrawHUD(gameManager)
                 DrawGameArea(gameManager, deltaTime)
+                DrawHUD(gameManager)
                 DrawJoystick()
                 DrawPauseButton()
                 DrawGameOverScreen(gameManager)
 
             Case GameState.LevelCleared
-                DrawHUD(gameManager)
                 DrawGameArea(gameManager, deltaTime)
+                DrawHUD(gameManager)
                 DrawJoystick()
                 DrawPauseButton()
                 DrawLevelClearedScreen(gameManager)
@@ -214,14 +213,18 @@ Public NotInheritable Class Renderer
         DrawPlayer(gameManager.Player, deltaTime)
         DrawEnemies(gameManager.Enemies, deltaTime)
 
-        If gameManager.IsGetReadyActive Then
-            DrawGetReadyMessage()
-        End If
-
+        If gameManager.IsGetReadyActive Then DrawGetReadyMessage()
         _spriteBatch.End()
         _graphicsDevice.SetRenderTarget(Nothing)
 
-        Dim renderRect As New Rectangle(_mazeOffsetX, _mazeOffsetY, _renderTarget.Width, _renderTarget.Height)
+        Const HUD_HEIGHT As Integer = 150
+        Dim renderRect As New Rectangle(
+            0,
+            (SCREEN_HEIGHT - HUD_HEIGHT - MAZE_HEIGHT * CELL_SIZE) \ 2,
+            SCREEN_WIDTH,
+            SCREEN_WIDTH * _renderTarget.Height \ _renderTarget.Width
+        )
+
         _spriteBatch.Begin(samplerState:=SamplerState.PointClamp)
         _spriteBatch.Draw(_renderTarget, renderRect, Color.White)
         _spriteBatch.End()
@@ -347,21 +350,14 @@ Public NotInheritable Class Renderer
             player.PixelPosition.Y - PLAYER_SIZE \ 2
         )
 
-        Dim playerColor As Color
-        If player.IsInDeathAnimation Then
-            playerColor = New Color(255, 100, 100)
-        Else
-            playerColor = Color.Yellow
-        End If
-
         ' Draw actual player
-        animation.SpriteSheet.DrawFrame(_spriteBatch, frameIndex, drawPos, scale, playerColor)
+        animation.SpriteSheet.DrawFrame(_spriteBatch, frameIndex, drawPos, scale, Color.White)
     End Sub
 
     Private Sub DrawEnemies(enemies As List(Of Actor.Enemy), deltaTime As Single)
         For Each enemy In From e In enemies Where e.IsActive
             Dim direction = enemy.Direction
-            Dim key = Tuple.Create(enemy.EnemyType, direction)
+            Dim key = (enemy.EnemyType, direction)
             Dim animation = _enemyAnimations(key)
             animation.Update(deltaTime)
             Dim frameIndex = animation.CurrentFrameIndex
