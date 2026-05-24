@@ -1,5 +1,6 @@
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Input
+Imports Microsoft.Xna.Framework.Graphics
 
 Public MustInherit Class Actor
     Public Property GridPosition As Point
@@ -72,6 +73,17 @@ Public MustInherit Class Actor
         Public Property IsInDeathAnimation As Boolean = False
         Public Property DeathAnimationTimer As Single = 0.0F
 
+        Private Shared _joystickBaseWidth As Integer = 64
+
+        Public Shared Property JoystickBaseWidth As Integer
+            Get
+                Return _joystickBaseWidth
+            End Get
+            Set(value As Integer)
+                _joystickBaseWidth = value
+            End Set
+        End Property
+
         Public Sub New(gridPosition As Point)
             MyBase.New(gridPosition, PLAYER_SIZE)
         End Sub
@@ -91,6 +103,7 @@ Public MustInherit Class Actor
             Dim keyboardState = Keyboard.GetState()
             Dim touchCollection = Touch.TouchPanel.GetState()
             Dim mouseState = Mouse.GetState()
+            Dim gamePadState = GamePad.GetState(PlayerIndex.One)
             IsMoving = False
 
             If keyboardState.IsKeyDown(Keys.Left) OrElse keyboardState.IsKeyDown(Keys.A) Then
@@ -110,13 +123,45 @@ Public MustInherit Class Actor
                 IsMoving = True
             End If
 
-            Dim joystickCenter = New Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 100)
-            Dim maxRadius = 60.0F
+            Dim leftThumbStick = gamePadState.ThumbSticks.Left
+            If Math.Abs(leftThumbStick.X) > 0.2F OrElse Math.Abs(leftThumbStick.Y) > 0.2F Then
+                If Math.Abs(leftThumbStick.X) > Math.Abs(leftThumbStick.Y) Then
+                    NextDirection = If(leftThumbStick.X < 0, Direction.Left, Direction.Right)
+                Else
+                    NextDirection = If(leftThumbStick.Y < 0, Direction.Up, Direction.Down)
+                End If
+                IsMoving = True
+            End If
+
+            If gamePadState.DPad.Left = ButtonState.Pressed Then
+                NextDirection = Direction.Left
+                IsMoving = True
+            End If
+            If gamePadState.DPad.Right = ButtonState.Pressed Then
+                NextDirection = Direction.Right
+                IsMoving = True
+            End If
+            If gamePadState.DPad.Up = ButtonState.Pressed Then
+                NextDirection = Direction.Up
+                IsMoving = True
+            End If
+            If gamePadState.DPad.Down = ButtonState.Pressed Then
+                NextDirection = Direction.Down
+                IsMoving = True
+            End If
+
+            Dim joystickCenter = New Vector2(
+                Renderer.ActualScreenWidth / 2F,
+                Renderer.ActualScreenHeight - _joystickBaseWidth * Renderer.ScreenScale * 2 - 10.0F
+            )
+            Dim joystickRadius = CSng(_joystickBaseWidth * Renderer.ScreenScale * 2)
 
             For Each touchLoc In touchCollection
-                If touchLoc.State = Touch.TouchLocationState.Pressed Then
-                    Dim delta = touchLoc.Position - joystickCenter
-                    If delta.Length() <= maxRadius * 2 Then
+                If touchLoc.State = Touch.TouchLocationState.Pressed OrElse
+                   touchLoc.State = Touch.TouchLocationState.Moved Then
+                    Dim touchPos = touchLoc.Position
+                    Dim delta = touchPos - joystickCenter
+                    If delta.Length() <= joystickRadius * 2 Then
                         HandleJoystickInput(delta)
                     End If
                 End If
@@ -125,7 +170,7 @@ Public MustInherit Class Actor
             If mouseState.LeftButton = ButtonState.Pressed Then
                 Dim mousePos = New Vector2(mouseState.X, mouseState.Y)
                 Dim delta = mousePos - joystickCenter
-                If delta.Length() <= maxRadius * 2 Then
+                If delta.Length() <= joystickRadius * 2 Then
                     HandleJoystickInput(delta)
                 End If
             End If

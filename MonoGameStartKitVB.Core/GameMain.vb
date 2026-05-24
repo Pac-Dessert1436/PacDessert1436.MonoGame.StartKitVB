@@ -17,7 +17,8 @@ Public NotInheritable Class GameMain
     Public Sub New()
         _graphics = New GraphicsDeviceManager(Me) With {
             .PreferredBackBufferWidth = SCREEN_WIDTH,
-            .PreferredBackBufferHeight = SCREEN_HEIGHT
+            .PreferredBackBufferHeight = SCREEN_HEIGHT,
+            .IsFullScreen = True
         }
         _graphics.ApplyChanges()
         Content.RootDirectory = "Content"
@@ -25,7 +26,10 @@ Public NotInheritable Class GameMain
     End Sub
 
     Protected Overrides Sub Initialize()
-        ' Initialize game systems
+        _graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width
+        _graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height
+        _graphics.ApplyChanges()
+
         _gameManager = New GameManager
         _renderer = New Renderer(GraphicsDevice, Content)
         _soundManager = New SoundManager(Content)
@@ -36,13 +40,7 @@ Public NotInheritable Class GameMain
     Protected Overrides Sub Update(gameTime As GameTime)
         ' Handle exit condition
         If GamePad.GetState(PlayerIndex.One).Buttons.Back = ButtonState.Pressed OrElse
-           Keyboard.GetState().IsKeyDown(Keys.Escape) Then
-            If _gameManager.GameState <> GameState.Title Then
-                ' Let the game manager handle escape key for pause functionality
-            Else
-                [Exit]()
-            End If
-        End If
+           Keyboard.GetState().IsKeyDown(Keys.Escape) Then [Exit]()
 
         ' Handle input for game state transitions
         _gameManager.HandleInput()

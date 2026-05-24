@@ -9,6 +9,14 @@ Public NotInheritable Class VirtualJoystick
     ' Required fields
     Private ReadOnly _baseTexture As Texture2D
     Private ReadOnly _knobTexture As Texture2D
+
+    Private Shared ReadOnly Property JoystickBaseScale As Integer
+        Get
+            If OperatingSystem.IsWindows() OrElse OperatingSystem.IsLinux() Then Return 3
+            Return 5   ' Larger for mobile devices
+        End Get
+    End Property
+
     ''' <summary>
     ''' Center of the joystick base.
     ''' </summary>
@@ -38,21 +46,28 @@ Public NotInheritable Class VirtualJoystick
         End If
     End Sub
 
-    Public Sub Draw(spriteBatch As SpriteBatch)
+    Public Sub Draw(spriteBatch As SpriteBatch, screenScale As Single)
+        Dim scale = JoystickBaseScale * screenScale
+        Dim scaledWidth = _baseTexture.Width * scale
+        Dim scaledHeight = _baseTexture.Height * scale
+
         Dim baseRect = New Rectangle(
-            CInt(Position.X - _baseTexture.Width),
-            CInt(Position.Y - _baseTexture.Height),
-            _baseTexture.Width * 2,
-            _baseTexture.Height * 2
+            CInt(Position.X - scaledWidth / 2),
+            CInt(Position.Y - scaledHeight / 2),
+            CInt(scaledWidth),
+            CInt(scaledHeight)
         )
         spriteBatch.Draw(_baseTexture, baseRect, Color.White)
-        
-        Dim knobPos = Position + Value * (_baseTexture.Width)
+
+        Dim knobPos = Position + Value * (scaledWidth / 2)
+        Dim knobScaledWidth = _knobTexture.Width * scale
+        Dim knobScaledHeight = _knobTexture.Height * scale
+
         Dim knobRect = New Rectangle(
-            CInt(knobPos.X - _knobTexture.Width),
-            CInt(knobPos.Y - _knobTexture.Height),
-            _knobTexture.Width * 2,
-            _knobTexture.Height * 2
+            CInt(knobPos.X - knobScaledWidth / 2),
+            CInt(knobPos.Y - knobScaledHeight / 2),
+            CInt(knobScaledWidth),
+            CInt(knobScaledHeight)
         )
         spriteBatch.Draw(_knobTexture, knobRect, Color.White)
     End Sub

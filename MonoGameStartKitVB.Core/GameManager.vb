@@ -1,6 +1,6 @@
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Input
-Imports Microsoft.Xna.Framework.Input.Touch
+Imports Microsoft.Xna.Framework.Graphics
 
 Public NotInheritable Class GameManager
     Private ReadOnly _random As New Random
@@ -258,21 +258,38 @@ Public NotInheritable Class GameManager
 
     Public Sub HandleInput()
         Dim keyboardState = Keyboard.GetState()
-        Dim touchCollection = TouchPanel.GetState()
+        Dim touchCollection = Touch.TouchPanel.GetState()
         Dim mouseState = Mouse.GetState()
+
+        Dim scale = Renderer.ScreenScale
+        Dim offsetX = Renderer.ScreenOffset.X
+        Dim offsetY = Renderer.ScreenOffset.Y
 
         Select Case GameState
             Case GameState.Title
-                If keyboardState.IsKeyDown(Keys.Enter) AndAlso Not _previousKeyboardState.IsKeyDown(Keys.Enter) Then
+                If keyboardState.IsKeyDown(Keys.Enter) AndAlso
+                    Not _previousKeyboardState.IsKeyDown(Keys.Enter) Then
                     GameState = GameState.Playing
                 End If
 
                 For Each touchLoc In touchCollection
-                    If touchLoc.State = TouchLocationState.Pressed Then
+                    If touchLoc.State = Touch.TouchLocationState.Pressed Then
                         Dim touchPos = touchLoc.Position
-                        If IsPointInRect(touchPos, New Rectangle(SCREEN_WIDTH \ 2 - 100, 400, 200, 80)) Then
+                        Dim startButton = New Rectangle(
+                            CInt((SCREEN_WIDTH \ 2 - 100) * scale + offsetX),
+                            CInt(400 * scale + offsetY),
+                            CInt(200 * scale),
+                            CInt(80 * scale)
+                        )
+                        Dim exitButton = New Rectangle(
+                            CInt((SCREEN_WIDTH \ 2 - 100) * scale + offsetX),
+                            CInt(520 * scale + offsetY),
+                            CInt(200 * scale),
+                            CInt(80 * scale)
+                        )
+                        If IsPointInRect(touchPos, startButton) Then
                             GameState = GameState.Playing
-                        ElseIf IsPointInRect(touchPos, New Rectangle(SCREEN_WIDTH \ 2 - 100, 520, 200, 80)) Then
+                        ElseIf IsPointInRect(touchPos, exitButton) Then
                             ScheduleEvent_GameStateChanged(GameState.Title)
                             Environment.Exit(0)
                         End If
@@ -281,9 +298,21 @@ Public NotInheritable Class GameManager
 
                 If mouseState.LeftButton = ButtonState.Pressed Then
                     Dim mousePos = New Vector2(mouseState.X, mouseState.Y)
-                    If IsPointInRect(mousePos, New Rectangle(SCREEN_WIDTH \ 2 - 100, 400, 200, 80)) Then
+                    Dim startButton = New Rectangle(
+                        CInt((SCREEN_WIDTH \ 2 - 100) * scale + offsetX),
+                        CInt(400 * scale + offsetY),
+                        CInt(200 * scale),
+                        CInt(80 * scale)
+                    )
+                    Dim exitButton = New Rectangle(
+                        CInt((SCREEN_WIDTH \ 2 - 100) * scale + offsetX),
+                        CInt(520 * scale + offsetY),
+                        CInt(200 * scale),
+                        CInt(80 * scale)
+                    )
+                    If IsPointInRect(mousePos, startButton) Then
                         GameState = GameState.Playing
-                    ElseIf IsPointInRect(mousePos, New Rectangle(SCREEN_WIDTH \ 2 - 100, 520, 200, 80)) Then
+                    ElseIf IsPointInRect(mousePos, exitButton) Then
                         ScheduleEvent_GameStateChanged(GameState.Title)
                         Environment.Exit(0)
                     End If
@@ -295,7 +324,7 @@ Public NotInheritable Class GameManager
                 End If
 
                 For Each touchLoc In touchCollection
-                    If touchLoc.State = TouchLocationState.Pressed Then
+                    If touchLoc.State = Touch.TouchLocationState.Pressed Then
                         GameState = GameState.Playing
                     End If
                 Next
@@ -309,18 +338,26 @@ Public NotInheritable Class GameManager
                     GameState = GameState.Paused
                 End If
 
+                Dim buttonScale = scale * 2
+                Dim pauseButtonRect = New Rectangle(
+                    CInt(10 * scale + offsetX),
+                    CInt(Renderer.ActualScreenHeight - Renderer.PauseButtonHeight * buttonScale - 10),
+                    CInt(Renderer.PauseButtonWidth * buttonScale),
+                    CInt(Renderer.PauseButtonHeight * buttonScale)
+                )
+
                 For Each touchLoc In touchCollection
-                    If touchLoc.State = TouchLocationState.Pressed Then
+                    If touchLoc.State = Touch.TouchLocationState.Pressed Then
                         Dim touchPos = touchLoc.Position
-                        If IsPointInRect(touchPos, New Rectangle(10, SCREEN_HEIGHT - 100, 60, 60)) Then
+                        If IsPointInRect(touchPos, pauseButtonRect) Then
                             GameState = GameState.Paused
                         End If
                     End If
                 Next
 
                 If mouseState.LeftButton = ButtonState.Pressed Then
-                    Dim mousePos = New Vector2(mouseState.X, mouseState.Y)
-                    If IsPointInRect(mousePos, New Rectangle(10, SCREEN_HEIGHT - 100, 60, 60)) Then
+                    Dim mousePos As New Vector2(mouseState.X, mouseState.Y)
+                    If IsPointInRect(mousePos, pauseButtonRect) Then
                         GameState = GameState.Paused
                     End If
                 End If
@@ -332,7 +369,7 @@ Public NotInheritable Class GameManager
                 End If
 
                 For Each touchLoc In touchCollection
-                    If touchLoc.State = TouchLocationState.Pressed Then
+                    If touchLoc.State = Touch.TouchLocationState.Pressed Then
                         GameState = GameState.Playing
                     End If
                 Next

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31903.59
+# Visual Studio Version 18
+VisualStudioVersion = 18.5.11801.241 oobstable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "MonoGameStartKitVB.Core", "MonoGameStartKitVB.Core\MonoGameStartKitVB.Core.vbproj", "{640BE6B2-252D-464E-8770-A2AABD97E451}"
 EndProject
@@ -61,6 +61,7 @@ Global
 		{D0E52182-E398-4AD6-8C17-9E12D384FADE}.Release|x86.Build.0 = Release|Any CPU
 		{3271C6F2-7F48-4C06-915E-C368814FC60E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3271C6F2-7F48-4C06-915E-C368814FC60E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3271C6F2-7F48-4C06-915E-C368814FC60E}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{3271C6F2-7F48-4C06-915E-C368814FC60E}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{3271C6F2-7F48-4C06-915E-C368814FC60E}.Debug|x64.Build.0 = Debug|Any CPU
 		{3271C6F2-7F48-4C06-915E-C368814FC60E}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -73,6 +74,7 @@ Global
 		{3271C6F2-7F48-4C06-915E-C368814FC60E}.Release|x86.Build.0 = Release|Any CPU
 		{204456F2-2157-4E46-99B5-3A7471561BCA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{204456F2-2157-4E46-99B5-3A7471561BCA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{204456F2-2157-4E46-99B5-3A7471561BCA}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{204456F2-2157-4E46-99B5-3A7471561BCA}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{204456F2-2157-4E46-99B5-3A7471561BCA}.Debug|x64.Build.0 = Debug|Any CPU
 		{204456F2-2157-4E46-99B5-3A7471561BCA}.Debug|x86.ActiveCfg = Debug|Any CPU

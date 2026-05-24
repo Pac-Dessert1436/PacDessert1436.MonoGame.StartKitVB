@@ -1,25 +1,80 @@
-# Devour-Man - MonoGame StartKit (VB.NET)
+# MonoGame 2D StartKit VB.NET (`PacDessert1436.MonoGame.StartKitVB`)
 
-A multi-platform game template built with **VB.NET** for [MonoGame](https://www.monogame.net/), inspired by Pac-Man.
+A multi-platform game template built with **VB.NET** for [MonoGame](https://www.monogame.net/), featuring the game **Devour-Man** — inspired by Pac-Man.
 
-For version notes of this project, please refer to the [Features](#features) section.
+---
 
 ## Overview
 
-_Devour-Man_ is a relatively simple game template that demonstrates modern MonoGame development practices using VB.NET. Players collect seeds to grow a forest while dodging patrolling insects. This project showcases a true object-oriented architecture with cross-platform support.
+**Project Name:** PacDessert1436.MonoGame.StartKitVB
+**Template Short Name**: `mgstartkit-vb`
+**Game Name:** Devour-Man
 
-> **Important Cross-Platform Note**: While this project is designed to be cross-platform, it has been **primarily validated on UWP (Universal Windows Platform)**. Other platforms have limited support and may require additional configuration or have known limitations.
+_PacDessert1436.MonoGame.StartKitVB_ is an **actively developed** game template demonstrating modern MonoGame development practices using VB.NET. The included game, **Devour-Man**, is a Pac-Man inspired arcade game where players collect seeds to grow a forest while dodging patrolling insects.
 
-This template serves as an excellent foundation for developers looking to build 2D games with MonoGame across multiple platforms, using Visual Basic .NET for the core game logic. However, it remains in development and is not a feature-complete game template. **Please stay tuned for version 1.1.0 for full feature implementation.**
+**Note:** This project is still in **active development** and is a few steps away from feature completeness.
+
+---
+
+## Current Development Status
+
+### Core Architecture
+- ✅ **Clean Architecture Pattern**: Proper separation of concerns with dedicated managers
+- ✅ **Event-Driven Design**: Comprehensive event system for game state management
+- ✅ **True OOP Implementation**: Polymorphic actor system with base `Actor` class 
+- ✅ **Memory Management**: Complete `IDisposable` pattern implementation
+
+### Game Systems
+- ✅ **GameManager**: Centralized game state management with collision detection
+- ✅ **Renderer**: Advanced 2D rendering with sprite sheets and animations
+- ⚠️ **SoundManager**: Basic audio playback support (needs expansion)
+- ✅ **VirtualJoystick**: Cross-platform input handling (touch, mouse, keyboard)
+
+### Entity System
+- ✅ **Actor Framework**: Base class with `Player`, `Enemy`, and `Seed` subclasses
+- ✅ **Enemy Movement**: Random patrolling behavior with direction changes
+- ⚠️ **Enemy Respawn Mechanics**: Currently not fully implemented and needs refinement
+- ⚠️ **Progression System**: Multiple seed types (Acorn, Berry, Nut) and enemy types (Beetle, Caterpillar); _Refinement required for the next version_
+- ✅ **Forest Growth**: Sapling-to-tree transformation when seeds are collected
+
+### Platform Support
+- ✅ **WindowsDX**: Primary platform with full feature support
+- ✅ **Android**: Touch input fully functional and tested
+- ⚠️ **iOS**: Compatibility in progress (untested)
+- ❌ **DesktopGL**: Build issues due to FFMPEG pipeline (see note below)
+
+---
 
 ## Project Architecture
 
-This project follows a clean architecture pattern with:
+```
+MonoGameStartKitVB/
+├── MonoGameStartKitVB.Core/          # Shared VB.NET game logic
+│   ├── Actor.vb                      # Entity framework (Player, Enemy, Seed)
+│   ├── Essentials.vb                 # Constants, enums, events, utilities
+│   ├── GameMain.vb                   # Main game class
+│   ├── GameManager.vb                # Game state and logic
+│   ├── Renderer.vb                   # Graphics rendering
+│   ├── SoundManager.vb               # Audio management
+│   ├── SpriteSheet.vb                # Sprite and animation system
+│   └── VirtualJoystick.vb            # Input handling
+├── MonoGameStartKitVB.WindowsDX/     # Windows desktop launcher
+├── MonoGameStartKitVB.Android/       # Android mobile launcher
+├── MonoGameStartKitVB.iOS/           # iOS mobile launcher
+└── MonoGameStartKitVB.DesktopGL/     # Cross-platform OpenGL launcher (build issues)
+```
 
-- **Shared Core**: VB.NET game logic (`MonoGameStartKitVB.Core`)
-- **Platform Launchers**: Platform-specific projects (WindowsDX, Android, iOS, DesktopGL)
-- **True OOP Design**: Proper `IDisposable` implementation, event-driven architecture
-- **Content Pipeline**: Centralized asset management
+### Key Components
+
+| Component | Responsibility | Status |
+|-----------|----------------|--------|
+| **GameMain** | Initializes game systems, coordinates Update/Draw cycles | ✅ Complete |
+| **GameManager** | Manages game state, collision detection, level progression | ✅ Working |
+| **Renderer** | Handles all rendering, animations, and HUD display | ✅ Working |
+| **SoundManager** | Plays background music and sound effects | ⚠️ Basic |
+| **Actor** | Base class for all game entities with inheritance | ✅ Working |
+
+---
 
 ## Getting Started
 
@@ -28,69 +83,6 @@ This project follows a clean architecture pattern with:
 - [.NET 10.0](https://dotnet.microsoft.com/download/dotnet/10.0) or later
 - MonoGame 3.8+ installation
 - VB.NET development tools
-
-### Critical: The Solution File Format
-
-The solution file has been changed from `slnx` into the `sln` format, perfect for older versions of Visual Studio. If you would like the latest `slnx` format, simply change the `sln` file to `slnx`, and replace everything in the solution file with the following:
-
-```xml
-<Solution>
-  <Project Path="MonoGameStartKitVB.Core\MonoGameStartKitVB.Core.vbproj"/>
-  <Project Path="MonoGameStartKitVB.WindowsDX\MonoGameStartKitVB.WindowsDX.csproj"/>
-  <Project Path="MonoGameStartKitVB.DesktopGL\MonoGameStartKitVB.DesktopGL.csproj"/>
-  <Project Path="MonoGameStartKitVB.Android\MonoGameStartKitVB.Android.csproj"/>
-  <Project Path="MonoGameStartKitVB.iOS\MonoGameStartKitVB.iOS.csproj"/>
-</Solution>
-```
-
-## Features
-
-### Version 1.0.3 Updates
-- ✅ **IDisposable Implementation**: Proper disposal pattern for sound manager and renderer
-- ✅ **Backward-Compatible Solution**: Updated solution file format for broader Visual Studio compatibility
-
-### Version 1.0.2 Updates
-- ✅ **Object-Oriented Architecture**: Refactored to true object-oriented patterns for better code organization, like `GameManager`, `Renderer`, `SoundManager`, etc.
-- ✅ **Improved Code Structure**: Enhanced maintainability and extensibility
-- ✅ **Event-Driven Design**: Better separation of concerns with event handling
-
-### Version 1.0.1 Updates
-- ✅ **Sound Effects**: Added immersive audio feedback for game actions
-- ✅ **Sprite Assets**: Implemented visual elements for characters and environment
-- ✅ **UWP Support**: Fully functional on Universal Windows Platform
-- ✅ **DesktopGL Support**: Basic functionality on Desktop OpenGL (with limitations)
-
-### Core Gameplay
-- Player character movement and controls
-- Seed collection mechanics
-- Enemy AI with patrolling behavior
-- Forest growth progression system
-- Basic collision detection
-
-## Platform Support
-
-This template supports multiple platforms with a shared VB.NET core and platform-specific launchers:
-
-### ✅ WindowsDX (DirectX)
-- **Status**: Fully Supported
-- **Features**: All game features work perfectly
-- **Performance**: Optimal for Windows desktop
-- **Recommended**: Primary development platform
-
-### ⚠️ Android
-- **Status**: Untested
-- **Deployment**: May require additional setup
-
-### ⚠️ iOS
-- **Status**: Untested
-- **Deployment**: May require additional setup
-
-### ⚠️ DesktopGL (OpenGL)
-- **Status**: Limited Support
-- **Known Limitations**:
-  - Background music synchronization issues
-  - Font file loading inconsistencies
-  - Recommended for testing only
 
 ### Building and Running
 
@@ -101,54 +93,123 @@ This template supports multiple platforms with a shared VB.NET core and platform
    - **WindowsDX**: For Windows desktop development (recommended)
    - **Android**: For mobile development and testing
    - **iOS**: For Apple mobile development (requires macOS)
-   - **DesktopGL**: For cross-platform testing (with limitations)
+   - **DesktopGL**: Cross-platform testing (currently has build issues)
 5. **Build and run** the project
 
-### Recommended Development Workflow
+---
 
-1. **Primary Development**: Use **WindowsDX** for full feature testing and debugging
-2. **Mobile Testing**: Test with **Android** for mobile functionality
-3. **Cross-Platform Validation**: Use **DesktopGL** for compatibility testing
-4. **Asset Management**: Ensure all assets are properly configured through the Content Pipeline
+## Game Features (Devour-Man)
+
+### Core Gameplay
+- **Player Movement**: 4-directional movement with smooth controls
+- **Seed Collection**: Collect seeds to grow trees and earn points
+- **Enemy Movement**: Patrolling insects with dynamic direction changes
+- **Pesticide Power-Up**: Temporarily makes enemies vulnerable
+- **Forest Growth**: Saplings transform into trees as seeds are collected
+- **Level Progression**: Increasing difficulty with new enemy types
+
+### Input Support
+- **Keyboard**: WASD or arrow keys for movement
+- **Touch**: Virtual joystick optimized for mobile devices (tested and working)
+- **Mouse**: Click-based controls for menus and virtual joystick
+
+### Visual Features
+- **Sprite Animations**: Smooth character animations for all entities
+- **Dynamic HUD**: Score, lives, level, and high score display
+- **Multiple Game States**: Title screen, playing, paused, game over, level cleared
+
+---
+
+## Platform Support Status
+
+### ✅ WindowsDX (DirectX)
+- **Status**: Fully Supported
+- **Features**: All game features work correctly
+- **Performance**: Optimal for Windows desktop
+- **Recommended**: Primary development platform
+
+### ✅ Android
+- **Status**: Fully Supported
+- **Features**: Touch input with virtual joystick (tested and working smoothly)
+- **Deployment**: Ready for testing on Android devices
+- **Notes**: Touch controls have been tested and work properly
+
+### ⚠️ iOS
+- **Status**: Planned
+- **Features**: Basic compatibility implemented
+- **Notes**: Requires macOS for development, untested on actual devices
+
+### ❌ DesktopGL (OpenGL)
+- **Status**: Build Issues
+- **Features**: Framework in place but cannot build
+- **Notes**: FFMPEG pipeline issues prevent building. This platform is currently non-functional.
+
+---
+
+## Roadmap
+
+### Planned Features
+- [ ] Enhanced sound effects and music system
+- [ ] DesktopGL build fix (FFMPEG pipeline)
+- [ ] High score saving and level progression system
+
+### Known Issues
+- DesktopGL cannot build due to FFMPEG pipeline issues
+- iOS untested on actual devices
+
+---
 
 ## Technical Notes
 
-### Asset Synchronization Issues
-
-The DesktopGL platform has known limitations with certain asset types:
-
-- **Audio Files**: Background music synchronization issues
-- **Font Files**: Loading and rendering inconsistencies
-- **Workarounds**: Consider using alternative asset formats or platform-specific content pipelines
+### Event System
+The game uses a comprehensive event-driven architecture:
+- `GameStateChanged` - Fired when game state transitions
+- `PlayerScoreChanged` - Fired when player collects items
+- `SeedCollected` - Fired when a seed is collected
+- `EnemyKilled` - Fired when an enemy is defeated
+- `LevelCleared` - Fired when all seeds are collected
 
 ### Content Pipeline
+All assets are processed through the MonoGame Content Pipeline:
+- Sprites: PNG format, loaded via SpriteSheet class
+- Audio: WAV for sound effects
+- Fonts: SpriteFont format for text rendering
 
-Ensure all assets are properly processed through the MonoGame Content Pipeline:
-- Sprites should be in supported formats (PNG recommended)
-- Audio files should use compatible formats
-- Fonts require proper Content Pipeline processing
+---
 
-## Future Enhancements
+## Version History
 
-Planned improvements for upcoming versions:
-- Resolve DesktopGL asset synchronization issues
-- Add more enemy types and behaviors
-- Implement power-up system
-- Add level progression
-- Improve visual effects and animations
+### Version 1.1.0 (Current - Development)
+- ✅ Clean architecture pattern implementation
+- ✅ Event-driven design with comprehensive event system
+- ✅ Polymorphic actor system
+- ✅ Sprite sheet animations
+- ✅ Android touch controls tested and working
+- ❌ DesktopGL build issues (FFMPEG pipeline)
 
-## Contributing
+### Version 1.0.3
+- ✅ IDisposable implementation for sound manager and renderer
+- ✅ Backward-compatible solution file format
+- ❌ DesktopGL build issues (FFMPEG pipeline)
 
-This project welcomes contributions! Areas that need attention:
-- DesktopGL platform compatibility fixes
-- Additional game features
-- Performance optimizations
-- Bug fixes and testing
+### Version 1.0.2
+- ✅ Object-oriented architecture refactoring
+- ✅ Improved code structure and maintainability
+- ✅ Event-driven design implementation
+- ❌ DesktopGL build issues (FFMPEG pipeline)
+
+### Version 1.0.1
+- ✅ Sound effects and sprite assets
+- ✅ DesktopGL support; **later broken by FFMPEG issues**
+
+---
 
 ## License
 
-This project is licensed under the BSD-3-Clause License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the BSD-3-Clause License.
 
 ---
+
+**Active Development Notice**: This project is still under active development. Features may be incomplete or subject to change.
 
 **Happy coding!** Build amazing games with MonoGame and VB.NET!
