@@ -23,6 +23,7 @@ Public NotInheritable Class Renderer
     Private _joystickKnob As Texture2D
     Private _pauseButton As Texture2D
     Private _generalButton As Texture2D
+    Private _frightenedEffect As Effect
 
     Private _playerAnimations As Dictionary(Of Direction, Animation)
     Private _playerDeathAnimation As Animation
@@ -159,6 +160,7 @@ Public NotInheritable Class Renderer
         _generalButton = _content.Load(Of Texture2D)("Images/general_button")
 
         _gameFont = _content.Load(Of SpriteFont)("Fonts/GameFont")
+        _frightenedEffect = _content.Load(Of Effect)("Effects/FrightenedEffect")
 
         Actor.Player.JoystickBaseWidth = _joystickBase.Width
         Renderer.PauseButtonWidth = _pauseButton.Width
@@ -323,12 +325,36 @@ Public NotInheritable Class Renderer
 
     Private Sub DrawGameArea(gameManager As GameManager, deltaTime As Single)
         DrawMaze(gameManager.Maze, gameManager.CurrentLevel)
+        DrawSpawnPoints(gameManager.Enemies)
         DrawSeeds(gameManager.Seeds)
         DrawPesticides(gameManager.Pesticides)
         DrawPlayer(gameManager.Player, deltaTime)
         DrawEnemies(gameManager.Enemies, deltaTime)
 
         If gameManager.IsGetReadyActive Then DrawGetReadyMessage()
+    End Sub
+
+    Private Sub DrawSpawnPoints(enemies As List(Of Actor.Enemy))
+        Dim renderScale = CSng(SCREEN_WIDTH) / (MAZE_WIDTH * CELL_SIZE)
+        
+        For Each enemy In enemies
+            Dim rect As New Rectangle(
+                CInt(enemy.SpawnPoint.X * CELL_SIZE * renderScale),
+                CInt(enemy.SpawnPoint.Y * CELL_SIZE * renderScale + HUD_HEIGHT),
+                CInt(CELL_SIZE * renderScale),
+                CInt(CELL_SIZE * renderScale)
+            )
+            
+            _spriteBatch.Draw(_pixelTexture, rect, Color.Red * 0.5F)
+            
+            Dim borderThickness = CInt(2 * renderScale)
+            If borderThickness < 1 Then borderThickness = 1
+            
+            _spriteBatch.Draw(_pixelTexture, New Rectangle(rect.X, rect.Y, rect.Width, borderThickness), Color.Red)
+            _spriteBatch.Draw(_pixelTexture, New Rectangle(rect.X, rect.Y, borderThickness, rect.Height), Color.Red)
+            _spriteBatch.Draw(_pixelTexture, New Rectangle(rect.X, rect.Y + rect.Height - borderThickness, rect.Width, borderThickness), Color.Red)
+            _spriteBatch.Draw(_pixelTexture, New Rectangle(rect.X + rect.Width - borderThickness, rect.Y, borderThickness, rect.Height), Color.Red)
+        Next
     End Sub
 
     Private Sub DrawMaze(maze As MazeTile(,), currentLevel As Integer)
@@ -451,7 +477,7 @@ Public NotInheritable Class Renderer
     Private Sub DrawEnemies(enemies As List(Of Actor.Enemy), deltaTime As Single)
         Dim renderScale = CSng(SCREEN_WIDTH) / (MAZE_WIDTH * CELL_SIZE)
 
-        For Each enemy In From e In enemies Where e.IsActive
+        For Each enemy In From e In enemies Where e.IsActive AndAlso Not e.IsVulnerable
             Dim direction = enemy.Direction
             Dim key = (enemy.EnemyType, direction)
             Dim animation = _enemyAnimations(key)
@@ -465,14 +491,39 @@ Public NotInheritable Class Renderer
             )
 
             Dim enemyColor = Color.White
-            If enemy.IsVulnerable Then
-                enemyColor = Color.LightBlue
-            ElseIf enemy.GracePeriodTimer > 0 Then
+            If enemy.GracePeriodTimer > 0 Then
                 enemyColor = New Color(200, 200, 255, 128)
             End If
 
             animation.SpriteSheet.DrawFrame(_spriteBatch, frameIndex, drawPos, scale, enemyColor)
         Next
+
+        Dim frightenedEnemies = From e In enemies Where e.IsActive AndAlso e.IsVulnerable
+        If frightenedEnemies.Any() Then
+            Dim blinkValue = Math.Abs(Math.Sin(DateTime.Now.TimeOfDay.TotalSeconds * 8.0))
+            Dim frightenedColor As Color
+            If blinkValue > 0.5 Then
+                frightenedColor = Color.White
+            Else
+                frightenedColor = Color.Blue
+            End If
+
+            For Each enemy In frightenedEnemies
+                Dim direction = enemy.Direction
+                Dim key = (enemy.EnemyType, direction)
+                Dim animation = _enemyAnimations(key)
+                animation.Update(deltaTime)
+                Dim frameIndex = animation.CurrentFrameIndex
+
+                Dim scale = CSng(ENEMY_SIZE / animation.SpriteSheet.FrameWidth) * renderScale
+                Dim drawPos As New Vector2(
+                    enemy.PixelPosition.X * renderScale - ENEMY_SIZE * renderScale / 2,
+                    enemy.PixelPosition.Y * renderScale - ENEMY_SIZE * renderScale / 2 + HUD_HEIGHT
+                )
+
+                animation.SpriteSheet.DrawFrame(_spriteBatch, frameIndex, drawPos, scale, frightenedColor)
+            Next
+        End If
     End Sub
 
     Private Sub DrawGetReadyMessage()

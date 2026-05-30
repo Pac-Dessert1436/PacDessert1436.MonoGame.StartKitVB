@@ -187,3 +187,8 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Sounds/enemy_reappear.wav
+
+#begin Effects/FrightenedEffect.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/build:Effects/FrightenedEffect.fx

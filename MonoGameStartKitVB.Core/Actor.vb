@@ -7,6 +7,8 @@ Public MustInherit Class Actor
     Public Property Size As Integer
     Public Property IsActive As Boolean = True
 
+    Protected Const SNAP_THRESHOLD As Integer = 5
+
     Public Sub New(gridPosition As Point, size As Integer)
         Me.GridPosition = gridPosition
         PixelPosition = New Vector2(
@@ -42,7 +44,7 @@ Public MustInherit Class Actor
     End Property
 
     Public Shared ReadOnly Property OppositeDirection(currDir As Direction) As Direction
-        get
+        Get
             Select Case currDir
                 Case Direction.Up
                     Return Direction.Down
@@ -203,9 +205,9 @@ Public MustInherit Class Actor
 
                     Dim tempPixelPosition = PixelPosition
                     If CurrentDirection = Direction.Left OrElse CurrentDirection = Direction.Right Then
-                        If distToCenterY < 3 Then tempPixelPosition.Y = cellCenterY
+                        If distToCenterY < SNAP_THRESHOLD Then tempPixelPosition.Y = cellCenterY
                     Else
-                        If distToCenterX < 3 Then tempPixelPosition.X = cellCenterX
+                        If distToCenterX < SNAP_THRESHOLD Then tempPixelPosition.X = cellCenterX
                     End If
                     PixelPosition = tempPixelPosition
                 End If
@@ -373,19 +375,16 @@ Public MustInherit Class Actor
 
                 Dim tempPixelPosition = PixelPosition
                 If Direction = Direction.Left OrElse Direction = Direction.Right Then
-                    If distToCenterY < 3 Then tempPixelPosition.Y = cellCenterY
+                    If distToCenterY < SNAP_THRESHOLD Then tempPixelPosition.Y = cellCenterY
                 Else
-                    If distToCenterX < 3 Then tempPixelPosition.X = cellCenterX
+                    If distToCenterX < SNAP_THRESHOLD Then tempPixelPosition.X = cellCenterX
                 End If
                 PixelPosition = tempPixelPosition
             Else
                 ChangeDirection()
             End If
 
-            If random.Next(0, 100) < 3 Then
-                ChangeDirection()
-            End If
-
+            If random.Next(0, 100) < 3 Then ChangeDirection()
             _previousDirection = Direction
         End Sub
 
