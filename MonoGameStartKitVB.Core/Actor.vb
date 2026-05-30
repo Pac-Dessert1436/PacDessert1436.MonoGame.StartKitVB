@@ -1,6 +1,5 @@
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Input
-Imports Microsoft.Xna.Framework.Graphics
 
 Public MustInherit Class Actor
     Public Property GridPosition As Point
@@ -10,7 +9,7 @@ Public MustInherit Class Actor
 
     Public Sub New(gridPosition As Point, size As Integer)
         Me.GridPosition = gridPosition
-        Me.PixelPosition = New Vector2(
+        PixelPosition = New Vector2(
             gridPosition.X * CELL_SIZE + CELL_SIZE \ 2,
             gridPosition.Y * CELL_SIZE + CELL_SIZE \ 2
         )
@@ -94,8 +93,7 @@ Public MustInherit Class Actor
             If IsInDeathAnimation Then
                 DeathAnimationTimer += deltaTime
                 If DeathAnimationTimer >= DEATH_ANIMATION_DURATION Then
-                    IsInDeathAnimation = False
-                    DeathAnimationTimer = 0.0F
+                    CompleteDeathAnimation()
                 End If
                 Return
             End If
@@ -151,27 +149,39 @@ Public MustInherit Class Actor
             End If
 
             Dim joystickCenter = New Vector2(
-                Renderer.ActualScreenWidth / 2F,
+                Renderer.ActualScreenWidth / 2.0F,
                 Renderer.ActualScreenHeight - _joystickBaseWidth * Renderer.ScreenScale * 2 - 10.0F
             )
             Dim joystickRadius = _joystickBaseWidth * Renderer.ScreenScale * 2
+
+            Dim buttonScale = Renderer.ScreenScale * 2
+            Dim pauseButtonRect = New Rectangle(
+                CInt(10 * Renderer.ScreenScale),
+                CInt(Renderer.ActualScreenHeight - Renderer.PauseButtonHeight * buttonScale - 10),
+                CInt(Renderer.PauseButtonWidth * buttonScale),
+                CInt(Renderer.PauseButtonHeight * buttonScale)
+            )
 
             For Each touchLoc In touchCollection
                 If touchLoc.State = Touch.TouchLocationState.Pressed OrElse
                    touchLoc.State = Touch.TouchLocationState.Moved Then
                     Dim touchPos = touchLoc.Position
-                    Dim delta = touchPos - joystickCenter
-                    If delta.Length() <= joystickRadius * 2 Then
-                        HandleJoystickInput(delta)
+                    If Not pauseButtonRect.Contains(CInt(touchPos.X), CInt(touchPos.Y)) Then
+                        Dim delta = touchPos - joystickCenter
+                        If delta.Length() <= joystickRadius * 2 Then
+                            HandleJoystickInput(delta)
+                        End If
                     End If
                 End If
             Next
 
             If mouseState.LeftButton = ButtonState.Pressed Then
                 Dim mousePos = New Vector2(mouseState.X, mouseState.Y)
-                Dim delta = mousePos - joystickCenter
-                If delta.Length() <= joystickRadius * 2 Then
-                    HandleJoystickInput(delta)
+                If Not pauseButtonRect.Contains(CInt(mousePos.X), CInt(mousePos.Y)) Then
+                    Dim delta = mousePos - joystickCenter
+                    If delta.Length() <= joystickRadius * 2 Then
+                        HandleJoystickInput(delta)
+                    End If
                 End If
             End If
 
@@ -185,6 +195,19 @@ Public MustInherit Class Actor
                         CInt(PixelPosition.X / CELL_SIZE),
                         CInt(PixelPosition.Y / CELL_SIZE)
                     )
+
+                    Dim cellCenterX = GridPosition.X * CELL_SIZE + CELL_SIZE \ 2
+                    Dim cellCenterY = GridPosition.Y * CELL_SIZE + CELL_SIZE \ 2
+                    Dim distToCenterX = Math.Abs(PixelPosition.X - cellCenterX)
+                    Dim distToCenterY = Math.Abs(PixelPosition.Y - cellCenterY)
+
+                    Dim tempPixelPosition = PixelPosition
+                    If CurrentDirection = Direction.Left OrElse CurrentDirection = Direction.Right Then
+                        If distToCenterY < 3 Then tempPixelPosition.Y = cellCenterY
+                    Else
+                        If distToCenterX < 3 Then tempPixelPosition.X = cellCenterX
+                    End If
+                    PixelPosition = tempPixelPosition
                 End If
             End If
         End Sub
@@ -222,8 +245,8 @@ Public MustInherit Class Actor
             For tileX = startTileX To endTileX
                 For tileY = startTileY To endTileY
                     Dim tile As MazeTile = maze(tileX, tileY)
-                    If tile = MazeTile.Fence OrElse 
-                       tile = MazeTile.Sapling OrElse 
+                    If tile = MazeTile.Fence OrElse
+                       tile = MazeTile.Sapling OrElse
                        tile = MazeTile.Tree Then Return False
                 Next tileY
             Next tileX
@@ -258,8 +281,14 @@ Public MustInherit Class Actor
                 ScheduleEvent_PlayerDied()
             Else
                 IsInDeathAnimation = True
-                ResetPosition()
             End If
+        End Sub
+
+        Public Sub CompleteDeathAnimation()
+            IsInDeathAnimation = False
+            DeathAnimationTimer = 0.0F
+            ResetPosition()
+            ScheduleEvent_DeathAnimationComplete()
         End Sub
 
         Public Sub ResetPosition()
@@ -285,6 +314,7 @@ Public MustInherit Class Actor
         Public Property IsRespawning As Boolean = False
         Public Property RespawnTimer As Single = 0.0F
         Public Property GracePeriodTimer As Single = 0.0F
+        Public Property SpawnPoint As Point
 
         Private ReadOnly random As New Random
         Private _previousDirection As Direction
@@ -292,14 +322,13 @@ Public MustInherit Class Actor
         Public Sub New(gridPosition As Point, Optional enemyType As EnemyType = EnemyType.Beetle)
             MyBase.New(gridPosition, ENEMY_SIZE)
             Me.EnemyType = enemyType
+            Me.SpawnPoint = gridPosition
             SetRandomDirection()
             _previousDirection = Direction
             IsActive = True
         End Sub
 
         Public Overrides Sub Update(deltaTime As Single, Optional maze As MazeTile(,) = Nothing)
-            If Not IsActive Then Return
-
             If IsRespawning Then
                 RespawnTimer += deltaTime
                 If RespawnTimer >= ENEMY_RESPAWN_TIME Then
@@ -311,6 +340,8 @@ Public MustInherit Class Actor
                 End If
                 Return
             End If
+
+            If Not IsActive Then Return
 
             If GracePeriodTimer > 0 Then
                 GracePeriodTimer -= deltaTime
@@ -334,6 +365,19 @@ Public MustInherit Class Actor
                     CInt(PixelPosition.X / CELL_SIZE),
                     CInt(PixelPosition.Y / CELL_SIZE)
                 )
+
+                Dim cellCenterX = GridPosition.X * CELL_SIZE + CELL_SIZE \ 2
+                Dim cellCenterY = GridPosition.Y * CELL_SIZE + CELL_SIZE \ 2
+                Dim distToCenterX = Math.Abs(PixelPosition.X - cellCenterX)
+                Dim distToCenterY = Math.Abs(PixelPosition.Y - cellCenterY)
+
+                Dim tempPixelPosition = PixelPosition
+                If Direction = Direction.Left OrElse Direction = Direction.Right Then
+                    If distToCenterY < 3 Then tempPixelPosition.Y = cellCenterY
+                Else
+                    If distToCenterX < 3 Then tempPixelPosition.X = cellCenterX
+                End If
+                PixelPosition = tempPixelPosition
             Else
                 ChangeDirection()
             End If
@@ -409,6 +453,11 @@ Public MustInherit Class Actor
             IsActive = False
             IsRespawning = True
             RespawnTimer = 0.0F
+            GridPosition = SpawnPoint
+            PixelPosition = New Vector2(
+                SpawnPoint.X * CELL_SIZE + CELL_SIZE \ 2,
+                SpawnPoint.Y * CELL_SIZE + CELL_SIZE \ 2
+            )
             ScheduleEvent_EnemyKilled(Me)
         End Sub
 

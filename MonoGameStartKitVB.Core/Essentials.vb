@@ -119,6 +119,8 @@ Public Module Essentials
     Public Event LevelCleared()
     Public Event GetReadyMessage()
     Public Event GameStart()
+    Public Event GameStarted()
+    Public Event DeathAnimationComplete()
     Public Event NextLevel()
     Public Event TreeGrown(position As Point)
 #End Region

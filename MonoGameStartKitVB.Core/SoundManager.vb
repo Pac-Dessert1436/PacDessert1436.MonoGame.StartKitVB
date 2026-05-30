@@ -64,6 +64,8 @@ Public NotInheritable Class SoundManager
         AddHandler LevelCleared, AddressOf OnLevelCleared
         AddHandler GetReadyMessage, AddressOf OnGetReadyMessage
         AddHandler GameStart, AddressOf OnGameStart
+        AddHandler GameStarted, AddressOf OnGameStarted
+        AddHandler DeathAnimationComplete, AddressOf OnDeathAnimationComplete
         AddHandler NextLevel, AddressOf OnNextLevel
         AddHandler TreeGrown, AddressOf OnTreeGrown
     End Sub
@@ -74,7 +76,7 @@ Public NotInheritable Class SoundManager
     Private Sub OnGameStateChanged(newState As GameState)
         Select Case newState
             Case GameState.Playing
-                PlayBackgroundMusic()
+                ' Don't play music yet - wait for GameStarted event after "Get Ready"
 
             Case GameState.GameOver
                 _sndGameOver.Play()
@@ -89,6 +91,16 @@ Public NotInheritable Class SoundManager
             Case GameState.LevelCleared
                 ' Continue playing music
         End Select
+    End Sub
+
+    Private Sub OnGameStarted()
+        PlayBackgroundMusic()
+    End Sub
+
+    Private Sub OnDeathAnimationComplete()
+        If MediaPlayer.State = MediaState.Paused Then
+            MediaPlayer.Resume()
+        End If
     End Sub
 
     ''' <summary>
@@ -155,6 +167,7 @@ Public NotInheritable Class SoundManager
     ''' </summary>
     Private Sub OnLifeLost()
         _sndLifeLost.Play()
+        MediaPlayer.Pause()
     End Sub
 
     ''' <summary>
@@ -210,6 +223,8 @@ Public NotInheritable Class SoundManager
                 RemoveHandler LevelCleared, AddressOf OnLevelCleared
                 RemoveHandler GetReadyMessage, AddressOf OnGetReadyMessage
                 RemoveHandler GameStart, AddressOf OnGameStart
+                RemoveHandler GameStarted, AddressOf OnGameStarted
+                RemoveHandler DeathAnimationComplete, AddressOf OnDeathAnimationComplete
                 RemoveHandler NextLevel, AddressOf OnNextLevel
                 RemoveHandler TreeGrown, AddressOf OnTreeGrown
 

@@ -114,10 +114,7 @@ Public NotInheritable Class Renderer
 
     Private Sub CreateRenderTarget()
         _renderTarget?.Dispose()
-
-        _renderTarget = New RenderTarget2D(
-            _graphicsDevice, SCREEN_WIDTH, SCREEN_HEIGHT
-        )
+        _renderTarget = New RenderTarget2D(_graphicsDevice, SCREEN_WIDTH, SCREEN_HEIGHT)
     End Sub
 
     ''' <summary>
@@ -573,20 +570,25 @@ Public NotInheritable Class Renderer
         Dim textSize As Vector2 = _gameFont.MeasureString(text)
         Dim position As New Vector2(
             (SCREEN_WIDTH - textSize.X) / 2,
-            (SCREEN_HEIGHT - textSize.Y) / 2
+            (SCREEN_HEIGHT - textSize.Y) / 2 - 80
         )
         _spriteBatch.DrawString(_gameFont, text, position, Color.White)
+
+        DrawButton("RESUME", CInt(SCREEN_WIDTH / 2), CInt(SCREEN_HEIGHT / 2), 1.0F)
+        DrawButton("EXIT", CInt(SCREEN_WIDTH / 2), CInt(SCREEN_HEIGHT / 2) + 120, 1.0F)
     End Sub
 
     Private Sub DrawGameOverScreen(gameManager As GameManager)
         Dim overlayRect As New Rectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
         _spriteBatch.Draw(_pixelTexture, overlayRect, New Color(0, 0, 0, 150))
 
-        DrawCenteredText("GAME OVER", -50, Color.Red, 2.0F)
-        DrawCenteredText($"Final Score: {gameManager.Player.Score}", 10, Color.White, 1.0F)
-        DrawCenteredText($"High Score: {gameManager.HighScore}", 40, Color.Yellow, 1.0F)
-        DrawCenteredText($"Seasons Cleared: {gameManager.CurrentLevel - 1}", 70, Color.Green, 1.0F)
-        DrawCenteredText("Press ENTER to restart", 120, Color.White, 1.0F)
+        DrawCenteredText("GAME OVER", -80, Color.Red, 2.0F)
+        DrawCenteredText($"Final Score: {gameManager.Player.Score}", -20, Color.White, 1.0F)
+        DrawCenteredText($"High Score: {gameManager.HighScore}", 10, Color.Yellow, 1.0F)
+        DrawCenteredText($"Seasons Cleared: {gameManager.CurrentLevel - 1}", 40, Color.Green, 1.0F)
+
+        DrawButton("RETRY", CInt(SCREEN_WIDTH / 2), CInt(SCREEN_HEIGHT / 2) + 50, 1.0F)
+        DrawButton("EXIT", CInt(SCREEN_WIDTH / 2), CInt(SCREEN_HEIGHT / 2) + 170, 1.0F)
     End Sub
 
     Private Sub DrawLevelClearedScreen(gameManager As GameManager)
