@@ -76,21 +76,31 @@ Public Module Essentials
         Oak = 2
     End Enum
 
+    ''' <summary>
+    ''' Represents the type of a seed.
+    ''' </summary>
     Public Enum SeedType As Integer
         Acorn = 0
         Berry = 1
         Nut = 2
     End Enum
 
+    ''' <summary>
+    ''' Represents the type of an enemy.
+    ''' </summary>
     Public Enum EnemyType As Integer
         Beetle = 0
         Caterpillar = 1
     End Enum
 
+    ''' <summary>
+    ''' Represents the status of an enemy.
+    ''' </summary>
     Public Enum EnemyStatus As Integer
         Active = 0
         Frightened = 1
         Eaten = 2
+        Returning = 3
     End Enum
 #End Region
 
@@ -252,6 +262,11 @@ Public Module Essentials
         Return maze
     End Function
 
+    ''' <summary>
+    ''' Determines the seed type for the current level.
+    ''' </summary>
+    ''' <param name="level">The current level number.</param>
+    ''' <returns>The seed type for the current level.</returns>
     Public ReadOnly Property SeedTypeForLevel(level As Integer) As SeedType
         Get
             Select Case (level - 1) Mod 3
@@ -267,6 +282,11 @@ Public Module Essentials
         End Get
     End Property
 
+    ''' <summary>
+    ''' Determines the enemy type for the current level.
+    ''' </summary>
+    ''' <param name="level">The current level number.</param>
+    ''' <returns>The enemy type for the current level.</returns>
     Public ReadOnly Property EnemyTypeForLevel(level As Integer) As EnemyType
         Get
             Select Case (level - 1) Mod 2

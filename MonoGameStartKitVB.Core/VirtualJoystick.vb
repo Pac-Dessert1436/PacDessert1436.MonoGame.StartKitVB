@@ -10,12 +10,10 @@ Public NotInheritable Class VirtualJoystick
     Private ReadOnly _baseTexture As Texture2D
     Private ReadOnly _knobTexture As Texture2D
 
-    Private Shared ReadOnly Property JoystickBaseScale As Integer
-        Get
-            If OperatingSystem.IsWindows() OrElse OperatingSystem.IsLinux() Then Return 3
-            Return 5   ' Larger for mobile devices
-        End Get
-    End Property
+    ''' <summary>
+    ''' The scale factor for the joystick base (same for all devices).
+    ''' </summary>
+    Private Const JOYSTICK_BASE_SCALE As Integer = 3
 
     ''' <summary>
     ''' Center of the joystick base.
@@ -47,7 +45,7 @@ Public NotInheritable Class VirtualJoystick
     End Sub
 
     Public Sub Draw(spriteBatch As SpriteBatch, screenScale As Single)
-        Dim scale = JoystickBaseScale * screenScale
+        Dim scale = JOYSTICK_BASE_SCALE * screenScale
         Dim scaledWidth = _baseTexture.Width * scale
         Dim scaledHeight = _baseTexture.Height * scale
 

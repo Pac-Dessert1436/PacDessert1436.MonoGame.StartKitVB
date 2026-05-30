@@ -31,6 +31,7 @@ Public NotInheritable Class Renderer
 
     Private Shared _screenScale As Single = 1.0F
     Private Shared _screenOffset As Vector2 = Vector2.Zero
+    Private Const HUD_HEIGHT As Integer = 100
 
     Public Shared ReadOnly Property ScreenScale As Single
         Get
@@ -101,9 +102,10 @@ Public NotInheritable Class Renderer
             _actualScreenHeight = newScreenHeight
 
             Dim scaleX = CSng(_actualScreenWidth) / SCREEN_WIDTH
-            _screenScale = scaleX
+            Dim scaleY = CSng(_actualScreenHeight) / SCREEN_HEIGHT
+            _screenScale = Math.Min(scaleX, scaleY)
 
-            _screenOffset.X = 0
+            _screenOffset.X = (_actualScreenWidth - SCREEN_WIDTH * _screenScale) / 2
             _screenOffset.Y = (_actualScreenHeight - SCREEN_HEIGHT * _screenScale) / 2
 
             CreateRenderTarget()
@@ -113,11 +115,8 @@ Public NotInheritable Class Renderer
     Private Sub CreateRenderTarget()
         _renderTarget?.Dispose()
 
-        Dim renderWidth = _actualScreenWidth
-        Dim renderHeight = CInt(renderWidth * CSng(MAZE_HEIGHT) / MAZE_WIDTH)
-
         _renderTarget = New RenderTarget2D(
-            _graphicsDevice, renderWidth, renderHeight
+            _graphicsDevice, SCREEN_WIDTH, SCREEN_HEIGHT
         )
     End Sub
 
@@ -173,6 +172,9 @@ Public NotInheritable Class Renderer
     Public Sub Render(gameManager As GameManager, gameState As GameState, deltaTime As Single)
         UpdateScreenScale()
         _graphicsDevice.Clear(Color.Black)
+
+        _graphicsDevice.SetRenderTarget(_renderTarget)
+        _graphicsDevice.Clear(Color.Black)
         _spriteBatch.Begin(samplerState:=SamplerState.PointClamp)
 
         Select Case gameState
@@ -205,22 +207,27 @@ Public NotInheritable Class Renderer
         End Select
 
         _spriteBatch.End()
+        _graphicsDevice.SetRenderTarget(Nothing)
+
+        Dim renderWidth = CInt(SCREEN_WIDTH * _screenScale)
+        Dim renderHeight = CInt(SCREEN_HEIGHT * _screenScale)
+        Dim renderRect As New Rectangle(CInt(_screenOffset.X), CInt(_screenOffset.Y), renderWidth, renderHeight)
+        _spriteBatch.Begin(samplerState:=SamplerState.PointClamp)
+        _spriteBatch.Draw(_renderTarget, renderRect, Color.White)
+        _spriteBatch.End()
     End Sub
 
     Private Sub DrawTitleScreen()
-        Dim scale = _screenScale
-        Dim offset = _screenOffset
-
         Dim titleRect As New Rectangle(
-            CInt((SCREEN_WIDTH - _titleCard.Width * 2) / 2 * scale + offset.X),
-            CInt(100 * scale + offset.Y),
-            CInt(_titleCard.Width * 2 * scale),
-            CInt(_titleCard.Height * 2 * scale)
+            CInt((SCREEN_WIDTH - _titleCard.Width * 2) / 2),
+            100,
+            _titleCard.Width * 2,
+            _titleCard.Height * 2
         )
         _spriteBatch.Draw(_titleCard, titleRect, Color.White)
 
-        DrawButton("START", CInt(SCREEN_WIDTH / 2 * scale + offset.X), CInt(400 * scale + offset.Y), scale)
-        DrawButton("EXIT", CInt(SCREEN_WIDTH / 2 * scale + offset.X), CInt(520 * scale + offset.Y), scale)
+        DrawButton("START", CInt(SCREEN_WIDTH / 2), 400, 1.0F)
+        DrawButton("EXIT", CInt(SCREEN_WIDTH / 2), 520, 1.0F)
     End Sub
 
     Private Sub DrawButton(text As String, centerX As Integer, y As Integer, Optional scale As Single = 1.0F)
@@ -258,26 +265,24 @@ Public NotInheritable Class Renderer
     End Sub
 
     Private Sub DrawHUD(gameManager As GameManager)
-        Dim scale = _screenScale
-        Dim offset = _screenOffset
         DrawText(
             $"1UP: {gameManager.Player.Score,5}",
-            New Vector2(10 * scale + offset.X, 10 * scale + offset.Y),
-            Color.White, scale)
+            New Vector2(10, 10),
+            Color.White, 1.0F)
         DrawText(
             $"HI: {gameManager.HighScore,5}",
-            New Vector2((SCREEN_WIDTH \ 2 + 10) * scale + offset.X, 10 * scale + offset.Y),
-            Color.White, scale)
+            New Vector2(SCREEN_WIDTH \ 2 + 10, 10),
+            Color.White, 1.0F)
 
         Dim lifeIconRect As New Rectangle(0, 0, ICON_SIZE, ICON_SIZE)
         For i As Integer = 0 To gameManager.Player.Lives - 1
             _spriteBatch.Draw(
                 _iconSpriteSheet,
                 New Rectangle(
-                    CInt((10 + i * (ICON_SIZE * 2 + 4)) * scale + offset.X),
-                    CInt(30 * scale + offset.Y),
-                    CInt(ICON_SIZE * 2 * scale),
-                    CInt(ICON_SIZE * 2 * scale)
+                    10 + i * (ICON_SIZE * 2 + 4),
+                    30,
+                    ICON_SIZE * 2,
+                    ICON_SIZE * 2
                 ),
                 lifeIconRect,
                 Color.White
@@ -289,17 +294,17 @@ Public NotInheritable Class Renderer
         Dim seedIconRect As New Rectangle(seedIconIndex * ICON_SIZE, 0, ICON_SIZE, ICON_SIZE)
 
         Dim seasonText = $"SEASON {gameManager.CurrentLevel}"
-        Dim seasonSize = _gameFont.MeasureString(seasonText) * scale
-        Dim seasonX = (SCREEN_WIDTH \ 2 + 10) * scale + offset.X
-        Dim seasonY = 30 * scale + offset.Y
-        _spriteBatch.DrawString(_gameFont, seasonText, New Vector2(seasonX, seasonY), Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, 0)
+        Dim seasonSize = _gameFont.MeasureString(seasonText)
+        Dim seasonX = SCREEN_WIDTH \ 2 + 10
+        Dim seasonY = 30
+        _spriteBatch.DrawString(_gameFont, seasonText, New Vector2(seasonX, seasonY), Color.White)
         _spriteBatch.Draw(
             _iconSpriteSheet,
             New Rectangle(
-                CInt(seasonX + seasonSize.X + 8 * scale),
-                CInt(seasonY),
-                CInt(ICON_SIZE * 2 * scale),
-                CInt(ICON_SIZE * 2 * scale)
+                CInt(seasonX + seasonSize.X + 8),
+                seasonY,
+                ICON_SIZE * 2,
+                ICON_SIZE * 2
             ),
             seedIconRect,
             Color.White
@@ -320,11 +325,6 @@ Public NotInheritable Class Renderer
     End Function
 
     Private Sub DrawGameArea(gameManager As GameManager, deltaTime As Single)
-        _spriteBatch.End()
-        _graphicsDevice.SetRenderTarget(_renderTarget)
-        _graphicsDevice.Clear(Color.Black)
-        _spriteBatch.Begin(samplerState:=SamplerState.PointClamp)
-
         DrawMaze(gameManager.Maze, gameManager.CurrentLevel)
         DrawSeeds(gameManager.Seeds)
         DrawPesticides(gameManager.Pesticides)
@@ -332,40 +332,29 @@ Public NotInheritable Class Renderer
         DrawEnemies(gameManager.Enemies, deltaTime)
 
         If gameManager.IsGetReadyActive Then DrawGetReadyMessage()
-        _spriteBatch.End()
-        _graphicsDevice.SetRenderTarget(Nothing)
-
-        Dim renderX = 0
-        Dim renderY = CInt((_actualScreenHeight - _renderTarget.Height) / 2)
-        Dim renderRect As New Rectangle(renderX, renderY, _renderTarget.Width, _renderTarget.Height)
-
-        _spriteBatch.Begin(samplerState:=SamplerState.PointClamp)
-        _spriteBatch.Draw(_renderTarget, renderRect, Color.White)
-        _spriteBatch.End()
-        _spriteBatch.Begin(samplerState:=SamplerState.PointClamp)
     End Sub
 
     Private Sub DrawMaze(maze As MazeTile(,), currentLevel As Integer)
-        Dim scale = CSng(_renderTarget.Width) / (MAZE_WIDTH * CELL_SIZE)
+        Dim scale = CSng(SCREEN_WIDTH) / (MAZE_WIDTH * CELL_SIZE)
 
         For x As Integer = 0 To MAZE_WIDTH - 1
             For y As Integer = 0 To MAZE_HEIGHT - 1
                 If maze(x, y) = MazeTile.Fence Then
                     Dim rect As New Rectangle(
                         CInt(x * CELL_SIZE * scale),
-                        CInt(y * CELL_SIZE * scale),
+                        CInt(y * CELL_SIZE * scale + HUD_HEIGHT),
                         CInt(CELL_SIZE * scale),
                         CInt(CELL_SIZE * scale)
                     )
                     DrawFence(rect, scale)
                 ElseIf maze(x, y) = MazeTile.Sapling OrElse maze(x, y) = MazeTile.Tree Then
-                    DrawVegetation(x, y, maze(x, y), currentLevel, scale)
+                    DrawVegetation(x, y, maze(x, y), currentLevel, scale, HUD_HEIGHT)
                 End If
             Next y
         Next x
     End Sub
 
-    Private Sub DrawVegetation(x As Integer, y As Integer, tileType As MazeTile, Optional currentLevel As Integer = 1, Optional scale As Single = 1.0F)
+    Private Sub DrawVegetation(x As Integer, y As Integer, tileType As MazeTile, Optional currentLevel As Integer = 1, Optional scale As Single = 1.0F, Optional yOffset As Integer = 0)
         Dim frameIndex As Integer
         If tileType = MazeTile.Sapling Then
             frameIndex = 7
@@ -394,7 +383,7 @@ Public NotInheritable Class Renderer
         End If
 
         Dim cellScale = CSng(CELL_SIZE / _objectSpriteSheet.FrameWidth) * scale
-        Dim drawPos As New Vector2(x * CELL_SIZE * scale, y * CELL_SIZE * scale)
+        Dim drawPos As New Vector2(x * CELL_SIZE * scale, y * CELL_SIZE * scale + yOffset)
         _objectSpriteSheet.DrawFrame(_spriteBatch, frameIndex, drawPos, cellScale, Color.White)
     End Sub
 
@@ -404,12 +393,12 @@ Public NotInheritable Class Renderer
     End Sub
 
     Private Sub DrawSeeds(seeds As List(Of Actor.Seed))
-        Dim renderScale = CSng(_renderTarget.Width) / (MAZE_WIDTH * CELL_SIZE)
+        Dim renderScale = CSng(SCREEN_WIDTH) / (MAZE_WIDTH * CELL_SIZE)
         For Each seed In From s In seeds Where s.IsActive
             Dim scale = CSng(CELL_SIZE / _objectSpriteSheet.FrameWidth) * renderScale
             Dim frameIndex = GetSeedFrameIndex(seed.SeedType)
             Dim gridPos As New Point(seed.GridPosition.X, seed.GridPosition.Y)
-            Dim drawPos As New Vector2(gridPos.X * CELL_SIZE * renderScale, gridPos.Y * CELL_SIZE * renderScale)
+            Dim drawPos As New Vector2(gridPos.X * CELL_SIZE * renderScale, gridPos.Y * CELL_SIZE * renderScale + HUD_HEIGHT)
             _objectSpriteSheet.DrawFrame(_spriteBatch, frameIndex, drawPos, scale, Color.White)
         Next
     End Sub
@@ -428,11 +417,11 @@ Public NotInheritable Class Renderer
     End Function
 
     Private Sub DrawPesticides(pesticides As List(Of Point))
-        Dim renderScale = CSng(_renderTarget.Width) / (MAZE_WIDTH * CELL_SIZE)
+        Dim renderScale = CSng(SCREEN_WIDTH) / (MAZE_WIDTH * CELL_SIZE)
         For Each item In pesticides
             Dim scale = CSng(CELL_SIZE / _objectSpriteSheet.FrameWidth) * renderScale
             Dim gridPos As New Point(item.X, item.Y)
-            Dim drawPos As New Vector2(gridPos.X * CELL_SIZE * renderScale, gridPos.Y * CELL_SIZE * renderScale)
+            Dim drawPos As New Vector2(gridPos.X * CELL_SIZE * renderScale, gridPos.Y * CELL_SIZE * renderScale + HUD_HEIGHT)
             _objectSpriteSheet.DrawFrame(_spriteBatch, 8, drawPos, scale, Color.White)
         Next
     End Sub
@@ -451,11 +440,11 @@ Public NotInheritable Class Renderer
             frameIndex = animation.CurrentFrameIndex
         End If
 
-        Dim renderScale = CSng(_renderTarget.Width) / (MAZE_WIDTH * CELL_SIZE)
+        Dim renderScale = CSng(SCREEN_WIDTH) / (MAZE_WIDTH * CELL_SIZE)
         Dim scale As Single = CSng(PLAYER_SIZE / animation.SpriteSheet.FrameWidth) * renderScale
         Dim drawPos As New Vector2(
             player.PixelPosition.X * renderScale - PLAYER_SIZE * renderScale / 2,
-            player.PixelPosition.Y * renderScale - PLAYER_SIZE * renderScale / 2
+            player.PixelPosition.Y * renderScale - PLAYER_SIZE * renderScale / 2 + HUD_HEIGHT
         )
 
         ' Draw actual player
@@ -463,7 +452,7 @@ Public NotInheritable Class Renderer
     End Sub
 
     Private Sub DrawEnemies(enemies As List(Of Actor.Enemy), deltaTime As Single)
-        Dim renderScale = CSng(_renderTarget.Width) / (MAZE_WIDTH * CELL_SIZE)
+        Dim renderScale = CSng(SCREEN_WIDTH) / (MAZE_WIDTH * CELL_SIZE)
 
         For Each enemy In From e In enemies Where e.IsActive
             Dim direction = enemy.Direction
@@ -475,7 +464,7 @@ Public NotInheritable Class Renderer
             Dim scale = CSng(ENEMY_SIZE / animation.SpriteSheet.FrameWidth) * renderScale
             Dim drawPos As New Vector2(
                 enemy.PixelPosition.X * renderScale - ENEMY_SIZE * renderScale / 2,
-                enemy.PixelPosition.Y * renderScale - ENEMY_SIZE * renderScale / 2
+                enemy.PixelPosition.Y * renderScale - ENEMY_SIZE * renderScale / 2 + HUD_HEIGHT
             )
 
             Dim enemyColor = Color.White
@@ -520,15 +509,20 @@ Public NotInheritable Class Renderer
         End If
 
         Dim joystickCenter = New Vector2(
-            _actualScreenWidth / 2F,
-            _actualScreenHeight - _joystickBase.Height * _screenScale * 2 - 10
+            SCREEN_WIDTH / 2.0F,
+            SCREEN_HEIGHT - _joystickBase.Height * 2 - 10
         )
-        Dim maxRadius = CSng(_joystickBase.Width * _screenScale * 2)
-        
+        Dim maxRadius = CSng(_joystickBase.Width * 2)
+
         For Each touchLoc In touchCollection
             If touchLoc.State = Touch.TouchLocationState.Pressed OrElse
                touchLoc.State = Touch.TouchLocationState.Moved Then
-                Dim delta = touchLoc.Position - joystickCenter
+                Dim screenPos = touchLoc.Position
+                Dim renderPos = New Vector2(
+                    (screenPos.X - _screenOffset.X) / _screenScale,
+                    (screenPos.Y - _screenOffset.Y) / _screenScale
+                )
+                Dim delta = renderPos - joystickCenter
                 If delta.Length() <= maxRadius * 2 Then
                     If delta.Length() > maxRadius Then
                         delta.Normalize()
@@ -540,8 +534,12 @@ Public NotInheritable Class Renderer
         Next
 
         If mouseState.LeftButton = ButtonState.Pressed Then
-            Dim mousePos = New Vector2(mouseState.X, mouseState.Y)
-            Dim delta = mousePos - joystickCenter
+            Dim screenPos = New Vector2(mouseState.X, mouseState.Y)
+            Dim renderPos = New Vector2(
+                (screenPos.X - _screenOffset.X) / _screenScale,
+                (screenPos.Y - _screenOffset.Y) / _screenScale
+            )
+            Dim delta = renderPos - joystickCenter
             If delta.Length() <= maxRadius * 2 Then
                 If delta.Length() > maxRadius Then
                     delta.Normalize()
@@ -557,10 +555,10 @@ Public NotInheritable Class Renderer
     End Sub
 
     Private Sub DrawPauseButton()
-        Dim scale = _screenScale * 2
+        Dim scale = 2.0F
         Dim buttonRect As New Rectangle(
-            CInt(10 * _screenScale + _screenOffset.X),
-            CInt(_actualScreenHeight - _pauseButton.Height * scale - 10),
+            10,
+            CInt(SCREEN_HEIGHT - _pauseButton.Height * scale - 10),
             CInt(_pauseButton.Width * scale),
             CInt(_pauseButton.Height * scale)
         )
@@ -568,39 +566,36 @@ Public NotInheritable Class Renderer
     End Sub
 
     Private Sub DrawPauseOverlay()
-        Dim scale = _screenScale
-        Dim overlayRect As New Rectangle(0, 0, _actualScreenWidth, _actualScreenHeight)
+        Dim overlayRect As New Rectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
         _spriteBatch.Draw(_pixelTexture, overlayRect, New Color(0, 0, 0, 150))
 
         Dim text As String = "PAUSED"
-        Dim textSize As Vector2 = _gameFont.MeasureString(text) * scale
+        Dim textSize As Vector2 = _gameFont.MeasureString(text)
         Dim position As New Vector2(
-            (_actualScreenWidth - textSize.X) / 2,
-            (_actualScreenHeight - textSize.Y) / 2
+            (SCREEN_WIDTH - textSize.X) / 2,
+            (SCREEN_HEIGHT - textSize.Y) / 2
         )
-        _spriteBatch.DrawString(_gameFont, text, position, Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, 0)
+        _spriteBatch.DrawString(_gameFont, text, position, Color.White)
     End Sub
 
     Private Sub DrawGameOverScreen(gameManager As GameManager)
-        Dim overlayRect As New Rectangle(0, 0, _actualScreenWidth, _actualScreenHeight)
+        Dim overlayRect As New Rectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
         _spriteBatch.Draw(_pixelTexture, overlayRect, New Color(0, 0, 0, 150))
 
-        Dim scale = _screenScale
-        DrawCenteredText("GAME OVER", CInt(-50 * scale), Color.Red, 2.0F * scale)
-        DrawCenteredText($"Final Score: {gameManager.Player.Score}", CInt(10 * scale), Color.White, scale)
-        DrawCenteredText($"High Score: {gameManager.HighScore}", CInt(40 * scale), Color.Yellow, scale)
-        DrawCenteredText($"Seasons Cleared: {gameManager.CurrentLevel - 1}", CInt(70 * scale), Color.Green, scale)
-        DrawCenteredText("Press ENTER to restart", CInt(120 * scale), Color.White, scale)
+        DrawCenteredText("GAME OVER", -50, Color.Red, 2.0F)
+        DrawCenteredText($"Final Score: {gameManager.Player.Score}", 10, Color.White, 1.0F)
+        DrawCenteredText($"High Score: {gameManager.HighScore}", 40, Color.Yellow, 1.0F)
+        DrawCenteredText($"Seasons Cleared: {gameManager.CurrentLevel - 1}", 70, Color.Green, 1.0F)
+        DrawCenteredText("Press ENTER to restart", 120, Color.White, 1.0F)
     End Sub
 
     Private Sub DrawLevelClearedScreen(gameManager As GameManager)
-        Dim overlayRect As New Rectangle(0, 0, _actualScreenWidth, _actualScreenHeight)
+        Dim overlayRect As New Rectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
         _spriteBatch.Draw(_pixelTexture, overlayRect, New Color(0, 0, 0, 150))
 
-        Dim scale = _screenScale
-        DrawCenteredText($"SEASON {gameManager.CurrentLevel} CLEARED!", CInt(-30 * scale), Color.Green, 1.5F * scale)
-        DrawCenteredText($"Score: {gameManager.Player.Score}", CInt(20 * scale), Color.White, scale)
-        DrawCenteredText("Get ready for next season...", CInt(60 * scale), Color.Yellow, scale)
+        DrawCenteredText($"SEASON {gameManager.CurrentLevel} CLEARED!", -30, Color.Green, 1.5F)
+        DrawCenteredText($"Score: {gameManager.Player.Score}", 20, Color.White, 1.0F)
+        DrawCenteredText("Get ready for next season...", 60, Color.Yellow, 1.0F)
     End Sub
 
     Private Sub DrawText(text As String, position As Vector2, color As Color, Optional scale As Single = 1.0F)
@@ -610,8 +605,8 @@ Public NotInheritable Class Renderer
     Private Sub DrawCenteredText(text As String, yOffset As Integer, color As Color, Optional scale As Single = 1.0F)
         Dim textSize As Vector2 = _gameFont.MeasureString(text) * scale
         Dim position As New Vector2(
-            (_actualScreenWidth - textSize.X) / 2,
-            (_actualScreenHeight - textSize.Y) / 2 + yOffset
+            (SCREEN_WIDTH - textSize.X) / 2,
+            (SCREEN_HEIGHT - textSize.Y) / 2 + yOffset
         )
         _spriteBatch.DrawString(_gameFont, text, position, color, 0, Vector2.Zero, scale, SpriteEffects.None, 0)
     End Sub

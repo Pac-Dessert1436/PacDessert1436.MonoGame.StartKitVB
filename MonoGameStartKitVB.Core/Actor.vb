@@ -154,7 +154,7 @@ Public MustInherit Class Actor
                 Renderer.ActualScreenWidth / 2F,
                 Renderer.ActualScreenHeight - _joystickBaseWidth * Renderer.ScreenScale * 2 - 10.0F
             )
-            Dim joystickRadius = CSng(_joystickBaseWidth * Renderer.ScreenScale * 2)
+            Dim joystickRadius = _joystickBaseWidth * Renderer.ScreenScale * 2
 
             For Each touchLoc In touchCollection
                 If touchLoc.State = Touch.TouchLocationState.Pressed OrElse
