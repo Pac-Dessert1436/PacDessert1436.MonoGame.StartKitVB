@@ -20,6 +20,7 @@ Public NotInheritable Class SoundManager
     Private _sndAtNextLevel As SoundEffect
     Private _sndGameOver As SoundEffect
     Private _sndLifeLost As SoundEffect
+    Private _sndLevelCleared As SoundEffect
 
     ' Background music
     Private _bgmMainTheme As Song
@@ -44,6 +45,7 @@ Public NotInheritable Class SoundManager
         _sndGameStart = _content.Load(Of SoundEffect)("Sounds/game_start")
         _sndAtNextLevel = _content.Load(Of SoundEffect)("Sounds/at_next_level")
         _sndGameOver = _content.Load(Of SoundEffect)("Sounds/game_over")
+        _sndLevelCleared = _content.Load(Of SoundEffect)("Sounds/level_cleared")
         _sndLifeLost = _content.Load(Of SoundEffect)("Sounds/life_lost")
 
         ' Load background music
@@ -59,14 +61,14 @@ Public NotInheritable Class SoundManager
         AddHandler PesticideCollected, AddressOf OnPesticideCollected
         AddHandler EnemyKilled, AddressOf OnEnemyKilled
         AddHandler EnemyRespawned, AddressOf OnEnemyRespawned
-        AddHandler PlayerDied, AddressOf OnPlayerDied
+        AddHandler GameHasEnded, AddressOf OnGameHasEnded
         AddHandler LifeLost, AddressOf OnLifeLost
         AddHandler LevelCleared, AddressOf OnLevelCleared
         AddHandler GetReadyMessage, AddressOf OnGetReadyMessage
         AddHandler GameStart, AddressOf OnGameStart
-        AddHandler GameStarted, AddressOf OnGameStarted
+        AddHandler GameHasBegun, AddressOf OnGameHasBegun
         AddHandler DeathAnimationComplete, AddressOf OnDeathAnimationComplete
-        AddHandler NextLevel, AddressOf OnNextLevel
+        AddHandler MovingToNextLevel, AddressOf OnMovingToNextLevel
         AddHandler TreeGrown, AddressOf OnTreeGrown
     End Sub
 
@@ -76,40 +78,32 @@ Public NotInheritable Class SoundManager
     Private Sub OnGameStateChanged(newState As GameState)
         Select Case newState
             Case GameState.Playing
-                ' Don't play music yet - wait for GameStarted event after "Get Ready"
-
+                RestartMusicOnPause()
             Case GameState.GameOver
                 _sndGameOver.Play()
                 StopBackgroundMusic()
-
             Case GameState.Title
                 StopBackgroundMusic()
-                
             Case GameState.Paused
                 MediaPlayer.Pause()
-                
             Case GameState.LevelCleared
-                ' Continue playing music
+                StopBackgroundMusic()
         End Select
     End Sub
 
-    Private Sub OnGameStarted()
+    Private Sub OnGameHasBegun()
         PlayBackgroundMusic()
     End Sub
 
     Private Sub OnDeathAnimationComplete()
-        If MediaPlayer.State = MediaState.Paused Then
-            MediaPlayer.Resume()
-        End If
+        RestartMusicOnPause()
     End Sub
 
     ''' <summary>
     ''' Handles get ready message for audio.
     ''' </summary>
     Private Sub OnGetReadyMessage()
-        If MediaPlayer.State = MediaState.Paused Then
-            MediaPlayer.Resume()
-        End If
+        RestartMusicOnPause()
     End Sub
 
     ''' <summary>
@@ -120,9 +114,9 @@ Public NotInheritable Class SoundManager
     End Sub
 
     ''' <summary>
-    ''' Handles next level sound.
+    ''' Handles sound on moving to next level.
     ''' </summary>
-    Private Sub OnNextLevel()
+    Private Sub OnMovingToNextLevel()
         _sndAtNextLevel.Play()
     End Sub
 
@@ -157,7 +151,7 @@ Public NotInheritable Class SoundManager
     ''' <summary>
     ''' Handles player death sound.
     ''' </summary>
-    Private Sub OnPlayerDied()
+    Private Sub OnGameHasEnded()
         _sndGameOver.Play()
         StopBackgroundMusic()
     End Sub
@@ -174,7 +168,7 @@ Public NotInheritable Class SoundManager
     ''' Handles level cleared sound.
     ''' </summary>
     Private Sub OnLevelCleared()
-        _sndAtNextLevel.Play()
+        _sndLevelCleared.Play()
     End Sub
 
     ''' <summary>
@@ -208,6 +202,15 @@ Public NotInheritable Class SoundManager
     End Sub
 
     ''' <summary>
+    ''' Restarts background music on paused state.
+    ''' </summary>
+    Private Sub RestartMusicOnPause()
+        If _isMusicPlaying AndAlso MediaPlayer.State = MediaState.Paused Then
+            MediaPlayer.Resume()
+        End If
+    End Sub
+
+    ''' <summary>
     ''' Disposes of sound resources.
     ''' </summary>
     Private Sub Dispose(disposing As Boolean)
@@ -218,14 +221,14 @@ Public NotInheritable Class SoundManager
                 RemoveHandler PesticideCollected, AddressOf OnPesticideCollected
                 RemoveHandler EnemyKilled, AddressOf OnEnemyKilled
                 RemoveHandler EnemyRespawned, AddressOf OnEnemyRespawned
-                RemoveHandler PlayerDied, AddressOf OnPlayerDied
+                RemoveHandler GameHasEnded, AddressOf OnGameHasEnded
                 RemoveHandler LifeLost, AddressOf OnLifeLost
                 RemoveHandler LevelCleared, AddressOf OnLevelCleared
                 RemoveHandler GetReadyMessage, AddressOf OnGetReadyMessage
                 RemoveHandler GameStart, AddressOf OnGameStart
-                RemoveHandler GameStarted, AddressOf OnGameStarted
+                RemoveHandler GameHasBegun, AddressOf OnGameHasBegun
                 RemoveHandler DeathAnimationComplete, AddressOf OnDeathAnimationComplete
-                RemoveHandler NextLevel, AddressOf OnNextLevel
+                RemoveHandler MovingToNextLevel, AddressOf OnMovingToNextLevel
                 RemoveHandler TreeGrown, AddressOf OnTreeGrown
 
                 StopBackgroundMusic()

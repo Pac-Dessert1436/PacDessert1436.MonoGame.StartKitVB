@@ -66,6 +66,7 @@ Public MustInherit Class Actor
         Public Const IMAGE_PATH As String = "Images/player_sheet"
         Public Property Score As Integer = 0
         Public Property Lives As Integer = STARTING_LIVES
+        Public Property HasReceivedBonusLife As Boolean = False
         Public Property IsAlive As Boolean = True
         Public Property Speed As Single = PLAYER_SPEED
         Public Property CurrentDirection As Direction = Direction.Right
@@ -258,18 +259,29 @@ Public MustInherit Class Actor
 
         Public Sub CollectSeed(seedType As SeedType)
             Score += SEED_POINTS
+            CheckBonusLife()
             ScheduleEvent_PlayerScoreChanged(Score)
             ScheduleEvent_SeedCollected(New Actor.Seed(GridPosition, seedType))
         End Sub
 
+        Public Sub CheckBonusLife()
+            If Not HasReceivedBonusLife AndAlso Score >= BONUS_LIFE_AT Then
+                Lives += 1
+                HasReceivedBonusLife = True
+                ScheduleEvent_LivesChanged(Lives)
+            End If
+        End Sub
+
         Public Sub CollectPesticide()
             Score += PESTICIDE_POINTS
+            CheckBonusLife()
             ScheduleEvent_PlayerScoreChanged(Score)
             ScheduleEvent_PesticideCollected()
         End Sub
 
         Public Sub KillEnemy()
             Score += ENEMY_POINTS
+            CheckBonusLife()
             ScheduleEvent_PlayerScoreChanged(Score)
         End Sub
 
@@ -280,7 +292,7 @@ Public MustInherit Class Actor
 
             If Lives <= 0 Then
                 IsAlive = False
-                ScheduleEvent_PlayerDied()
+                ScheduleEvent_GameHasEnded()
             Else
                 IsInDeathAnimation = True
             End If
@@ -301,6 +313,10 @@ Public MustInherit Class Actor
             )
             CurrentDirection = Direction.Right
             NextDirection = Direction.Right
+        End Sub
+
+        Public Sub ResetBonusLifeFlag()
+            HasReceivedBonusLife = False
         End Sub
     End Class
 

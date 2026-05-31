@@ -20,13 +20,15 @@ Public Module Essentials
     Public Const VULNERABLE_DURATION As Single = 8.0F
     Public Const ENEMY_RESPAWN_TIME As Single = 5.0F
     Public Const ENEMY_GRACE_PERIOD As Single = 2.0F
-    Public Const GET_READY_DURATION As Single = 3.0F
+    Public Const GET_READY_DURATION As Single = 6.0F
+    Public Const LEVEL_CLEARED_DURATION As Single = 3.5F
     Public Const DEATH_ANIMATION_DURATION As Single = 2.0F
 
     Public Const STARTING_LIVES As Integer = 3
     Public Const SEED_POINTS As Integer = 10
-    Public Const ENEMY_POINTS As Integer = 50
-    Public Const PESTICIDE_POINTS As Integer = 15
+    Public Const ENEMY_POINTS As Integer = 200
+    Public Const PESTICIDE_POINTS As Integer = 50
+    Public Const BONUS_LIFE_AT As Integer = 7000
 
     Public ReadOnly Property PlayerStartingPoint As New Point(MAZE_WIDTH \ 2, MAZE_HEIGHT - 2)
 #End Region
@@ -114,14 +116,14 @@ Public Module Essentials
     Public Event PesticideCollected()
     Public Event EnemyKilled(enemy As Actor.Enemy)
     Public Event EnemyRespawned(enemy As Actor.Enemy)
-    Public Event PlayerDied()
+    Public Event GameHasEnded()
     Public Event LifeLost()
     Public Event LevelCleared()
     Public Event GetReadyMessage()
     Public Event GameStart()
-    Public Event GameStarted()
+    Public Event GameHasBegun()
     Public Event DeathAnimationComplete()
-    Public Event NextLevel()
+    Public Event MovingToNextLevel()
     Public Event TreeGrown(position As Point)
 #End Region
 

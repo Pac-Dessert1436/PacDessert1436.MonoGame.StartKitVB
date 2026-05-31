@@ -23,7 +23,6 @@ Public NotInheritable Class Renderer
     Private _joystickKnob As Texture2D
     Private _pauseButton As Texture2D
     Private _generalButton As Texture2D
-    Private _frightenedEffect As Effect
 
     Private _playerAnimations As Dictionary(Of Direction, Animation)
     Private _playerDeathAnimation As Animation
@@ -158,13 +157,11 @@ Public NotInheritable Class Renderer
         _joystickKnob = _content.Load(Of Texture2D)("Images/joystick_knob")
         _pauseButton = _content.Load(Of Texture2D)("Images/pause_button")
         _generalButton = _content.Load(Of Texture2D)("Images/general_button")
-
         _gameFont = _content.Load(Of SpriteFont)("Fonts/GameFont")
-        _frightenedEffect = _content.Load(Of Effect)("Effects/FrightenedEffect")
 
         Actor.Player.JoystickBaseWidth = _joystickBase.Width
-        Renderer.PauseButtonWidth = _pauseButton.Width
-        Renderer.PauseButtonHeight = _pauseButton.Height
+        PauseButtonWidth = _pauseButton.Width
+        PauseButtonHeight = _pauseButton.Height
         _joystick = New VirtualJoystick(_joystickBase, _joystickKnob, New Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 100))
     End Sub
 
@@ -202,7 +199,7 @@ Public NotInheritable Class Renderer
                 DrawHUD(gameManager)
                 DrawJoystick()
                 DrawPauseButton()
-                DrawLevelClearedScreen(gameManager)
+                DrawLevelClearedScreen()
         End Select
 
         _spriteBatch.End()
@@ -210,7 +207,9 @@ Public NotInheritable Class Renderer
 
         Dim renderWidth = CInt(SCREEN_WIDTH * _screenScale)
         Dim renderHeight = CInt(SCREEN_HEIGHT * _screenScale)
-        Dim renderRect As New Rectangle(CInt(_screenOffset.X), CInt(_screenOffset.Y), renderWidth, renderHeight)
+        Dim renderRect As New Rectangle(
+            CInt(_screenOffset.X), CInt(_screenOffset.Y), renderWidth, renderHeight
+        )
         _spriteBatch.Begin(samplerState:=SamplerState.PointClamp)
         _spriteBatch.Draw(_renderTarget, renderRect, Color.White)
         _spriteBatch.End()
@@ -227,6 +226,27 @@ Public NotInheritable Class Renderer
 
         DrawButton("START", CInt(SCREEN_WIDTH / 2), 400, 1.0F)
         DrawButton("EXIT", CInt(SCREEN_WIDTH / 2), 520, 1.0F)
+
+        Static instructions As String() = {
+            "--- HOW TO PLAY ---",
+            "Move with joystick/keyboard",
+            "Collect seeds to plant trees",
+            "Pesticide weakens enemies",
+            "Survive as long as possible"
+        }
+
+        _spriteBatch.DrawString(_gameFont, 
+            $"BONUS LIFE AT {BONUS_LIFE_AT} PTS.", New Vector2(50, 300), Color.LightGreen
+        )
+        Dim instrY As Integer = 700
+        For Each instr As String In instructions
+            Dim instructionPos As New Vector2(
+                (SCREEN_WIDTH - _gameFont.MeasureString(instr).X) / 2,
+                instrY
+            )
+            _spriteBatch.DrawString(_gameFont, instr, instructionPos, Color.White)
+            instrY += 50
+        Next
     End Sub
 
     Private Sub DrawButton(text As String, centerX As Integer, y As Integer, Optional scale As Single = 1.0F)
@@ -264,14 +284,13 @@ Public NotInheritable Class Renderer
     End Sub
 
     Private Sub DrawHUD(gameManager As GameManager)
-        DrawText(
-            $"1UP: {gameManager.Player.Score,5}",
-            New Vector2(10, 10),
-            Color.White, 1.0F)
-        DrawText(
-            $"HI: {gameManager.HighScore,5}",
-            New Vector2(SCREEN_WIDTH \ 2 + 10, 10),
-            Color.White, 1.0F)
+        With gameManager
+            DrawText($"1UP { .Player.Score,6}", New Vector2(10, 10), Color.MintCream, 1.0F)
+            DrawText(
+                If(.Player.Score > .HighScore, "-NEW BEST-", $"HI. { .HighScore,6}"),
+                New Vector2(SCREEN_WIDTH \ 2 + 10, 10),
+                Color.MintCream, 1.0F)
+        End With
 
         Dim lifeIconRect As New Rectangle(0, 0, ICON_SIZE, ICON_SIZE)
         For i As Integer = 0 To gameManager.Player.Lives - 1
@@ -292,10 +311,10 @@ Public NotInheritable Class Renderer
         Dim seedIconIndex = GetSeedIconIndex(seedType)
         Dim seedIconRect As New Rectangle(seedIconIndex * ICON_SIZE, 0, ICON_SIZE, ICON_SIZE)
 
-        Dim seasonText = $"SEASON {gameManager.CurrentLevel}"
+        Dim seasonText = $"SEASON {gameManager.CurrentLevel,2}"
         Dim seasonSize = _gameFont.MeasureString(seasonText)
-        Dim seasonX = SCREEN_WIDTH \ 2 + 10
-        Dim seasonY = 30
+        Dim seasonX = SCREEN_WIDTH \ 2 - 50
+        Dim seasonY = 45
         _spriteBatch.DrawString(_gameFont, seasonText, New Vector2(seasonX, seasonY), Color.White)
         _spriteBatch.Draw(
             _iconSpriteSheet,
@@ -308,6 +327,10 @@ Public NotInheritable Class Renderer
             seedIconRect,
             Color.White
         )
+
+        If gameManager.IsGetReadyActive Then
+            _spriteBatch.DrawString(_gameFont, "GET READY!", New Vector2(10, 60), Color.Yellow)
+        End If
     End Sub
 
     Private Shared Function GetSeedIconIndex(seedType As SeedType) As Integer
@@ -330,8 +353,6 @@ Public NotInheritable Class Renderer
         DrawPesticides(gameManager.Pesticides)
         DrawPlayer(gameManager.Player, deltaTime)
         DrawEnemies(gameManager.Enemies, deltaTime)
-
-        If gameManager.IsGetReadyActive Then DrawGetReadyMessage()
     End Sub
 
     Private Sub DrawSpawnPoints(enemies As List(Of Actor.Enemy))
@@ -490,17 +511,13 @@ Public NotInheritable Class Renderer
                 enemy.PixelPosition.Y * renderScale - ENEMY_SIZE * renderScale / 2 + HUD_HEIGHT
             )
 
-            Dim enemyColor = Color.White
-            If enemy.GracePeriodTimer > 0 Then
-                enemyColor = New Color(200, 200, 255, 128)
-            End If
-
+            Dim enemyColor = If(enemy.GracePeriodTimer > 0, New Color(200, 200, 255, 128), Color.White)
             animation.SpriteSheet.DrawFrame(_spriteBatch, frameIndex, drawPos, scale, enemyColor)
         Next
 
         Dim frightenedEnemies = From e In enemies Where e.IsActive AndAlso e.IsVulnerable
         If frightenedEnemies.Any() Then
-            Dim blinkValue = Math.Abs(Math.Sin(DateTime.Now.TimeOfDay.TotalSeconds * 8.0))
+            Dim blinkValue = Math.Abs(Math.Sin(Date.Now.TimeOfDay.TotalSeconds * 8.0))
             Dim frightenedColor As Color
             If blinkValue > 0.5 Then
                 frightenedColor = Color.White
@@ -524,17 +541,6 @@ Public NotInheritable Class Renderer
                 animation.SpriteSheet.DrawFrame(_spriteBatch, frameIndex, drawPos, scale, frightenedColor)
             Next
         End If
-    End Sub
-
-    Private Sub DrawGetReadyMessage()
-        Dim text = "GET READY!"
-        Dim textSize As Vector2 = _gameFont.MeasureString(text)
-        Dim position As New Vector2(
-            (_renderTarget.Width - textSize.X) / 2,
-            (_renderTarget.Height - textSize.Y) / 2
-        )
-
-        _spriteBatch.DrawString(_gameFont, text, position, Color.Yellow)
     End Sub
 
     Private Sub DrawJoystick()
@@ -617,38 +623,29 @@ Public NotInheritable Class Renderer
         Dim overlayRect As New Rectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
         _spriteBatch.Draw(_pixelTexture, overlayRect, New Color(0, 0, 0, 150))
 
-        Dim text As String = "PAUSED"
-        Dim textSize As Vector2 = _gameFont.MeasureString(text)
-        Dim position As New Vector2(
-            (SCREEN_WIDTH - textSize.X) / 2,
-            (SCREEN_HEIGHT - textSize.Y) / 2 - 80
-        )
-        _spriteBatch.DrawString(_gameFont, text, position, Color.White)
-
+        DrawCenteredText("PAUSED", -80, Color.White, 2.0F)
         DrawButton("RESUME", CInt(SCREEN_WIDTH / 2), CInt(SCREEN_HEIGHT / 2), 1.0F)
-        DrawButton("EXIT", CInt(SCREEN_WIDTH / 2), CInt(SCREEN_HEIGHT / 2) + 120, 1.0F)
+        DrawButton("MENU", CInt(SCREEN_WIDTH / 2), CInt(SCREEN_HEIGHT / 2) + 120, 1.0F)
     End Sub
 
     Private Sub DrawGameOverScreen(gameManager As GameManager)
         Dim overlayRect As New Rectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
         _spriteBatch.Draw(_pixelTexture, overlayRect, New Color(0, 0, 0, 150))
 
-        DrawCenteredText("GAME OVER", -80, Color.Red, 2.0F)
+        DrawCenteredText("GAME OVER", -80, Color.White, 2.0F)
         DrawCenteredText($"Final Score: {gameManager.Player.Score}", -20, Color.White, 1.0F)
-        DrawCenteredText($"High Score: {gameManager.HighScore}", 10, Color.Yellow, 1.0F)
-        DrawCenteredText($"Seasons Cleared: {gameManager.CurrentLevel - 1}", 40, Color.Green, 1.0F)
+        DrawCenteredText($"Highest Score: {gameManager.HighScore}", 10, Color.White, 1.0F)
 
         DrawButton("RETRY", CInt(SCREEN_WIDTH / 2), CInt(SCREEN_HEIGHT / 2) + 50, 1.0F)
-        DrawButton("EXIT", CInt(SCREEN_WIDTH / 2), CInt(SCREEN_HEIGHT / 2) + 170, 1.0F)
+        DrawButton("MENU", CInt(SCREEN_WIDTH / 2), CInt(SCREEN_HEIGHT / 2) + 170, 1.0F)
     End Sub
 
-    Private Sub DrawLevelClearedScreen(gameManager As GameManager)
+    Private Sub DrawLevelClearedScreen()
         Dim overlayRect As New Rectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
         _spriteBatch.Draw(_pixelTexture, overlayRect, New Color(0, 0, 0, 150))
 
-        DrawCenteredText($"SEASON {gameManager.CurrentLevel} CLEARED!", -30, Color.Green, 1.5F)
-        DrawCenteredText($"Score: {gameManager.Player.Score}", 20, Color.White, 1.0F)
-        DrawCenteredText("Get ready for next season...", 60, Color.Yellow, 1.0F)
+        DrawCenteredText($"SEASON CLEARED", -30, Color.White, 1.5F)
+        DrawCenteredText($"Let's move on to the next!", 60, Color.White, 1.0F)
     End Sub
 
     Private Sub DrawText(text As String, position As Vector2, color As Color, Optional scale As Single = 1.0F)

@@ -1,6 +1,5 @@
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Input
-Imports Microsoft.Xna.Framework.Graphics
 
 Public NotInheritable Class GameManager
     Private ReadOnly _random As New Random
@@ -22,6 +21,7 @@ Public NotInheritable Class GameManager
     Public Property IsGetReadyActive As Boolean = False
     Public Property PesticideActive As Boolean = False
     Public Property PesticideTimer As Single = 0.0F
+    Public Property LevelClearedTimer As Single = 0.0F
 
     Private _previousKeyboardState As KeyboardState
 
@@ -35,6 +35,14 @@ Public NotInheritable Class GameManager
         InitializeLevel()
     End Sub
 
+    Public Sub ResetGame()
+        Player.Score = 0
+        Player.Lives = STARTING_LIVES
+        Player.ResetBonusLifeFlag()
+        CurrentLevel = 1
+        InitializeLevel()
+    End Sub
+
     Public Sub InitializeLevel()
         Maze = CreateMazeLayout(CurrentLevel)
         Seeds.Clear()
@@ -44,7 +52,8 @@ Public NotInheritable Class GameManager
         Trees.Clear()
         ParseMaze(CurrentLevel)
         Player.ResetPosition()
-        GetReadyTimer = GET_READY_DURATION
+        GetReadyTimer = If(CurrentLevel <= 1, GET_READY_DURATION, LEVEL_CLEARED_DURATION)
+        LevelClearedTimer = LEVEL_CLEARED_DURATION
         IsGetReadyActive = True
         PesticideActive = False
         PesticideTimer = 0.0F
@@ -101,13 +110,21 @@ Public NotInheritable Class GameManager
     Public Sub Update(deltaTime As Single)
         HandleGameStateTransitions()
 
+        If GameState = GameState.LevelCleared Then
+            LevelClearedTimer -= deltaTime
+            If LevelClearedTimer <= 0 Then
+                GameState = GameState.Playing
+            End If
+            Exit Sub
+        End If
+
         If GameState = GameState.Playing Then
             If IsGetReadyActive Then
                 GetReadyTimer -= deltaTime
                 If GetReadyTimer <= 0 Then
                     IsGetReadyActive = False
                     GetReadyTimer = 0
-                    ScheduleEvent_GameStarted()
+                    ScheduleEvent_GameHasBegun()
                 End If
                 Exit Sub
             End If
@@ -152,13 +169,15 @@ Public NotInheritable Class GameManager
                         ScheduleEvent_GameStart()
                         ScheduleEvent_GameStateChanged(GameState)
                     ElseIf oldState = GameState.GameOver Then
-                        InitializeGame()
+                        ResetGame()
                         ScheduleEvent_GameStart()
                         ScheduleEvent_GameStateChanged(GameState)
                     ElseIf oldState = GameState.LevelCleared Then
                         CurrentLevel += 1
                         InitializeLevel()
-                        ScheduleEvent_NextLevel()
+                        ScheduleEvent_MovingToNextLevel()
+                        ScheduleEvent_GameStateChanged(GameState)
+                    ElseIf oldState = GameState.Paused Then
                         ScheduleEvent_GameStateChanged(GameState)
                     End If
 
@@ -334,7 +353,8 @@ Public NotInheritable Class GameManager
                 End If
 
             Case GameState.GameOver
-                If keyboardState.IsKeyDown(Keys.Enter) AndAlso Not _previousKeyboardState.IsKeyDown(Keys.Enter) Then
+                If keyboardState.IsKeyDown(Keys.Enter) AndAlso
+                    Not _previousKeyboardState.IsKeyDown(Keys.Enter) Then
                     GameState = GameState.Playing
                 End If
 
