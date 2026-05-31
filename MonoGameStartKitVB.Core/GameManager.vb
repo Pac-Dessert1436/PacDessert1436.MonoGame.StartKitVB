@@ -51,6 +51,9 @@ Public NotInheritable Class GameManager
         Saplings.Clear()
         Trees.Clear()
         ParseMaze(CurrentLevel)
+        Player.IsAlive = True
+        Player.IsInDeathAnimation = False
+        Player.DeathAnimationTimer = 0.0F
         Player.ResetPosition()
         GetReadyTimer = If(CurrentLevel <= 1, GET_READY_DURATION, LEVEL_CLEARED_DURATION)
         LevelClearedTimer = LEVEL_CLEARED_DURATION
@@ -88,7 +91,7 @@ Public NotInheritable Class GameManager
     Private Sub SpawnEnemies()
         Dim enemyType = EnemyTypeForLevel(CurrentLevel)
         Dim enemyCount = Math.Min(4 + CurrentLevel, 8)
-        Dim spawnPoints = New List(Of Point)
+        Dim spawnPoints As New List(Of Point)
 
         For x As Integer = 0 To MAZE_WIDTH - 1
             For y As Integer = 0 To MAZE_HEIGHT - 1
@@ -132,7 +135,11 @@ Public NotInheritable Class GameManager
             If Player.IsInDeathAnimation Then
                 Player.Update(deltaTime, Maze)
                 If Not Player.IsInDeathAnimation Then
-                    ResetPositionsAfterDeath()
+                    If Player.Lives <= 0 Then
+                        GameState = GameState.GameOver
+                    Else
+                        ResetPositionsAfterDeath()
+                    End If
                 End If
                 Return
             End If
@@ -235,11 +242,6 @@ Public NotInheritable Class GameManager
                     Player.KillEnemy()
                 ElseIf enemy.GracePeriodTimer <= 0 AndAlso Not Player.IsInDeathAnimation Then
                     Player.LoseLife()
-                    If Player.Lives <= 0 Then
-                        GameState = GameState.GameOver
-                    Else
-                        ResetPositionsAfterDeath()
-                    End If
                     Exit For
                 End If
             End If

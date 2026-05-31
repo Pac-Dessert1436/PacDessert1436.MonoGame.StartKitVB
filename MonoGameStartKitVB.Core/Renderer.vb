@@ -329,7 +329,7 @@ Public NotInheritable Class Renderer
         )
 
         If gameManager.IsGetReadyActive Then
-            _spriteBatch.DrawString(_gameFont, "GET READY!", New Vector2(10, 60), Color.Yellow)
+            _spriteBatch.DrawString(_gameFont, "GET READY!", New Vector2(10, 70), Color.Yellow)
         End If
     End Sub
 
@@ -632,9 +632,9 @@ Public NotInheritable Class Renderer
         Dim overlayRect As New Rectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
         _spriteBatch.Draw(_pixelTexture, overlayRect, New Color(0, 0, 0, 150))
 
-        DrawCenteredText("GAME OVER", -80, Color.White, 2.0F)
-        DrawCenteredText($"Final Score: {gameManager.Player.Score}", -20, Color.White, 1.0F)
-        DrawCenteredText($"Highest Score: {gameManager.HighScore}", 10, Color.White, 1.0F)
+        DrawCenteredText("GAME OVER", -100, Color.White, 2.0F)
+        DrawCenteredText($"Final Score: {gameManager.Player.Score}", -50, Color.White, 1.0F)
+        DrawCenteredText($"Highest Score: {gameManager.HighScore}", -20, Color.White, 1.0F)
 
         DrawButton("RETRY", CInt(SCREEN_WIDTH / 2), CInt(SCREEN_HEIGHT / 2) + 50, 1.0F)
         DrawButton("MENU", CInt(SCREEN_WIDTH / 2), CInt(SCREEN_HEIGHT / 2) + 170, 1.0F)
@@ -644,8 +644,8 @@ Public NotInheritable Class Renderer
         Dim overlayRect As New Rectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
         _spriteBatch.Draw(_pixelTexture, overlayRect, New Color(0, 0, 0, 150))
 
-        DrawCenteredText($"SEASON CLEARED", -30, Color.White, 1.5F)
-        DrawCenteredText($"Let's move on to the next!", 60, Color.White, 1.0F)
+        DrawCenteredText($"SEASON CLEARED", -100, Color.White, 1.5F)
+        DrawCenteredText($"Let's move on to the next!", -50, Color.White, 1.0F)
     End Sub
 
     Private Sub DrawText(text As String, position As Vector2, color As Color, Optional scale As Single = 1.0F)

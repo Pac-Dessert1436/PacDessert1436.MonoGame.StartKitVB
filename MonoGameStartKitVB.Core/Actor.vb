@@ -189,7 +189,11 @@ Public MustInherit Class Actor
             End If
 
             If IsMoving Then
-                CurrentDirection = NextDirection
+                Dim nextPosition = PixelPosition + NextDirection.ToVector2() * Speed * deltaTime
+                If IsValidPosition(nextPosition, maze) Then
+                    CurrentDirection = NextDirection
+                End If
+
                 Dim newPosition = PixelPosition + CurrentDirection.ToVector2() * Speed * deltaTime
 
                 If IsValidPosition(newPosition, maze) Then
@@ -198,19 +202,6 @@ Public MustInherit Class Actor
                         CInt(PixelPosition.X / CELL_SIZE),
                         CInt(PixelPosition.Y / CELL_SIZE)
                     )
-
-                    Dim cellCenterX = GridPosition.X * CELL_SIZE + CELL_SIZE \ 2
-                    Dim cellCenterY = GridPosition.Y * CELL_SIZE + CELL_SIZE \ 2
-                    Dim distToCenterX = Math.Abs(PixelPosition.X - cellCenterX)
-                    Dim distToCenterY = Math.Abs(PixelPosition.Y - cellCenterY)
-
-                    Dim tempPixelPosition = PixelPosition
-                    If CurrentDirection = Direction.Left OrElse CurrentDirection = Direction.Right Then
-                        If distToCenterY < SNAP_THRESHOLD Then tempPixelPosition.Y = cellCenterY
-                    Else
-                        If distToCenterX < SNAP_THRESHOLD Then tempPixelPosition.X = cellCenterX
-                    End If
-                    PixelPosition = tempPixelPosition
                 End If
             End If
         End Sub
@@ -289,20 +280,20 @@ Public MustInherit Class Actor
             Lives -= 1
             ScheduleEvent_LivesChanged(Lives)
             ScheduleEvent_LifeLost()
-
-            If Lives <= 0 Then
-                IsAlive = False
-                ScheduleEvent_GameHasEnded()
-            Else
-                IsInDeathAnimation = True
-            End If
+            IsInDeathAnimation = True
         End Sub
 
         Public Sub CompleteDeathAnimation()
             IsInDeathAnimation = False
             DeathAnimationTimer = 0.0F
-            ResetPosition()
-            ScheduleEvent_DeathAnimationComplete()
+
+            If Lives <= 0 Then
+                IsAlive = False
+                ScheduleEvent_GameHasEnded()
+            Else
+                ResetPosition()
+                ScheduleEvent_DeathAnimationComplete()
+            End If
         End Sub
 
         Public Sub ResetPosition()
@@ -313,6 +304,8 @@ Public MustInherit Class Actor
             )
             CurrentDirection = Direction.Right
             NextDirection = Direction.Right
+            IsInDeathAnimation = False
+            DeathAnimationTimer = 0.0F
         End Sub
 
         Public Sub ResetBonusLifeFlag()
@@ -374,6 +367,17 @@ Public MustInherit Class Actor
                 End If
             End If
 
+            Dim cellCenterX = GridPosition.X * CELL_SIZE + CELL_SIZE \ 2
+            Dim cellCenterY = GridPosition.Y * CELL_SIZE + CELL_SIZE \ 2
+            Dim distToCenterX = Math.Abs(PixelPosition.X - cellCenterX)
+            Dim distToCenterY = Math.Abs(PixelPosition.Y - cellCenterY)
+
+            Dim isAtCellCenter = distToCenterX < SNAP_THRESHOLD AndAlso distToCenterY < SNAP_THRESHOLD
+
+            If isAtCellCenter Then
+                PixelPosition = New Vector2(cellCenterX, cellCenterY)
+            End If
+
             Dim movement = Direction.ToVector2()
             Dim newPosition = PixelPosition + movement * Speed * deltaTime
 
@@ -383,11 +387,6 @@ Public MustInherit Class Actor
                     CInt(PixelPosition.X / CELL_SIZE),
                     CInt(PixelPosition.Y / CELL_SIZE)
                 )
-
-                Dim cellCenterX = GridPosition.X * CELL_SIZE + CELL_SIZE \ 2
-                Dim cellCenterY = GridPosition.Y * CELL_SIZE + CELL_SIZE \ 2
-                Dim distToCenterX = Math.Abs(PixelPosition.X - cellCenterX)
-                Dim distToCenterY = Math.Abs(PixelPosition.Y - cellCenterY)
 
                 Dim tempPixelPosition = PixelPosition
                 If Direction = Direction.Left OrElse Direction = Direction.Right Then
