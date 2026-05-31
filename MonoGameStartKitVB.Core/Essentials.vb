@@ -12,6 +12,8 @@ Public Module Essentials
     Public Const MAZE_HEIGHT As Integer = 21
     Public Const CELL_SIZE As Integer = 24
     Public Const ICON_SIZE As Integer = 12
+    Public Const PAUSE_BUTTON_SCALE As Integer = 2
+
     Public Const PLAYER_SIZE As Integer = 20
     Public Const SEED_SIZE As Integer = 12
     Public Const ENEMY_SIZE As Integer = 20
@@ -225,7 +227,7 @@ Public Module Essentials
 
         Dim enemyCount = Math.Clamp(level, 3, 8)
         Dim rnd = Random.Shared
-        Dim pesticideCount = 3
+        Dim pesticideCount = 4
 
         Dim playerStart = PlayerStartingPoint
         Dim GetWalkableTiles =
@@ -304,6 +306,6 @@ Public Module Essentials
         End Get
     End Property
 
-    ' Note: Event scheduling methods generated using ModuleEventRaiser.Generator.
+    ' Note: Event scheduling methods generated using `ModuleEventRaiser.Generator`.
 #End Region
 End Module

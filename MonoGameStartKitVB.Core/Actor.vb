@@ -157,19 +157,36 @@ Public MustInherit Class Actor
             )
             Dim joystickRadius = _joystickBaseWidth * Renderer.ScreenScale * 2
 
-            Dim buttonScale = Renderer.ScreenScale * 2
-            Dim pauseButtonRect = New Rectangle(
-                CInt(10 * Renderer.ScreenScale),
-                CInt(Renderer.ActualScreenHeight - Renderer.PauseButtonHeight * buttonScale - 10),
-                CInt(Renderer.PauseButtonWidth * buttonScale),
-                CInt(Renderer.PauseButtonHeight * buttonScale)
+            Dim scale = Renderer.ScreenScale
+            Dim offsetX = Renderer.ScreenOffset.X
+            Dim offsetY = Renderer.ScreenOffset.Y
+
+            Dim basePauseButtonRect As New Rectangle(
+                10,
+                SCREEN_HEIGHT - Renderer.PauseButtonHeight * PAUSE_BUTTON_SCALE - 10,
+                Renderer.PauseButtonWidth * PAUSE_BUTTON_SCALE,
+                Renderer.PauseButtonHeight * PAUSE_BUTTON_SCALE
+            )
+            Dim realPauseButtonRect As New Rectangle(
+                CInt(basePauseButtonRect.X * scale + offsetX),
+                CInt(basePauseButtonRect.Y * scale + offsetY),
+                CInt(basePauseButtonRect.Width * scale),
+                CInt(basePauseButtonRect.Height * scale)
+            )
+
+            Dim touchPadding = CInt(20 * scale)
+            Dim expandedPauseButtonRect As New Rectangle(
+                Math.Max(0, realPauseButtonRect.X - touchPadding),
+                Math.Max(0, realPauseButtonRect.Y - touchPadding),
+                realPauseButtonRect.Width + (touchPadding * 2),
+                realPauseButtonRect.Height + (touchPadding * 2)
             )
 
             For Each touchLoc In touchCollection
                 If touchLoc.State = Touch.TouchLocationState.Pressed OrElse
                    touchLoc.State = Touch.TouchLocationState.Moved Then
                     Dim touchPos = touchLoc.Position
-                    If Not pauseButtonRect.Contains(CInt(touchPos.X), CInt(touchPos.Y)) Then
+                    If Not expandedPauseButtonRect.Contains(CInt(touchPos.X), CInt(touchPos.Y)) Then
                         Dim delta = touchPos - joystickCenter
                         If delta.Length() <= joystickRadius * 2 Then
                             HandleJoystickInput(delta)
@@ -180,7 +197,7 @@ Public MustInherit Class Actor
 
             If mouseState.LeftButton = ButtonState.Pressed Then
                 Dim mousePos = New Vector2(mouseState.X, mouseState.Y)
-                If Not pauseButtonRect.Contains(CInt(mousePos.X), CInt(mousePos.Y)) Then
+                If Not realPauseButtonRect.Contains(CInt(mousePos.X), CInt(mousePos.Y)) Then
                     Dim delta = mousePos - joystickCenter
                     If delta.Length() <= joystickRadius * 2 Then
                         HandleJoystickInput(delta)

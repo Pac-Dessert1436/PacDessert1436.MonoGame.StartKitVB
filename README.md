@@ -2,12 +2,14 @@
 
 A **fully-functional** multi-platform game template built with **VB.NET** for [MonoGame](https://www.monogame.net/), featuring the game **Devour-Man** - inspired by Pac-Man.
 
+> **v1.1.3 Latest Update**: Fixed button interaction issue between WindowsDX and Android platforms. The pause button now works consistently across both platforms.
+
 ---
 
 ## Overview
 
 - **Project Name:** PacDessert1436.MonoGame.StartKitVB
-- **Template Short Name**: `mg2dstartkitvb` (formerly `mgstartkit-vb`)
+- **Template Short Name**: `mg2dstartkitvb`
 - **Game Name:** Devour-Man
 
 _PacDessert1436.MonoGame.StartKitVB_ is a **production-ready** game template demonstrating modern MonoGame development practices using VB.NET. The included game, **Devour-Man**, is a Pac-Man inspired arcade game where players collect seeds to grow a forest while dodging patrolling insects.
@@ -149,9 +151,9 @@ MonoGameStartKitVB/
 ## Roadmap
 
 ### Planned Features
-- [ ] Enhanced sound effects and music system
+- ✅ Enhanced sound effects and music system
 - [ ] DesktopGL build fix (FFMPEG pipeline)
-- [ ] High score saving and level progression system
+- [ ] High score saving on future versions
 
 ### Known Issues
 - DesktopGL cannot build due to FFMPEG pipeline issues
@@ -179,7 +181,13 @@ All assets are processed through the MonoGame Content Pipeline:
 
 ## Version History
 
-### Version 1.1.1 (Current; Production-Ready)
+### Version 1.1.3 (Latest; Production-Ready)
+- ✅ Fixed button interaction issue between WindowsDX and Android platforms
+- ✅ Pause button now works consistently across platforms
+- ✅ Improved touch detection accuracy for mobile devices
+- ✅ Better coordinate system alignment between rendering and input handling
+
+### Version 1.1.1 and 1.1.2 (Production-Ready)
 - ✅ Fully-functional game template ready for production use
 - ✅ Complete Android touch input support with virtual joystick
 - ✅ Clean architecture pattern implementation

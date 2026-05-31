@@ -398,18 +398,31 @@ Public NotInheritable Class GameManager
                     GameState = GameState.Paused
                 End If
 
-                Dim buttonScale = scale * 2
-                Dim pauseButtonRect = New Rectangle(
-                    CInt(10 * scale + offsetX),
-                    CInt(Renderer.ActualScreenHeight - Renderer.PauseButtonHeight * buttonScale - 10),
-                    CInt(Renderer.PauseButtonWidth * buttonScale),
-                    CInt(Renderer.PauseButtonHeight * buttonScale)
+                Dim basePauseButtonRect As New Rectangle(
+                    10,
+                    SCREEN_HEIGHT - Renderer.PauseButtonHeight * PAUSE_BUTTON_SCALE - 10,
+                    Renderer.PauseButtonWidth * PAUSE_BUTTON_SCALE,
+                    Renderer.PauseButtonHeight * PAUSE_BUTTON_SCALE
+                )
+                Dim realPauseButtonRect As New Rectangle(
+                    CInt(basePauseButtonRect.X * scale + offsetX),
+                    CInt(basePauseButtonRect.Y * scale + offsetY),
+                    CInt(basePauseButtonRect.Width * scale),
+                    CInt(basePauseButtonRect.Height * scale)
+                )
+
+                Dim touchPadding = CInt(20 * scale)
+                Dim expandedPauseButtonRect As New Rectangle(
+                    Math.Max(0, realPauseButtonRect.X - touchPadding),
+                    Math.Max(0, realPauseButtonRect.Y - touchPadding),
+                    realPauseButtonRect.Width + (touchPadding * 2),
+                    realPauseButtonRect.Height + (touchPadding * 2)
                 )
 
                 For Each touchLoc In touchCollection
                     If touchLoc.State = Touch.TouchLocationState.Pressed Then
                         Dim touchPos = touchLoc.Position
-                        If IsPointInRect(touchPos, pauseButtonRect) Then
+                        If IsPointInRect(touchPos, expandedPauseButtonRect) Then
                             GameState = GameState.Paused
                         End If
                     End If
@@ -417,7 +430,7 @@ Public NotInheritable Class GameManager
 
                 If mouseState.LeftButton = ButtonState.Pressed Then
                     Dim mousePos As New Vector2(mouseState.X, mouseState.Y)
-                    If IsPointInRect(mousePos, pauseButtonRect) Then
+                    If IsPointInRect(mousePos, expandedPauseButtonRect) Then
                         GameState = GameState.Paused
                     End If
                 End If
