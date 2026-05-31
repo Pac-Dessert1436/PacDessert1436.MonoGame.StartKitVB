@@ -508,12 +508,12 @@ Dim deltaTime As Single = CSng(gameTime.ElapsedGameTime.TotalSeconds)
 - Split your game into classes (Player, Enemy, GameManager, Renderer)
 - Keep related code together
 
----
-
 ## Additional Resources
 
 - [MonoGame Documentation](https://docs.monogame.net/)
 - [MonoGame Samples](https://github.com/MonoGame/MonoGame.Samples)
 - [MonoGame Community Discord](https://discord.gg/monogame)
 
-Happy coding with MonoGame and VB.NET! 🎮
+---
+
+Happy coding! Build amazing games with MonoGame and VB.NET! 🎮

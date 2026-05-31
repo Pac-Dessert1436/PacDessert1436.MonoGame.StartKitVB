@@ -15,7 +15,7 @@ Public NotInheritable Class SoundManager
     Private _sndSeedPacket As SoundEffect
     Private _sndPesticide As SoundEffect
     Private _sndEnemyKilled As SoundEffect
-    Private _sndEnemyReappear As SoundEffect
+    Private _sndEnemyRespawn As SoundEffect
     Private _sndGameStart As SoundEffect
     Private _sndAtNextLevel As SoundEffect
     Private _sndGameOver As SoundEffect
@@ -41,7 +41,7 @@ Public NotInheritable Class SoundManager
         _sndSeedPacket = _content.Load(Of SoundEffect)("Sounds/seed_packet")
         _sndPesticide = _content.Load(Of SoundEffect)("Sounds/pesticide")
         _sndEnemyKilled = _content.Load(Of SoundEffect)("Sounds/enemy_killed")
-        _sndEnemyReappear = _content.Load(Of SoundEffect)("Sounds/enemy_reappear")
+        _sndEnemyRespawn = _content.Load(Of SoundEffect)("Sounds/enemy_respawn")
         _sndGameStart = _content.Load(Of SoundEffect)("Sounds/game_start")
         _sndAtNextLevel = _content.Load(Of SoundEffect)("Sounds/at_next_level")
         _sndGameOver = _content.Load(Of SoundEffect)("Sounds/game_over")
@@ -145,7 +145,7 @@ Public NotInheritable Class SoundManager
     ''' Handles enemy respawned sound.
     ''' </summary>
     Private Sub OnEnemyRespawned(enemy As Actor.Enemy)
-        _sndEnemyReappear.Play()
+        _sndEnemyRespawn.Play()
     End Sub
 
     ''' <summary>

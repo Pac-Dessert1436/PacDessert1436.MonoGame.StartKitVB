@@ -182,8 +182,8 @@
 /processorParam:Quality=Best
 /build:Sounds/seed_packet.wav
 
-#begin Sounds/enemy_reappear.wav
+#begin Sounds/enemy_respawn.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
-/build:Sounds/enemy_reappear.wav
+/build:Sounds/enemy_respawn.wav
