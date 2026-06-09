@@ -1,0 +1,19 @@
+{
+    "$schema": "http://json.schemastore.org/template",
+    "author": "Pac-Dessert1436",
+    "classifications": [
+        "GameDev",
+        "MonoGame",
+        "VB.NET",
+        "C#"
+    ],
+    "name": "MonoGame Blank 2D StartKit VB.NET",
+    "identity": "PacDessert1436.MonoGame.StartKitVB",
+    "shortName": "mgblank2dstartkitvb",
+    "tags": {
+        "language": "VB",
+        "type": "project"
+    },
+    "sourceName": "Blank2DStartKitVB",
+    "preferNameDirectory": true
+}

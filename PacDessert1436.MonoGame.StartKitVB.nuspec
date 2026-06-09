@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>PacDessert1436.MonoGame.StartKitVB</id>
+    <version>1.1.3</version>
+    <title>MonoGame StartKit VB.NET</title>
+    <authors>Pac-Dessert1436</authors>
+    <owners>Pac-Dessert1436</owners>
+    <license type="expression">BSD-3-Clause</license>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <readme>README.md</readme>
+    <description>A multi-platform game template built with VB.NET for MonoGame, featuring the game "Devour-Man" — inspired by Pac-Man.</description>
+    <tags>monogame;vbnet;csharp;gamedev;pacman-like;tree-planting;startkit;template</tags>
+    <packageTypes>
+      <packageType name="Template" />
+    </packageTypes>
+    <repository type="git" url="https://github.com/Pac-Dessert1436/PacDessert1436.MonoGame.StartKitVB" />
+  </metadata>
+  <files>
+    <file src="MonoGameStartKitVB/**/*"
+      exclude="bin/**/*;obj/**/*;.git/**/*;*.user;*.suo;*.vsidx;*.dtbcache.v2;*.slnx;**/*.nupkg;**/*.nuspec;**/.vs/**/*;**/project.assets.json;**/*.AssemblyInfo.vb;**/.NETCoreApp*;**/Content/bin/**/*;.vs/**/*"
+      target="content" />
+    <file src="MonoGameStartKitVB/README.md" target="README.md" />
+  </files>
+</package>

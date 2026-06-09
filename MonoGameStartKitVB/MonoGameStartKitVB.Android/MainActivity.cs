@@ -2,9 +2,7 @@ using Android.App;
 using Android.Content.PM;
 using Android.OS;
 using Android.Views;
-
 using Microsoft.Xna.Framework;
-
 using MonoGameStartKitVB.Core;
 
 namespace MonoGameStartKitVB.Android
@@ -41,10 +39,8 @@ namespace MonoGameStartKitVB.Android
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
-
             _game = new GameMain();
             _view = _game.Services.GetService(typeof(View)) as View;
-
             SetContentView(_view);
             _game.Run();
         }
