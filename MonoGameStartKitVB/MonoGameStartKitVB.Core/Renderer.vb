@@ -167,10 +167,9 @@ Public NotInheritable Class Renderer
 
     Public Sub Render(gameManager As GameManager, gameState As GameState, deltaTime As Single)
         UpdateScreenScale()
-        _graphicsDevice.Clear(Color.Black)
 
         _graphicsDevice.SetRenderTarget(_renderTarget)
-        _graphicsDevice.Clear(Color.Black)
+        _graphicsDevice.Clear(Color.LightSeaGreen)
         _spriteBatch.Begin(samplerState:=SamplerState.PointClamp)
 
         Select Case gameState
@@ -204,6 +203,7 @@ Public NotInheritable Class Renderer
 
         _spriteBatch.End()
         _graphicsDevice.SetRenderTarget(Nothing)
+        _graphicsDevice.Clear(Color.Black)
 
         Dim renderWidth = CInt(SCREEN_WIDTH * _screenScale)
         Dim renderHeight = CInt(SCREEN_HEIGHT * _screenScale)
@@ -235,8 +235,11 @@ Public NotInheritable Class Renderer
             "Survive as long as possible"
         }
 
-        _spriteBatch.DrawString(_gameFont, 
-            $"BONUS LIFE AT {BONUS_LIFE_AT} PTS.", New Vector2(50, 300), Color.LightGreen
+        Dim bonusLifeStr = $"BONUS LIFE AT {BONUS_LIFE_AT} PTS."
+        _spriteBatch.DrawString(_gameFont,
+            bonusLifeStr,
+            New Vector2((SCREEN_WIDTH - _gameFont.MeasureString(bonusLifeStr).X) / 2, 300),
+            Color.LightGreen
         )
         Dim instrY As Integer = 700
         For Each instr As String In instructions
@@ -298,7 +301,7 @@ Public NotInheritable Class Renderer
                 _iconSpriteSheet,
                 New Rectangle(
                     10 + i * (ICON_SIZE * 2 + 4),
-                    30,
+                    35,
                     ICON_SIZE * 2,
                     ICON_SIZE * 2
                 ),
