@@ -1,6 +1,6 @@
 # MonoGame 2D StartKit VB.NET
 
-A **fully-functional** multi-platform game template built with **VB.NET** for [MonoGame](https://www.monogame.net/), featuring the game **Devour-Man** - inspired by Pac-Man.
+A **fully-functional** multi-platform game template built with **VB.NET** for [MonoGame](https://www.monogame.net/), featuring the game **Seed-Scape: Forest Planting Quest**.
 
 > **v1.1.3 Latest Update**: Fixed button interaction issue between WindowsDX and Android platforms. The pause button now works consistently across both platforms.
 
@@ -10,7 +10,7 @@ A **fully-functional** multi-platform game template built with **VB.NET** for [M
 
 - **Project Name:** PacDessert1436.MonoGame.StartKitVB
 - **Template Short Name**: `mg2dstartkitvb`
-- **Game Name:** Devour-Man
+- **Game Name:** Seed-Scape: Forest Planting Quest
 
 _PacDessert1436.MonoGame.StartKitVB_ is a **production-ready** game template demonstrating modern MonoGame development practices using VB.NET. The included game, **Devour-Man**, is a Pac-Man inspired arcade game where players collect seeds to grow a forest while dodging patrolling insects.
 
@@ -221,6 +221,21 @@ All assets are processed through the MonoGame Content Pipeline:
 - ✅ DesktopGL support; **later broken by FFMPEG issues**
 
 ---
+
+## Music/Sound Credits
+
+Every music/sound asset is **CC0-licensed**, selected from [Open Game Art](https://opengameart.org/). Many sound effects are carefully chosen from [512 Sound Effects (8-Bit Style)](https://opengameart.org/content/512-sound-effects-8-bit-style) by SubspaceAudio, together with a few sound effects from the original MonoGame StartKit (C# Version).
+
+- `BGM/main_theme.mp3` - _Dark Forest Waltz_, from [10-Track Modern Chiptune Demo](https://opengameart.org/content/10-track-modern-chiptune-demo) by IndieDevs.
+- `level_cleared.wav` - _[New Thing Get!](https://opengameart.org/content/new-thing-get)_ composed by congusbongus.
+- `game_start.wav` - _[Difference](https://opengameart.org/content/difference)_ composed by Chasersgaming; only the first 4 seconds are chosen.
+- `game_over.wav` - from 512 Sound Effects (8-Bit Style) by SubspaceAudio.
+- `enemy_killed.wav` - from 512 Sound Effects (8-Bit Style) by SubspaceAudio.
+- `enemy_respawn.wav` - from 512 Sound Effects (8-Bit Style) by SubspaceAudio.
+- `seed_packet.wav` - from the original MonoGame StartKit (C# Version).
+- `life_lost.wav` - from the original MonoGame StartKit (C# Version).
+- `pesticide.wav` - from 512 Sound Effects (8-Bit Style) by SubspaceAudio.
+- `at_next_level.wav` - from the original MonoGame StartKit (C# Version).
 
 ## License
 

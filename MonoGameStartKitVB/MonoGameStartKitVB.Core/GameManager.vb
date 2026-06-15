@@ -55,7 +55,7 @@ Public NotInheritable Class GameManager
         Player.IsInDeathAnimation = False
         Player.DeathAnimationTimer = 0.0F
         Player.ResetPosition()
-        GetReadyTimer = If(CurrentLevel <= 1, GET_READY_DURATION, LEVEL_CLEARED_DURATION)
+        GetReadyTimer = GET_READY_DURATION
         LevelClearedTimer = LEVEL_CLEARED_DURATION
         IsGetReadyActive = True
         PesticideActive = False

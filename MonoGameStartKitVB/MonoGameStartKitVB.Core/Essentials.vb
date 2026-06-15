@@ -22,7 +22,7 @@ Public Module Essentials
     Public Const VULNERABLE_DURATION As Single = 8.0F
     Public Const ENEMY_RESPAWN_TIME As Single = 5.0F
     Public Const ENEMY_GRACE_PERIOD As Single = 2.0F
-    Public Const GET_READY_DURATION As Single = 6.0F
+    Public Const GET_READY_DURATION As Single = 4.0F
     Public Const LEVEL_CLEARED_DURATION As Single = 3.5F
     Public Const DEATH_ANIMATION_DURATION As Single = 2.0F
 

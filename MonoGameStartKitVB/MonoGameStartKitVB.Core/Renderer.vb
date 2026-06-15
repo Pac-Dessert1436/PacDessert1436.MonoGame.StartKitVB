@@ -239,7 +239,7 @@ Public NotInheritable Class Renderer
         _spriteBatch.DrawString(_gameFont,
             bonusLifeStr,
             New Vector2((SCREEN_WIDTH - _gameFont.MeasureString(bonusLifeStr).X) / 2, 300),
-            Color.LightGreen
+            Color.MintCream
         )
         Dim instrY As Integer = 700
         For Each instr As String In instructions
