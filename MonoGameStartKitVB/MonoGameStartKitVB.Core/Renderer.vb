@@ -94,8 +94,8 @@ Public NotInheritable Class Renderer
     End Sub
 
     Private Sub UpdateScreenScale()
-        Dim newScreenWidth = _graphicsDevice.PresentationParameters.BackBufferWidth
-        Dim newScreenHeight = _graphicsDevice.PresentationParameters.BackBufferHeight
+        Dim newScreenWidth = _graphicsDevice.Viewport.Width
+        Dim newScreenHeight = _graphicsDevice.Viewport.Height
 
         If newScreenWidth <> _actualScreenWidth OrElse newScreenHeight <> _actualScreenHeight Then
             _actualScreenWidth = newScreenWidth
@@ -169,7 +169,7 @@ Public NotInheritable Class Renderer
         UpdateScreenScale()
 
         _graphicsDevice.SetRenderTarget(_renderTarget)
-        _graphicsDevice.Clear(Color.LightSeaGreen)
+        _graphicsDevice.Clear(Color.DarkGreen)
         _spriteBatch.Begin(samplerState:=SamplerState.PointClamp)
 
         Select Case gameState
@@ -261,10 +261,8 @@ Public NotInheritable Class Renderer
             buttonWidth,
             buttonHeight
         )
-
         Dim keyboardState = Keyboard.GetState()
         Dim isPressed = keyboardState.IsKeyDown(Keys.Enter)
-
         Dim buttonColor = If(isPressed, Color.LightGray, Color.White)
         _spriteBatch.Draw(_generalButton, buttonRect, buttonColor)
 
@@ -332,7 +330,7 @@ Public NotInheritable Class Renderer
         )
 
         If gameManager.IsGetReadyActive Then
-            _spriteBatch.DrawString(_gameFont, "GET READY!", New Vector2(10, 70), Color.Yellow)
+            _spriteBatch.DrawString(_gameFont, "GET READY!", New Vector2(10, 70), Color.LightGreen)
         End If
     End Sub
 

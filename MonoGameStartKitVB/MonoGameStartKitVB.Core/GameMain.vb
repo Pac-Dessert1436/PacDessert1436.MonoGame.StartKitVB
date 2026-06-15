@@ -1,4 +1,5 @@
 Imports Microsoft.Xna.Framework
+Imports Microsoft.Xna.Framework.Graphics
 Imports Microsoft.Xna.Framework.Input
 
 ''' <summary>
@@ -15,19 +16,23 @@ Public NotInheritable Class GameMain
     Private _soundManager As SoundManager
 
     Public Sub New()
-        _graphics = New GraphicsDeviceManager(Me) With {
-            .PreferredBackBufferWidth = SCREEN_WIDTH,
-            .PreferredBackBufferHeight = SCREEN_HEIGHT,
-            .IsFullScreen = True
-        }
-        _graphics.ApplyChanges()
+        _graphics = New GraphicsDeviceManager(Me)
         Content.RootDirectory = "Content"
         IsMouseVisible = True
     End Sub
 
     Protected Overrides Sub Initialize()
-        _graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width
-        _graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height
+        If OperatingSystem.IsAndroid() Then
+            _graphics.IsFullScreen = True
+            With GraphicsDevice.PresentationParameters
+                GraphicsDevice.Viewport = New Viewport(0, 0, .BackBufferWidth, .BackBufferHeight) _
+                    With {.MinDepth = 0.0F, .MaxDepth = 1.0F}
+            End With
+        Else
+            _graphics.PreferredBackBufferWidth = SCREEN_WIDTH
+            _graphics.PreferredBackBufferHeight = SCREEN_HEIGHT
+            _graphics.IsFullScreen = False
+        End If
         _graphics.ApplyChanges()
 
         _gameManager = New GameManager

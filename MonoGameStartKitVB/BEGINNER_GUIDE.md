@@ -51,7 +51,7 @@ Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Graphics
 Imports Microsoft.Xna.Framework.Input
 
-Public Class YourGame
+Public Class GameMain
     Inherits Game
     
     Private _graphics As GraphicsDeviceManager

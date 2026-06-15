@@ -29,7 +29,7 @@ namespace Blank2DStartKitVB.Android
     )]
     public class MainActivity : AndroidGameActivity
     {
-        private Blank2DStartKitVBGame _game;
+        private GameMain _game;
         private View _view;
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace Blank2DStartKitVB.Android
         {
             base.OnCreate(bundle);
 
-            _game = new Blank2DStartKitVBGame();
+            _game = new GameMain();
             _view = _game.Services.GetService(typeof(View)) as View;
 
             SetContentView(_view);

@@ -158,6 +158,12 @@
 /processorParam:Quality=Best
 /build:Sounds/level_cleared.wav
 
+#begin Sounds/life_gained.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/life_gained.wav
+
 #begin Sounds/life_lost.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor

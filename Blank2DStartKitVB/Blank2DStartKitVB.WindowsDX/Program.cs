@@ -15,7 +15,7 @@ internal class Program
         Application.SetHighDpiMode(HighDpiMode.SystemAware);
 
         // Create an instance of the game and start the game loop.
-        using var game = new Blank2DStartKitVBGame();
+        using var game = new GameMain();
         game.Run();
     }
 }

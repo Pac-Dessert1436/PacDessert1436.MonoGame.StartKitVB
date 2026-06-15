@@ -26,6 +26,7 @@ Public NotInheritable Class GameManager
     Private _previousKeyboardState As KeyboardState
 
     Public Sub New()
+        HighScore = LoadHighScore()
         InitializeGame()
     End Sub
 
@@ -55,7 +56,7 @@ Public NotInheritable Class GameManager
         Player.IsInDeathAnimation = False
         Player.DeathAnimationTimer = 0.0F
         Player.ResetPosition()
-        GetReadyTimer = GET_READY_DURATION
+        GetReadyTimer = If(CurrentLevel <= 1, GET_READY_DURATION, NEXT_LEVEL_DURATION)
         LevelClearedTimer = LEVEL_CLEARED_DURATION
         IsGetReadyActive = True
         PesticideActive = False
@@ -68,7 +69,7 @@ Public NotInheritable Class GameManager
         For x As Integer = 0 To MAZE_WIDTH - 1
             For y As Integer = 0 To MAZE_HEIGHT - 1
                 Dim tile = Maze(x, y)
-                Dim pos = New Point(x, y)
+                Dim pos As New Point(x, y)
 
                 Select Case tile
                     Case MazeTile.Collectible
@@ -115,9 +116,7 @@ Public NotInheritable Class GameManager
 
         If GameState = GameState.LevelCleared Then
             LevelClearedTimer -= deltaTime
-            If LevelClearedTimer <= 0 Then
-                GameState = GameState.Playing
-            End If
+            If LevelClearedTimer <= 0 Then GameState = GameState.Playing
             Exit Sub
         End If
 
@@ -145,18 +144,13 @@ Public NotInheritable Class GameManager
             End If
 
             Player.Update(deltaTime, Maze)
-
-            For Each enemy In Enemies
-                enemy.Update(deltaTime, Maze)
-            Next
+            Enemies.ForEach(Sub(e) e.Update(deltaTime, Maze))
 
             If PesticideActive Then
                 PesticideTimer -= deltaTime
                 If PesticideTimer <= 0 Then
                     PesticideActive = False
-                    For Each enemy In Enemies
-                        enemy.IsVulnerable = False
-                    Next
+                    Enemies.ForEach(Sub(e) e.IsVulnerable = False)
                 End If
             End If
 
@@ -191,6 +185,7 @@ Public NotInheritable Class GameManager
                 Case GameState.GameOver
                     If Player.Score > HighScore Then
                         HighScore = Player.Score
+                        SaveHighScore(HighScore)
                         ScheduleEvent_HighScoreChanged(HighScore)
                     End If
                     ScheduleEvent_GameStateChanged(GameState)
@@ -251,12 +246,7 @@ Public NotInheritable Class GameManager
     Private Sub ActivatePesticide()
         PesticideActive = True
         PesticideTimer = VULNERABLE_DURATION
-
-        For Each enemy In Enemies
-            If enemy.IsActive AndAlso Not enemy.IsRespawning Then
-                enemy.MakeVulnerable()
-            End If
-        Next
+        Enemies.ForEach(Sub(e) If e.IsActive AndAlso Not e.IsRespawning Then e.MakeVulnerable())
     End Sub
 
     Private Sub GrowSaplingToTree()
@@ -286,7 +276,7 @@ Public NotInheritable Class GameManager
     End Sub
 
     Private Sub CheckLevelComplete()
-        If Not Seeds.Any(Function(s) s.IsActive) Then
+        If Not Aggregate s In Seeds Into Any(s.IsActive) Then
             GameState = GameState.LevelCleared
             ScheduleEvent_LevelCleared()
         End If

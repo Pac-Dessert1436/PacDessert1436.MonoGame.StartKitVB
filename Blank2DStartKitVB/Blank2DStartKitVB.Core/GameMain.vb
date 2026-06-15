@@ -5,7 +5,7 @@ Imports Microsoft.Xna.Framework.Input
 Public NotInheritable Class GameMain
     Inherits Game
 
-        Private _graphics As GraphicsDeviceManager
+    Private _graphics As GraphicsDeviceManager
     Private _spriteBatch As SpriteBatch
 
     Public Sub New()
@@ -15,7 +15,16 @@ Public NotInheritable Class GameMain
     End Sub
 
     Protected Overrides Sub Initialize()
-        ' TODO: Add your initialization logic here
+        _graphics.PreferredBackBufferWidth = 800
+        _graphics.PreferredBackBufferHeight = 600
+        
+        #If ANDROID Then
+            _graphics.IsFullScreen = True
+        #Else
+            _graphics.IsFullScreen = False
+        #End If
+        
+        _graphics.ApplyChanges()
 
         MyBase.Initialize()
     End Sub

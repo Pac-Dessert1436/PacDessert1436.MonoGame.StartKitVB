@@ -20,6 +20,7 @@ Public NotInheritable Class SoundManager
     Private _sndAtNextLevel As SoundEffect
     Private _sndGameOver As SoundEffect
     Private _sndLifeLost As SoundEffect
+    Private _sndLifeGained As SoundEffect
     Private _sndLevelCleared As SoundEffect
 
     ' Background music
@@ -47,6 +48,7 @@ Public NotInheritable Class SoundManager
         _sndGameOver = _content.Load(Of SoundEffect)("Sounds/game_over")
         _sndLevelCleared = _content.Load(Of SoundEffect)("Sounds/level_cleared")
         _sndLifeLost = _content.Load(Of SoundEffect)("Sounds/life_lost")
+        _sndLifeGained = _content.Load(Of SoundEffect)("Sounds/life_gained")
 
         ' Load background music
         _bgmMainTheme = _content.Load(Of Song)("Sounds/BGM/main_theme")
@@ -55,6 +57,8 @@ Public NotInheritable Class SoundManager
     ''' <summary>
     ''' Sets up event handlers for game events.
     ''' </summary>
+    Private _previousLives As Integer = STARTING_LIVES
+
     Private Sub SetupEventHandlers()
         AddHandler GameStateChanged, AddressOf OnGameStateChanged
         AddHandler SeedCollected, AddressOf OnSeedCollected
@@ -63,6 +67,7 @@ Public NotInheritable Class SoundManager
         AddHandler EnemyRespawned, AddressOf OnEnemyRespawned
         AddHandler GameHasEnded, AddressOf OnGameHasEnded
         AddHandler LifeLost, AddressOf OnLifeLost
+        AddHandler LivesChanged, AddressOf OnLivesChanged
         AddHandler LevelCleared, AddressOf OnLevelCleared
         AddHandler GetReadyMessage, AddressOf OnGetReadyMessage
         AddHandler GameStart, AddressOf OnGameStart
@@ -80,7 +85,6 @@ Public NotInheritable Class SoundManager
             Case GameState.Playing
                 RestartMusicOnPause()
             Case GameState.GameOver
-                _sndGameOver.Play()
                 StopBackgroundMusic()
             Case GameState.Title
                 StopBackgroundMusic()
@@ -154,6 +158,7 @@ Public NotInheritable Class SoundManager
     Private Sub OnGameHasEnded()
         _sndGameOver.Play()
         StopBackgroundMusic()
+        _previousLives = STARTING_LIVES
     End Sub
 
     ''' <summary>
@@ -162,6 +167,14 @@ Public NotInheritable Class SoundManager
     Private Sub OnLifeLost()
         _sndLifeLost.Play()
         MediaPlayer.Pause()
+    End Sub
+
+    ''' <summary>
+    ''' Handles life gained sound.
+    ''' </summary>
+    Private Sub OnLivesChanged(lives As Integer)
+        If lives > _previousLives Then _sndLifeGained.Play()
+        _previousLives = lives
     End Sub
 
     ''' <summary>
@@ -223,6 +236,7 @@ Public NotInheritable Class SoundManager
                 RemoveHandler EnemyRespawned, AddressOf OnEnemyRespawned
                 RemoveHandler GameHasEnded, AddressOf OnGameHasEnded
                 RemoveHandler LifeLost, AddressOf OnLifeLost
+                RemoveHandler LivesChanged, AddressOf OnLivesChanged
                 RemoveHandler LevelCleared, AddressOf OnLevelCleared
                 RemoveHandler GetReadyMessage, AddressOf OnGetReadyMessage
                 RemoveHandler GameStart, AddressOf OnGameStart
