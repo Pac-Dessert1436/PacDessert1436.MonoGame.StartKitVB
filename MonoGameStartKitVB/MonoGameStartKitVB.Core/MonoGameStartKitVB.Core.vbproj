@@ -8,7 +8,7 @@
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="ModuleEventRaiser.Generator" Version="1.1.8" />
+    <PackageReference Include="ModuleEventRaiser.Generator" Version="1.2.0" />
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.*">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>

@@ -25,7 +25,8 @@ Public NotInheritable Class GameMain
         If OperatingSystem.IsAndroid() Then
             _graphics.IsFullScreen = True
             With GraphicsDevice.PresentationParameters
-                GraphicsDevice.Viewport = New Viewport(0, 0, .BackBufferWidth, .BackBufferHeight) _
+                GraphicsDevice.Viewport =
+                    New Viewport(0, 0, .BackBufferWidth, .BackBufferHeight) _
                     With {.MinDepth = 0.0F, .MaxDepth = 1.0F}
             End With
         Else
@@ -59,7 +60,7 @@ Public NotInheritable Class GameMain
     Protected Overrides Sub Draw(gameTime As GameTime)
         Dim deltaTime As Single = CSng(gameTime.ElapsedGameTime.TotalSeconds)
         _renderer.Render(_gameManager, _gameManager.GameState, deltaTime)
-        RaiseScheduledEvents()
+        EventScheduler.RaiseScheduledEvents()
         MyBase.Draw(gameTime)
     End Sub
 

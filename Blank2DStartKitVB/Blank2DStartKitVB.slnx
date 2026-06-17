@@ -1,6 +1,0 @@
-﻿<Solution>
-  <Project Path="Blank2DStartKitVB.Core/Blank2DStartKitVB.Core.vbproj" />
-  <Project Path="Blank2DStartKitVB.DesktopGL/Blank2DStartKitVB.DesktopGL.csproj" />
-  <Project Path="Blank2DStartKitVB.Android/Blank2DStartKitVB.Android.csproj" />
-  <Project Path="Blank2DStartKitVB.WindowsDX/Blank2DStartKitVB.WindowsDX.csproj" />
-</Solution>

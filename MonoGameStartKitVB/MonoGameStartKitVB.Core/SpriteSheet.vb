@@ -2,6 +2,9 @@ Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Graphics
 Imports Microsoft.Xna.Framework.Content
 
+''' <summary>
+''' Represents a sprite sheet with multiple frames.
+''' </summary>
 Public NotInheritable Class SpriteSheet
     Private ReadOnly _texture As Texture2D
     Public ReadOnly FrameWidth As Integer
@@ -101,6 +104,9 @@ Public NotInheritable Class SpriteSheet
     End Property
 End Class
 
+''' <summary>
+''' Represents an animation sequence for a sprite sheet.
+''' </summary>
 Public NotInheritable Class Animation
     Private ReadOnly _spriteSheet As SpriteSheet
     Private ReadOnly _frameIndices As Integer()

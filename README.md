@@ -2,7 +2,12 @@
 
 A **fully-functional** multi-platform game template built with **VB.NET** for [MonoGame](https://www.monogame.net/), featuring the game **Seed-Scape: Forest Planting Quest**.
 
-> **v1.2.0 Latest Update**: ✅ **Complete Copyright Safety Achieved**! All assets are now fully licensed and attribution-ready:
+> **v1.2.1 Latest Update**: **Blank Template Enhanced**! Improved structure and cross-platform compatibility:
+> - Refined `GameMain.vb` with proper viewport handling for Android
+> - Consistent screen resolution handling across all platforms
+> - Applied the latest version of `ModuleEventRaiser.Generator`
+>
+> **v1.2.0 Important Update**: ✅ **Complete Copyright Safety Achieved**! All assets are now fully licensed and attribution-ready:
 > - Main character sprite adapted from CC0-licensed art
 > - All original graphics created in Aseprite
 > - All audio assets CC0-licensed from Open Game Art
@@ -15,6 +20,8 @@ A **fully-functional** multi-platform game template built with **VB.NET** for [M
 
 **Versions prior to 1.2.0 have been unlisted and should not be used** due to potential copyright concerns with included assets. Always use version 1.2.0 or later for production projects.
 
+This template is designed as a **VB.NET alternative** to the original C# MonoGame StartKit (`mg2dstartkit`), which enables VB.NET developers to leverage MonoGame's powerful game development capabilities, especially the ones transitioning from `vbPixelGameEngine` to MonoGame.
+
 ---
 
 ## Overview
@@ -25,8 +32,8 @@ A **fully-functional** multi-platform game template built with **VB.NET** for [M
 
 _PacDessert1436.MonoGame.StartKitVB_ is a **production-ready** game template demonstrating modern MonoGame development practices using VB.NET. The package includes **two templates**:
 
-1. **Complete Demo Game**: **Seed-Scape: Forest Planting Quest** - An arcade game where players collect seeds to grow a forest while dodging patrolling insects.
-2. **Blank Template**: A clean starting point for your own MonoGame projects.
+1. **Complete Demo Game**: _**Seed-Scape: Forest Planting Quest**_ - An arcade game where players collect seeds to grow a forest while dodging patrolling insects.
+2. **Blank Template (`mgblank2dstartkitvb`)**: A clean starting point for your own MonoGame projects.
 
 > **New to MonoGame?** Check out [BEGINNER_GUIDE.md](MonoGameStartKitVB/BEGINNER_GUIDE.md) for a comprehensive guide transitioning from `vbPixelGameEngine` to MonoGame.
 
@@ -184,12 +191,12 @@ dotnet new mgblank2dstartkitvb -n YourGameName
 
 ## Roadmap
 
-### Planned Features
+### Completed Features on 1.2.1
 - ✅ Enhanced sound effects and music system
 - ✅ **High score saving** with JSON serialization
 - ✅ DesktopGL build fix (FFMPEG pipeline)
 
-### Known Issues on 1.2.0
+### Known Issues on 1.2.1
 - DesktopGL high DPI mode unavailable (game window may exceed screen height)
 - iOS untested on actual devices
 
@@ -209,7 +216,7 @@ _Mending Garden_ (version 2.0.0) is a farming simulation game deeply connected t
 ## Technical Notes
 
 ### Event Scheduling System
-The game utilizes [ModuleEventRaiser.Generator](https://github.com/Pac-Dessert1436/ModuleEventRaiser.Generator) to schedule events, providing a comprehensive event-driven architecture:
+The game utilizes the latest version of [ModuleEventRaiser.Generator](https://github.com/Pac-Dessert1436/ModuleEventRaiser.Generator) to schedule events, providing a comprehensive event-driven architecture:
 - `GameStateChanged` - Fired when game state transitions
 - `PlayerScoreChanged` - Fired when player collects items
 - `SeedCollected` - Fired when a seed is collected
@@ -226,7 +233,12 @@ All assets are processed through the MonoGame Content Pipeline:
 
 ## Version History
 
-### Version 1.2.0 (Latest; Production-Ready)
+### Version 1.2.1 (Latest; Improved)
+- ✅ Improved `GameMain.vb` in blank template, with proper viewport handling for all platforms
+- ✅ Better screen resolution handling across all platforms
+- ✅ Upgraded the `ModuleEventRaiser.Generator` library to the latest version
+
+### Version 1.2.0 (Production-Ready)
 - ✅ **Complete Copyright Safety**: All assets now properly licensed
 - ✅ Main character `player_sheet.png` adapted from CC0-licensed [Forest Boy](https://opengameart.org/content/forest-boy-platformer-animated-character-24x24)
 - ✅ All original graphics (seeds, trees, beetles, caterpillars) created in Aseprite

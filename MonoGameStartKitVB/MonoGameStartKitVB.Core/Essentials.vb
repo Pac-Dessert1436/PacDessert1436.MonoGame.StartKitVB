@@ -115,7 +115,7 @@ Public Module Essentials
     Public Event TreeGrown(position As Point)
 #End Region
 
-#Region "Functions"
+#Region "Functions and Properties"
     ''' <summary>
     ''' Calculates the Manhattan distance between two points.
     ''' </summary>
@@ -124,6 +124,18 @@ Public Module Essentials
     ''' <returns>The Manhattan distance between the two points.</returns>
     Public Function ManhattanDistance(pt1 As Point, pt2 As Point) As Integer
         Return Math.Abs(pt1.X - pt2.X) + Math.Abs(pt1.Y - pt2.Y)
+    End Function
+
+    ''' <summary>
+    ''' Checks if a point (e.g., mouse click or touch position) is within a rectangular area.
+    ''' Primarily used for button interaction detection in the game UI.
+    ''' </summary>
+    ''' <param name="point">The point to check (typically a mouse or touch position).</param>
+    ''' <param name="rect">The rectangular area to check against (typically a button bounds).</param>
+    ''' <returns>True if the point is within the rectangle, False otherwise.</returns>
+    Public Function IsPointInRect(point As Vector2, rect As Rectangle) As Boolean
+        Return point.X >= rect.X AndAlso point.X <= rect.X + rect.Width AndAlso
+               point.Y >= rect.Y AndAlso point.Y <= rect.Y + rect.Height
     End Function
 
     ''' <summary>

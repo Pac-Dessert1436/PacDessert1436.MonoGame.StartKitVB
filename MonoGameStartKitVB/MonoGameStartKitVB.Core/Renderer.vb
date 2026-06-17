@@ -3,6 +3,9 @@ Imports Microsoft.Xna.Framework.Graphics
 Imports Microsoft.Xna.Framework.Content
 Imports Microsoft.Xna.Framework.Input
 
+''' <summary>
+''' Renders the game scene, game entities, and HUD to the screen.
+''' </summary>
 Public NotInheritable Class Renderer
     Implements IDisposable
 
@@ -93,6 +96,9 @@ Public NotInheritable Class Renderer
         LoadContent()
     End Sub
 
+    ''' <summary>
+    ''' Updates the screen scale and offset.
+    ''' </summary>
     Private Sub UpdateScreenScale()
         Dim newScreenWidth = _graphicsDevice.Viewport.Width
         Dim newScreenHeight = _graphicsDevice.Viewport.Height
@@ -112,6 +118,9 @@ Public NotInheritable Class Renderer
         End If
     End Sub
 
+    ''' <summary>
+    ''' Creates a new render target.
+    ''' </summary>
     Private Sub CreateRenderTarget()
         _renderTarget?.Dispose()
         _renderTarget = New RenderTarget2D(_graphicsDevice, SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -127,6 +136,9 @@ Public NotInheritable Class Renderer
         Return Enumerable.Range(start - 1, [stop] - start + 1).ToArray()
     End Function
 
+    ''' <summary>
+    ''' Loads the game content.
+    ''' </summary>
     Private Sub LoadContent()
         _playerSpriteSheet = New SpriteSheet(_content, "Images/player_sheet", CELL_SIZE, CELL_SIZE)
         _enemySpriteSheet = New SpriteSheet(_content, "Images/enemy_sheet", CELL_SIZE, CELL_SIZE)
@@ -165,6 +177,12 @@ Public NotInheritable Class Renderer
         _joystick = New VirtualJoystick(_joystickBase, _joystickKnob, New Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 100))
     End Sub
 
+    ''' <summary>
+    ''' Renders the game scene to the screen.
+    ''' </summary>
+    ''' <param name="gameManager">The game manager instance.</param>
+    ''' <param name="gameState">The current game state.</param>
+    ''' <param name="deltaTime">The time interval between frames.</param>
     Public Sub Render(gameManager As GameManager, gameState As GameState, deltaTime As Single)
         UpdateScreenScale()
 
@@ -215,6 +233,9 @@ Public NotInheritable Class Renderer
         _spriteBatch.End()
     End Sub
 
+    ''' <summary>
+    ''' Draws the title screen.
+    ''' </summary>
     Private Sub DrawTitleScreen()
         Dim titleRect As New Rectangle(
             CInt((SCREEN_WIDTH - _titleCard.Width * 2) / 2),
@@ -252,6 +273,13 @@ Public NotInheritable Class Renderer
         Next
     End Sub
 
+    ''' <summary>
+    ''' Draws a button on the screen.
+    ''' </summary>
+    ''' <param name="text">The text to display on the button.</param>
+    ''' <param name="centerX">The center X coordinate of the button.</param>
+    ''' <param name="y">The Y coordinate of the button.</param>
+    ''' <param name="scale">The scale factor for the button.</param>
     Private Sub DrawButton(text As String, centerX As Integer, y As Integer, Optional scale As Single = 1.0F)
         Dim buttonWidth = CInt(_generalButton.Width * 2 * scale)
         Dim buttonHeight = CInt(_generalButton.Height * 2 * scale)
@@ -284,6 +312,10 @@ Public NotInheritable Class Renderer
         )
     End Sub
 
+    ''' <summary>
+    ''' Draws the HUD on the screen.
+    ''' </summary>
+    ''' <param name="gameManager">The game manager instance.</param>
     Private Sub DrawHUD(gameManager As GameManager)
         With gameManager
             DrawText($"1UP { .Player.Score,6}", New Vector2(10, 10), Color.MintCream, 1.0F)
@@ -334,6 +366,11 @@ Public NotInheritable Class Renderer
         End If
     End Sub
 
+    ''' <summary>
+    ''' Gets the index of the seed icon for the given seed type.
+    ''' </summary>
+    ''' <param name="seedType">The seed type.</param>
+    ''' <returns>The index of the icon.</returns>
     Private Shared Function GetSeedIconIndex(seedType As SeedType) As Integer
         Select Case seedType
             Case SeedType.Acorn
@@ -347,6 +384,11 @@ Public NotInheritable Class Renderer
         End Select
     End Function
 
+    ''' <summary>
+    ''' Draws the game area on the screen.
+    ''' </summary>
+    ''' <param name="gameManager">The game manager instance.</param>
+    ''' <param name="deltaTime">The time interval since the last frame.</param>
     Private Sub DrawGameArea(gameManager As GameManager, deltaTime As Single)
         DrawMaze(gameManager.Maze, gameManager.CurrentLevel)
         DrawSpawnPoints(gameManager.Enemies)
@@ -356,6 +398,10 @@ Public NotInheritable Class Renderer
         DrawEnemies(gameManager.Enemies, deltaTime)
     End Sub
 
+    ''' <summary>
+    ''' Draws the spawn points on the screen.
+    ''' </summary>
+    ''' <param name="enemies">The list of enemies to draw.</param>
     Private Sub DrawSpawnPoints(enemies As List(Of Actor.Enemy))
         Dim renderScale = CSng(SCREEN_WIDTH) / (MAZE_WIDTH * CELL_SIZE)
         
@@ -379,6 +425,11 @@ Public NotInheritable Class Renderer
         Next
     End Sub
 
+    ''' <summary>
+    ''' Draws the maze on the screen.
+    ''' </summary>
+    ''' <param name="maze">The maze to draw.</param>
+    ''' <param name="currentLevel">The current level.</param>
     Private Sub DrawMaze(maze As MazeTile(,), currentLevel As Integer)
         Dim scale = CSng(SCREEN_WIDTH) / (MAZE_WIDTH * CELL_SIZE)
 
@@ -399,6 +450,15 @@ Public NotInheritable Class Renderer
         Next x
     End Sub
 
+    ''' <summary>
+    ''' Draws the vegetation on the screen.
+    ''' </summary>
+    ''' <param name="x">The x-coordinate of the tile.</param>
+    ''' <param name="y">The y-coordinate of the tile.</param>
+    ''' <param name="tileType">The type of the tile.</param>
+    ''' <param name="currentLevel">The current level.</param>
+    ''' <param name="scale">The scale factor.</param>
+    ''' <param name="yOffset">The y-offset for the tile.</param>
     Private Sub DrawVegetation(x As Integer, y As Integer, tileType As MazeTile, Optional currentLevel As Integer = 1, Optional scale As Single = 1.0F, Optional yOffset As Integer = 0)
         Dim frameIndex As Integer
         If tileType = MazeTile.Sapling Then
@@ -432,11 +492,20 @@ Public NotInheritable Class Renderer
         _objectSpriteSheet.DrawFrame(_spriteBatch, frameIndex, drawPos, cellScale, Color.White)
     End Sub
 
+    ''' <summary>
+    ''' Draws the fence on the screen.
+    ''' </summary>
+    ''' <param name="rect">The rectangle to draw the fence.</param>
+    ''' <param name="scale">The scale factor.</param>
     Private Sub DrawFence(rect As Rectangle, Optional scale As Single = 1.0F)
         Dim cellScale = CSng(CELL_SIZE / _objectSpriteSheet.FrameWidth) * scale
         _objectSpriteSheet.DrawFrame(_spriteBatch, 0, New Vector2(rect.X, rect.Y), cellScale, Color.White)
     End Sub
 
+    ''' <summary>
+    ''' Draws the seeds on the screen.
+    ''' </summary>
+    ''' <param name="seeds">The list of seeds to draw.</param>
     Private Sub DrawSeeds(seeds As List(Of Actor.Seed))
         Dim renderScale = CSng(SCREEN_WIDTH) / (MAZE_WIDTH * CELL_SIZE)
         For Each seed In From s In seeds Where s.IsActive
@@ -448,6 +517,11 @@ Public NotInheritable Class Renderer
         Next
     End Sub
 
+    ''' <summary>
+    ''' Gets the frame index for a seed type.
+    ''' </summary>
+    ''' <param name="seedType">The type of seed.</param>
+    ''' <returns>The frame index for the seed type.</returns>
     Private Shared Function GetSeedFrameIndex(seedType As SeedType) As Integer
         Select Case seedType
             Case SeedType.Acorn
@@ -461,6 +535,10 @@ Public NotInheritable Class Renderer
         End Select
     End Function
 
+    ''' <summary>
+    ''' Draws the pesticides on the screen.
+    ''' </summary>
+    ''' <param name="pesticides">The list of pesticides to draw.</param>
     Private Sub DrawPesticides(pesticides As List(Of Point))
         Dim renderScale = CSng(SCREEN_WIDTH) / (MAZE_WIDTH * CELL_SIZE)
         For Each item In pesticides
@@ -471,6 +549,11 @@ Public NotInheritable Class Renderer
         Next
     End Sub
 
+    ''' <summary>
+    ''' Draws the player on the screen.
+    ''' </summary>
+    ''' <param name="player">The player to draw.</param>
+    ''' <param name="deltaTime">The time interval since the last frame.</param>
     Private Sub DrawPlayer(player As Actor.Player, deltaTime As Single)
         If Not player.IsAlive Then Exit Sub
         Dim animation As Animation, frameIndex As Integer
@@ -496,6 +579,11 @@ Public NotInheritable Class Renderer
         animation.SpriteSheet.DrawFrame(_spriteBatch, frameIndex, drawPos, scale, Color.White)
     End Sub
 
+    ''' <summary>
+    ''' Draws the enemies on the screen.
+    ''' </summary>
+    ''' <param name="enemies">The list of enemies to draw.</param>
+    ''' <param name="deltaTime">The time interval since the last frame.</param>
     Private Sub DrawEnemies(enemies As List(Of Actor.Enemy), deltaTime As Single)
         Dim renderScale = CSng(SCREEN_WIDTH) / (MAZE_WIDTH * CELL_SIZE)
 
@@ -544,6 +632,9 @@ Public NotInheritable Class Renderer
         End If
     End Sub
 
+    ''' <summary>
+    ''' Draws the joystick on the screen.
+    ''' </summary>
     Private Sub DrawJoystick()
         Dim keyboardState = Keyboard.GetState()
         Dim touchCollection = Touch.TouchPanel.GetState()
@@ -609,6 +700,9 @@ Public NotInheritable Class Renderer
         _joystick.Draw(_spriteBatch, 1.0F)
     End Sub
 
+    ''' <summary>
+    ''' Draws the pause button on the screen.
+    ''' </summary>
     Private Sub DrawPauseButton()
         Dim scale = 2.0F
         Dim buttonRect As New Rectangle(
@@ -620,6 +714,9 @@ Public NotInheritable Class Renderer
         _spriteBatch.Draw(_pauseButton, buttonRect, Color.White)
     End Sub
 
+    ''' <summary>
+    ''' Draws the pause overlay on the screen.
+    ''' </summary>
     Private Sub DrawPauseOverlay()
         Dim overlayRect As New Rectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
         _spriteBatch.Draw(_pixelTexture, overlayRect, New Color(0, 0, 0, 150))
@@ -629,6 +726,10 @@ Public NotInheritable Class Renderer
         DrawButton("MENU", CInt(SCREEN_WIDTH / 2), CInt(SCREEN_HEIGHT / 2) + 120, 1.0F)
     End Sub
 
+    ''' <summary>
+    ''' Draws the game over screen on the screen.
+    ''' </summary>
+    ''' <param name="gameManager">The game manager to use for drawing the game over screen.</param>
     Private Sub DrawGameOverScreen(gameManager As GameManager)
         Dim overlayRect As New Rectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
         _spriteBatch.Draw(_pixelTexture, overlayRect, New Color(0, 0, 0, 150))
@@ -641,6 +742,9 @@ Public NotInheritable Class Renderer
         DrawButton("MENU", CInt(SCREEN_WIDTH / 2), CInt(SCREEN_HEIGHT / 2) + 170, 1.0F)
     End Sub
 
+    ''' <summary>
+    ''' Draws the level cleared screen on the screen.
+    ''' </summary>
     Private Sub DrawLevelClearedScreen()
         Dim overlayRect As New Rectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
         _spriteBatch.Draw(_pixelTexture, overlayRect, New Color(0, 0, 0, 150))
@@ -649,10 +753,24 @@ Public NotInheritable Class Renderer
         DrawCenteredText($"Let's move on to the next!", -50, Color.White, 1.0F)
     End Sub
 
+    ''' <summary>
+    ''' Draws text on the screen.
+    ''' </summary>
+    ''' <param name="text">The text to draw.</param>
+    ''' <param name="position">The position to draw the text.</param>
+    ''' <param name="color">The color of the text.</param>
+    ''' <param name="scale">The scale factor for the text.</param>
     Private Sub DrawText(text As String, position As Vector2, color As Color, Optional scale As Single = 1.0F)
         _spriteBatch.DrawString(_gameFont, text, position, color, 0, Vector2.Zero, scale, SpriteEffects.None, 0)
     End Sub
 
+    ''' <summary>
+    ''' Draws centered text on the screen.
+    ''' </summary>
+    ''' <param name="text">The text to draw.</param>
+    ''' <param name="yOffset">The vertical offset to draw the text.</param>
+    ''' <param name="color">The color of the text.</param>
+    ''' <param name="scale">The scale factor for the text.</param>
     Private Sub DrawCenteredText(text As String, yOffset As Integer, color As Color, Optional scale As Single = 1.0F)
         Dim textSize As Vector2 = _gameFont.MeasureString(text) * scale
         Dim position As New Vector2(
@@ -673,6 +791,9 @@ Public NotInheritable Class Renderer
         End If
     End Sub
 
+    ''' <summary>
+    ''' Disposes of the current <see cref="Renderer"/> instance.
+    ''' </summary>
     Public Sub Dispose() Implements IDisposable.Dispose
         Dispose(disposing:=True)
         GC.SuppressFinalize(Me)

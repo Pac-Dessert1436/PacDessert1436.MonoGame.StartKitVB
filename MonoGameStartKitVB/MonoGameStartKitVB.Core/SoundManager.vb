@@ -9,6 +9,7 @@ Imports Microsoft.Xna.Framework.Content
 Public NotInheritable Class SoundManager
     Implements IDisposable
 
+    Private _previousLives As Integer = STARTING_LIVES
     Private ReadOnly _content As ContentManager
 
     ' Sound effects
@@ -57,8 +58,6 @@ Public NotInheritable Class SoundManager
     ''' <summary>
     ''' Sets up event handlers for game events.
     ''' </summary>
-    Private _previousLives As Integer = STARTING_LIVES
-
     Private Sub SetupEventHandlers()
         AddHandler GameStateChanged, AddressOf OnGameStateChanged
         AddHandler SeedCollected, AddressOf OnSeedCollected
@@ -95,10 +94,16 @@ Public NotInheritable Class SoundManager
         End Select
     End Sub
 
+    ''' <summary>
+    ''' Handles game beginning for audio.
+    ''' </summary>
     Private Sub OnGameHasBegun()
         PlayBackgroundMusic()
     End Sub
 
+    ''' <summary>
+    ''' Handles death animation complete for audio.
+    ''' </summary>
     Private Sub OnDeathAnimationComplete()
         RestartMusicOnPause()
     End Sub
@@ -252,6 +257,9 @@ Public NotInheritable Class SoundManager
         End If
     End Sub
 
+    ''' <summary>
+    ''' Disposes of sound resources.
+    ''' </summary>
     Public Sub Dispose() Implements IDisposable.Dispose
         Dispose(disposing:=True)
         GC.SuppressFinalize(Me)

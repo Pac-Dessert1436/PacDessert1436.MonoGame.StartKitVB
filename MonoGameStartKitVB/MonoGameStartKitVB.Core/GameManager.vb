@@ -1,6 +1,9 @@
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Input
 
+''' <summary>
+''' Manages the game state and logic.
+''' </summary>
 Public NotInheritable Class GameManager
     Private ReadOnly _random As New Random
 
@@ -30,12 +33,18 @@ Public NotInheritable Class GameManager
         InitializeGame()
     End Sub
 
+    ''' <summary>
+    ''' Initializes the game state.
+    ''' </summary>
     Public Sub InitializeGame()
         Player = New Actor.Player(PlayerStartingPoint)
         CurrentLevel = 1
         InitializeLevel()
     End Sub
 
+    ''' <summary>
+    ''' Resets the game state to the initial conditions.
+    ''' </summary>
     Public Sub ResetGame()
         Player.Score = 0
         Player.Lives = STARTING_LIVES
@@ -44,6 +53,9 @@ Public NotInheritable Class GameManager
         InitializeLevel()
     End Sub
 
+    ''' <summary>
+    ''' Initializes the current level.
+    ''' </summary>
     Public Sub InitializeLevel()
         Maze = CreateMazeLayout(CurrentLevel)
         Seeds.Clear()
@@ -65,6 +77,10 @@ Public NotInheritable Class GameManager
         ScheduleEvent_GetReadyMessage()
     End Sub
 
+    ''' <summary>
+    ''' Parses the maze layout for collectibles, pesticides, and saplings.
+    ''' </summary>
+    ''' <param name="level">The level number.</param>
     Private Sub ParseMaze(level As Integer)
         For x As Integer = 0 To MAZE_WIDTH - 1
             For y As Integer = 0 To MAZE_HEIGHT - 1
@@ -89,6 +105,9 @@ Public NotInheritable Class GameManager
         SpawnEnemies()
     End Sub
 
+    ''' <summary>
+    ''' Spawns enemies in the current level.
+    ''' </summary>
     Private Sub SpawnEnemies()
         Dim enemyType = EnemyTypeForLevel(CurrentLevel)
         Dim enemyCount = Math.Min(4 + CurrentLevel, 8)
@@ -111,6 +130,10 @@ Public NotInheritable Class GameManager
         Next i
     End Sub
 
+    ''' <summary>
+    ''' Updates the game state.
+    ''' </summary>
+    ''' <param name="deltaTime">The time interval between frames.</param>
     Public Sub Update(deltaTime As Single)
         HandleGameStateTransitions()
 
@@ -159,6 +182,9 @@ Public NotInheritable Class GameManager
         End If
     End Sub
 
+    ''' <summary>
+    ''' Handles transitions between game states.
+    ''' </summary>
     Private Sub HandleGameStateTransitions()
         If _previousGameState <> GameState Then
             Dim oldState = _previousGameState
@@ -203,6 +229,9 @@ Public NotInheritable Class GameManager
         End If
     End Sub
 
+    ''' <summary>
+    ''' Checks for collisions between the player and other entities.
+    ''' </summary>
     Private Sub CheckCollisions()
         Dim playerBounds = Player.GetBounds()
 
@@ -243,12 +272,18 @@ Public NotInheritable Class GameManager
         Next
     End Sub
 
+    ''' <summary>
+    ''' Activates the pesticide effect on enemies.
+    ''' </summary>
     Private Sub ActivatePesticide()
         PesticideActive = True
         PesticideTimer = VULNERABLE_DURATION
         Enemies.ForEach(Sub(e) If e.IsActive AndAlso Not e.IsRespawning Then e.MakeVulnerable())
     End Sub
 
+    ''' <summary>
+    ''' Grows a sapling to a tree.
+    ''' </summary>
     Private Sub GrowSaplingToTree()
         If Saplings.Count > 0 Then
             Dim saplingIndex = _random.Next(Saplings.Count)
@@ -260,6 +295,9 @@ Public NotInheritable Class GameManager
         End If
     End Sub
 
+    ''' <summary>
+    ''' Resets the positions of the player and enemies after a death.
+    ''' </summary>
     Private Sub ResetPositionsAfterDeath()
         Player.ResetPosition()
 
@@ -275,6 +313,9 @@ Public NotInheritable Class GameManager
         Next
     End Sub
 
+    ''' <summary>
+    ''' Checks if the level is completed.
+    ''' </summary>
     Private Sub CheckLevelComplete()
         If Not Aggregate s In Seeds Into Any(s.IsActive) Then
             GameState = GameState.LevelCleared
@@ -282,6 +323,9 @@ Public NotInheritable Class GameManager
         End If
     End Sub
 
+    ''' <summary>
+    ''' Handles keyboard, touch and mouse input from the player.
+    ''' </summary>
     Public Sub HandleInput()
         Dim keyboardState = Keyboard.GetState()
         Dim touchCollection = Touch.TouchPanel.GetState()
@@ -467,9 +511,4 @@ Public NotInheritable Class GameManager
 
         _previousKeyboardState = keyboardState
     End Sub
-
-    Private Shared Function IsPointInRect(point As Vector2, rect As Rectangle) As Boolean
-        Return point.X >= rect.X AndAlso point.X <= rect.X + rect.Width AndAlso
-               point.Y >= rect.Y AndAlso point.Y <= rect.Y + rect.Height
-    End Function
 End Class
