@@ -27,8 +27,9 @@ Public NotInheritable Class SpriteSheet
         Me.FrameHeight = frameHeight
 
         ' Calculate columns and rows based on texture dimensions
-        _columns = If(_texture IsNot Nothing AndAlso _texture.Width > 0, Math.Max(1, _texture.Width \ frameWidth), 1)
-        _rows = If(_texture IsNot Nothing AndAlso _texture.Height > 0, Math.Max(1, _texture.Height \ frameHeight), 1)
+        ArgumentNullException.ThrowIfNull(_texture)
+        _columns = If(_texture.Width > 0, Math.Max(1, _texture.Width \ frameWidth), 1)
+        _rows = If(_texture.Height > 0, Math.Max(1, _texture.Height \ frameHeight), 1)
         FrameCount = _columns * _rows
     End Sub
 
@@ -38,16 +39,14 @@ Public NotInheritable Class SpriteSheet
     ''' <param name="frameIndex">The index of the frame to retrieve.</param>
     ''' <returns>The rectangle defining the frame's position in the sprite sheet.</returns>
     Public Function GetFrameRectangle(frameIndex As Integer) As Rectangle
-        If _texture Is Nothing Then
-            Return New Rectangle(0, 0, FrameWidth, FrameHeight)
-        End If
+        If _texture Is Nothing Then Return New Rectangle(0, 0, FrameWidth, FrameHeight)
 
         ' Clamp the frame index to valid range
         Dim clampedIndex = Math.Max(0, Math.Min(frameIndex, FrameCount - 1))
-        
+
         ' Calculate the row and column for this frame
-        Dim row = clampedIndex \ _columns
-        Dim col = clampedIndex Mod _columns
+        Dim row As Integer = clampedIndex \ _columns
+        Dim col As Integer = clampedIndex Mod _columns
 
         ' Return the rectangle for this frame
         Return New Rectangle(col * FrameWidth, row * FrameHeight, FrameWidth, FrameHeight)
@@ -61,28 +60,21 @@ Public NotInheritable Class SpriteSheet
     ''' <param name="position">The position to draw the sprite at.</param>
     ''' <param name="scale">The scale to apply to the sprite.</param>
     ''' <param name="color">The color to tint the sprite.</param>
-    Public Sub DrawFrame(spriteBatch As SpriteBatch, frameIndex As Integer, position As Vector2, Optional scale As Single = 1.0F, Optional color As Color = Nothing)
+    Public Sub DrawFrame(spriteBatch As SpriteBatch, frameIndex As Integer, position As Vector2,
+                         Optional scale As Single = 1.0F, Optional color As Color = Nothing)
         If color = Nothing Then color = Color.White
-        
-        Dim frameRect = GetFrameRectangle(frameIndex)
-        spriteBatch.Draw(_texture, position, frameRect, color, 0.0F, Vector2.Zero, scale, SpriteEffects.None, 0.0F)
-    End Sub
 
-    ''' <summary>
-    ''' Draws a specific frame from the sprite sheet to the sprite batch with rotation and origin.
-    ''' </summary>
-    ''' <param name="spriteBatch">The SpriteBatch to draw with.</param>
-    ''' <param name="frameIndex">The index of the frame to draw.</param>
-    ''' <param name="position">The position to draw the sprite at.</param>
-    ''' <param name="rotation">The rotation to apply to the sprite.</param>
-    ''' <param name="origin">The origin point for rotation and scaling.</param>
-    ''' <param name="scale">The scale to apply to the sprite.</param>
-    ''' <param name="color">The color to tint the sprite.</param>
-    Public Sub DrawFrameWithOrigin(spriteBatch As SpriteBatch, frameIndex As Integer, position As Vector2, rotation As Single, origin As Vector2, scale As Single, Optional color As Color = Nothing)
-        If color = Nothing Then color = Color.White
-        
-        Dim frameRect = GetFrameRectangle(frameIndex)
-        spriteBatch.Draw(_texture, position, frameRect, color, rotation, origin, scale, SpriteEffects.None, 0.0F)
+        spriteBatch.Draw(
+            _texture,
+            position,
+            GetFrameRectangle(frameIndex),
+            color,
+            0.0F,
+            Vector2.Zero,
+            scale,
+            SpriteEffects.None,
+            0.0F
+        )
     End Sub
 
     Public ReadOnly Property Texture As Texture2D

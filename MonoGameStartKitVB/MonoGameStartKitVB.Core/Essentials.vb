@@ -26,8 +26,8 @@ Public Module Essentials
     Public Const ENEMY_GRACE_PERIOD As Single = 2.0F
     Public Const GET_READY_DURATION As Single = 5.0F
     Public Const NEXT_LEVEL_DURATION As Single = 2.0F
-    Public Const LEVEL_CLEARED_DURATION As Single = 3.5F
-    Public Const DEATH_ANIMATION_DURATION As Single = 2.0F
+    Public Const LEVEL_CLEARED_DURATION As Single = 4.0F
+    Public Const DEATH_ANIM_DURATION As Single = 1.75F
 
     Public Const STARTING_LIVES As Integer = 3
     Public Const SEED_POINTS As Integer = 10

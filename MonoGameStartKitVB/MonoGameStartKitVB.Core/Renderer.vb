@@ -494,30 +494,13 @@ Public NotInheritable Class Renderer
         Dim renderScale = CSng(SCREEN_WIDTH) / (MAZE_WIDTH * CELL_SIZE)
         For Each seed In From s In seeds Where s.IsActive
             Dim scale = CSng(CELL_SIZE / _objectSpriteSheet.FrameWidth) * renderScale
-            Dim frameIndex = GetSeedFrameIndex(seed.SeedType)
+            ' Frame index for a seed type equals its enum value plus 1
+            Dim frameIndex As Integer = seed.SeedType + 1
             Dim gridPos As New Point(seed.GridPosition.X, seed.GridPosition.Y)
             Dim drawPos As New Vector2(gridPos.X * CELL_SIZE * renderScale, gridPos.Y * CELL_SIZE * renderScale + HUD_HEIGHT)
             _objectSpriteSheet.DrawFrame(_spriteBatch, frameIndex, drawPos, scale, Color.White)
         Next
     End Sub
-
-    ''' <summary>
-    ''' Gets the frame index for a seed type.
-    ''' </summary>
-    ''' <param name="seedType">The type of seed.</param>
-    ''' <returns>The frame index for the seed type.</returns>
-    Private Shared Function GetSeedFrameIndex(seedType As SeedType) As Integer
-        Select Case seedType
-            Case SeedType.Acorn
-                Return 1
-            Case SeedType.Berry
-                Return 2
-            Case SeedType.Nut
-                Return 3
-            Case Else
-                Return 1
-        End Select
-    End Function
 
     ''' <summary>
     ''' Draws the pesticides on the screen.
@@ -588,17 +571,12 @@ Public NotInheritable Class Renderer
             animation.SpriteSheet.DrawFrame(_spriteBatch, frameIndex, drawPos, scale, enemyColor)
         Next
 
-        Dim frightenedEnemies = From e In enemies Where e.IsActive AndAlso e.IsVulnerable
-        If frightenedEnemies.Any() Then
+        Dim weakEnemies = From e In enemies Where e.IsActive AndAlso e.IsVulnerable
+        If weakEnemies.Any() Then
             Dim blinkValue = Math.Abs(Math.Sin(Date.Now.TimeOfDay.TotalSeconds * 8.0))
-            Dim frightenedColor As Color
-            If blinkValue > 0.5 Then
-                frightenedColor = Color.White
-            Else
-                frightenedColor = Color.Blue
-            End If
+            Dim blinkColor = If(blinkValue > 0.5, Color.White, Color.BlueViolet)
 
-            For Each enemy In frightenedEnemies
+            For Each enemy In weakEnemies
                 Dim direction = enemy.Direction
                 Dim key = (enemy.EnemyType, direction)
                 Dim animation = _enemyAnimations(key)
@@ -611,7 +589,7 @@ Public NotInheritable Class Renderer
                     enemy.PixelPosition.Y * renderScale - ENEMY_SIZE * renderScale / 2 + HUD_HEIGHT
                 )
 
-                animation.SpriteSheet.DrawFrame(_spriteBatch, frameIndex, drawPos, scale, frightenedColor)
+                animation.SpriteSheet.DrawFrame(_spriteBatch, frameIndex, drawPos, scale, blinkColor)
             Next
         End If
     End Sub

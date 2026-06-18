@@ -86,6 +86,7 @@ Public NotInheritable Class SoundManager
             Case GameState.GameOver
                 StopBackgroundMusic()
             Case GameState.Title
+                _previousLives = STARTING_LIVES
                 StopBackgroundMusic()
             Case GameState.Paused
                 MediaPlayer.Pause()

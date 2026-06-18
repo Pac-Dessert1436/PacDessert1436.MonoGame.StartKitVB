@@ -2,14 +2,17 @@
 
 A **fully-functional** multi-platform game template built with **VB.NET** for [MonoGame](https://www.monogame.net/), featuring the game **Seed-Scape: Forest Planting Quest**.
 
-> **v1.2.2 Latest Update**: ✅ **Gameplay & Stability Improvements**! Key fixes and enhancements:
-> - ✅ **Enemy Spawn Bug Fix**: Enemies' spawn points won't overlap with seeds or pesticides
-> - ✅ **Level & Score Limits**: Capped at Level 99 and a score of 999999 points for stability
-> - ✅ **Complete XML Documentation**: Full `<summary>` comments throughout `Actor.vb`
+> **v1.2.3 Latest Update** 🎮  
+> ✅ **v1.x Feature Completion & Polish** — Final touches for _Seed-Scape: Forest Planting Quest_:
+> - **Audio Fix**: Corrected `life_gained.wav` playback to trigger only at appropriate moments
+> - **Animation Polish**: Fine-tuned death sequence and "Season Cleared" caption timing
+> - **Code Cleanup**: Removed unused `DrawFrameWithOrigin` method from `SpriteSheet.vb`
+> - **Visual Enhancement**: Updated enemy blink color to **`Color.BlueViolet`** for better visibility
+> - **Roadmap**: _Mending Garden_ (v2.0.0) development planned for post-2026
 >
 > **v1.2.0 Important Update**: ✅ **Complete Copyright Safety Achieved**! All assets are now fully licensed and attribution-ready:
 > - Main character sprite adapted from CC0-licensed art
-> - All original graphics created in Aseprite
+> - All original graphics created in Aseprite (published to Open Game Art)
 > - All audio assets CC0-licensed from Open Game Art
 > - Font properly licensed for commercial use
 > - **Blank template now available** for starting your own projects
@@ -233,16 +236,21 @@ All assets are processed through the MonoGame Content Pipeline:
 
 ## Version History
 
-### Version 1.2.2 (Latest; Gameplay & Stability Improvements)
-- ✅ **Maze Creation Function Fix**: 
-  - Enemies' spawn points are now correctly chosen from available tiles, and won't overlap with seeds or pesticides
-  - Smart tile placement with proper distance constraints for seeds, pesticides, and enemies
+### Version 1.2.3 (Latest; Final Polish & Bug Fixes)
+- ✅ **Sound Playback Fix**: Corrected edge case where `life_gained.wav` played at incorrect moments
+- ✅ **Animation Timing Adjustments**: Fine-tuned death sequence duration and "Season Cleared" caption display
+- ✅ **Code Cleanup**: Removed unused `DrawFrameWithOrigin` method from `SpriteSheet.vb`
+- ✅ **Visual Polish**: Updated enemy blink color to **`Color.BlueViolet`** for better visibility
+- ✅ **Roadmap Update**: _Mending Garden_ (v2.0.0) development planned post-2026
+
+### Version 1.2.2 (Gameplay & Stability Improvements)
+- ✅ **Maze Generation Fix**: Enemies now spawn correctly without overlapping seeds or pesticides
+  - Smart tile placement with proper distance constraints
   - Dynamic enemy count scaling with level (5-12 enemies, clamped)
-- ✅ **Level Number Limit**: Levels capped at 99 to prevent overflow and ensure game stability
-- ✅ **Player Score Limit**: Score clamped between 0-999999 to prevent integer overflow
+- ✅ **Level & Score Limits**: Levels capped at 99, score clamped between 0-999999 to prevent overflow
 - ✅ **Complete XML Documentation**: Full `<summary>` comments added to `Actor.vb`
-  - Base `Actor` class with properties and methods documented
-  - `Player` class with all input handling and game mechanics documented
+  - `Actor` base class with properties and methods documented
+  - `Player` class with input handling and game mechanics documented
   - `Enemy` class with AI behavior and respawning mechanics documented
   - `Seed` class with collectible item documentation
 
@@ -306,25 +314,28 @@ All assets are processed through the MonoGame Content Pipeline:
 
 ### Graphics
 - `player_sheet.png` - Adapted from [Forest Boy: Platformer Animated Character](https://opengameart.org/content/forest-boy-platformer-animated-character-24x24) (CC0, public domain)
-- All other sprites (seeds, trees, beetles, caterpillars, UI elements) - **Original artwork created in Aseprite**
+- All original sprites (seeds, trees, beetles, caterpillars, UI elements) - Created in Aseprite, published to Open Game Art with CC0 & OGA-BY licenses  
+  - See: [Seed-Scape: Forest Planting Quest Assets](https://opengameart.org/content/seed-scape-forest-planting-quest)
 
 ### Fonts
 - `GameFont.spritefont` - 12px Monospace variant of [Fusion Pixel Font](https://github.com/TakWolf/fusion-pixel-font) by TakWolf (SIL Open Font License 1.1)
 
-### Music & Sound Effects (All CC0-Licensed)
-All audio assets are **CC0-licensed** (public domain), selected from [Open Game Art](https://opengameart.org/):
+### Music & Sound Effects
+All audio assets are **CC0-licensed** (public domain), sourced from [Open Game Art](https://opengameart.org/):
 
-- `BGM/main_theme.mp3` - _Dark Forest Waltz_, from [10-Track Modern Chiptune Demo](https://opengameart.org/content/10-track-modern-chiptune-demo) by IndieDevs.
-- `level_cleared.wav` - _[New Thing Get!](https://opengameart.org/content/new-thing-get)_ by congusbongus.
-- `game_start.wav` - _[Difference](https://opengameart.org/content/difference)_ by Chasersgaming (first 4 seconds).
-- `game_over.wav` - _Shutdown Sound #1_, from [512 Sound Effects (8-Bit Style)](https://opengameart.org/content/512-sound-effects-8-bit-style) by SubspaceAudio.
-- `enemy_killed.wav` - _Impact Sound #13_, from [512 Sound Effects (8-Bit Style)](https://opengameart.org/content/512-sound-effects-8-bit-style) by SubspaceAudio.
-- `enemy_respawn.wav` - _Neutral Sound #11_, from [512 Sound Effects (8-Bit Style)](https://opengameart.org/content/512-sound-effects-8-bit-style) by SubspaceAudio.
-- `seed_packet.wav` - _Coin Sound (Double #1)_, from [512 Sound Effects (8-Bit Style)](https://opengameart.org/content/512-sound-effects-8-bit-style) by SubspaceAudio.
-- `life_gained.wav` - _Powerup Sound #12_, from [512 Sound Effects (8-Bit Style)](https://opengameart.org/content/512-sound-effects-8-bit-style) by SubspaceAudio.
-- `life_lost.wav` - _Human Death Scream #12_ (0.5x speed), from [512 Sound Effects (8-Bit Style)](https://opengameart.org/content/512-sound-effects-8-bit-style) by SubspaceAudio.
-- `pesticide.wav` - _Coin Sound (Cluster #3)_, from [512 Sound Effects (8-Bit Style)](https://opengameart.org/content/512-sound-effects-8-bit-style) by SubspaceAudio.
-- `at_next_level.wav` - _Fanfare Sound #3_ (0.25x speed), from [512 Sound Effects (8-Bit Style)](https://opengameart.org/content/512-sound-effects-8-bit-style) by SubspaceAudio.
+| Asset | Description | Source |
+|-------|-------------|--------|
+| `BGM/main_theme.mp3` | _Dark Forest Waltz_ | [10-Track Modern Chiptune Demo](https://opengameart.org/content/10-track-modern-chiptune-demo) by IndieDevs |
+| `level_cleared.wav` | _New Thing Get!_ | [congusbongus](https://opengameart.org/content/new-thing-get) |
+| `game_start.wav` | _Difference_ (first 4 seconds) | [Chasersgaming](https://opengameart.org/content/difference) |
+| `game_over.wav` | _Shutdown Sound #1_ | [512 Sound Effects (8-Bit Style)](https://opengameart.org/content/512-sound-effects-8-bit-style) by SubspaceAudio |
+| `enemy_killed.wav` | _Impact Sound #13_ | [512 Sound Effects (8-Bit Style)](https://opengameart.org/content/512-sound-effects-8-bit-style) by SubspaceAudio |
+| `enemy_respawn.wav` | _Neutral Sound #11_ | [512 Sound Effects (8-Bit Style)](https://opengameart.org/content/512-sound-effects-8-bit-style) by SubspaceAudio |
+| `seed_packet.wav` | _Coin Sound (Double #1)_ | [512 Sound Effects (8-Bit Style)](https://opengameart.org/content/512-sound-effects-8-bit-style) by SubspaceAudio |
+| `life_gained.wav` | _Powerup Sound #12_ | [512 Sound Effects (8-Bit Style)](https://opengameart.org/content/512-sound-effects-8-bit-style) by SubspaceAudio |
+| `life_lost.wav` | _Human Death Scream #12_ (0.5x speed) | [512 Sound Effects (8-Bit Style)](https://opengameart.org/content/512-sound-effects-8-bit-style) by SubspaceAudio |
+| `pesticide.wav` | _Coin Sound (Cluster #3)_ | [512 Sound Effects (8-Bit Style)](https://opengameart.org/content/512-sound-effects-8-bit-style) by SubspaceAudio |
+| `at_next_level.wav` | _Fanfare Sound #3_ (0.25x speed) | [512 Sound Effects (8-Bit Style)](https://opengameart.org/content/512-sound-effects-8-bit-style) by SubspaceAudio |
 
 ## License
 

@@ -220,9 +220,7 @@ Public MustInherit Class Actor
 
             If IsInDeathAnimation Then
                 DeathAnimationTimer += deltaTime
-                If DeathAnimationTimer >= DEATH_ANIMATION_DURATION Then
-                    CompleteDeathAnimation()
-                End If
+                If DeathAnimationTimer >= DEATH_ANIM_DURATION Then CompleteDeathAnimation()
                 Exit Sub
             End If
 
@@ -308,9 +306,7 @@ Public MustInherit Class Actor
                     Dim touchPos = touchLoc.Position
                     If Not expandedPauseButtonRect.Contains(CInt(touchPos.X), CInt(touchPos.Y)) Then
                         Dim delta = touchPos - joystickCenter
-                        If delta.Length() <= joystickRadius * 2 Then
-                            HandleJoystickInput(delta)
-                        End If
+                        If delta.Length() <= joystickRadius * 2 Then HandleJoystickInput(delta)
                     End If
                 End If
             Next touchLoc
@@ -319,18 +315,13 @@ Public MustInherit Class Actor
                 Dim mousePos As New Vector2(mouseState.X, mouseState.Y)
                 If Not realPauseButtonRect.Contains(CInt(mousePos.X), CInt(mousePos.Y)) Then
                     Dim delta = mousePos - joystickCenter
-                    If delta.Length() <= joystickRadius * 2 Then
-                        HandleJoystickInput(delta)
-                    End If
+                    If delta.Length() <= joystickRadius * 2 Then HandleJoystickInput(delta)
                 End If
             End If
 
             If IsMoving Then
                 Dim nextPosition = PixelPosition + NextDirection.ToVector2() * Speed * deltaTime
-                If IsValidPosition(nextPosition, maze) Then
-                    CurrentDirection = NextDirection
-                End If
-
+                If IsValidPosition(nextPosition, maze) Then CurrentDirection = NextDirection
                 Dim newPosition = PixelPosition + CurrentDirection.ToVector2() * Speed * deltaTime
 
                 If IsValidPosition(newPosition, maze) Then

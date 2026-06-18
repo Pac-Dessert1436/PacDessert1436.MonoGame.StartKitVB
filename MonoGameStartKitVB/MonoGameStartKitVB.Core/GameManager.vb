@@ -302,7 +302,7 @@ Public NotInheritable Class GameManager
     Private Sub ResetPositionsAfterDeath()
         Player.ResetPosition()
 
-        For Each enemy In Enemies
+        For Each enemy As Actor.Enemy In Enemies
             If enemy.IsActive AndAlso Not enemy.IsRespawning Then
                 enemy.GridPosition = enemy.SpawnPoint
                 enemy.PixelPosition = New Vector2(
@@ -311,7 +311,7 @@ Public NotInheritable Class GameManager
                 )
                 enemy.SetRandomDirection()
             End If
-        Next
+        Next enemy
     End Sub
 
     ''' <summary>
@@ -417,7 +417,7 @@ Public NotInheritable Class GameManager
                             GameState = GameState.Title
                         End If
                     End If
-                Next
+                Next touchLoc
 
                 If mouseState.LeftButton = ButtonState.Pressed Then
                     Dim mousePos As New Vector2(mouseState.X, mouseState.Y)
@@ -461,7 +461,7 @@ Public NotInheritable Class GameManager
                             GameState = GameState.Paused
                         End If
                     End If
-                Next
+                Next touchLoc
 
                 If mouseState.LeftButton = ButtonState.Pressed Then
                     Dim mousePos As New Vector2(mouseState.X, mouseState.Y)
@@ -498,7 +498,7 @@ Public NotInheritable Class GameManager
                             GameState = GameState.Title
                         End If
                     End If
-                Next
+                Next touchLoc
 
                 If mouseState.LeftButton = ButtonState.Pressed Then
                     Dim mousePos As New Vector2(mouseState.X, mouseState.Y)
