@@ -205,9 +205,9 @@ Public Module Essentials
             Next j
         Next i
 
-        Dim enemyCount = Math.Clamp(level, 3, 8)
+        Dim enemyCount = Math.Clamp(level + 4, 5, 12)
         Dim rnd = Random.Shared
-        Dim pesticideCount = 4
+        Const PESTICIDE_COUNT = 4
 
         Dim playerStart = PlayerStartingPoint
         Dim GetWalkableTiles =
@@ -231,18 +231,18 @@ Public Module Essentials
             maze(tile.X, tile.Y) = MazeTile.Collectible
         Next tile
 
+        Dim farTiles = From wt In GetWalkableTiles()
+                       Where ManhattanDistance(wt, playerStart) > 5
+                       Order By rnd.Next() Take PESTICIDE_COUNT
+        For Each tile In farTiles
+            maze(tile.X, tile.Y) = MazeTile.Pesticide
+        Next tile
+
         Dim enemyTiles = From wt In GetWalkableTiles()
                          Where ManhattanDistance(wt, playerStart) > 5
                          Order By rnd.Next() Take enemyCount
         For Each tile In enemyTiles
-            maze(tile.X, tile.Y) = MazeTile.Walkable
-        Next tile
-
-        Dim farTiles = From wt In GetWalkableTiles()
-                       Where ManhattanDistance(wt, playerStart) > 5
-                       Order By rnd.Next() Take pesticideCount
-        For Each tile In farTiles
-            maze(tile.X, tile.Y) = MazeTile.Pesticide
+            maze(tile.X, tile.Y) = MazeTile.Enemy
         Next tile
 
         Return maze

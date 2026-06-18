@@ -84,7 +84,7 @@ MonoGameStartKitVB/
 ├── MonoGameStartKitVB.WindowsDX/     # Windows desktop launcher
 ├── MonoGameStartKitVB.Android/       # Android mobile launcher
 ├── MonoGameStartKitVB.iOS/           # iOS mobile launcher
-└── MonoGameStartKitVB.DesktopGL/     # Cross-platform OpenGL launcher (build issues)
+└── MonoGameStartKitVB.DesktopGL/     # Cross-platform OpenGL launcher
 ```
 
 ### Key Components

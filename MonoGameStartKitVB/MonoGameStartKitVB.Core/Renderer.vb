@@ -199,10 +199,7 @@ Public NotInheritable Class Renderer
                 DrawHUD(gameManager)
                 DrawJoystick()
                 DrawPauseButton()
-
-                If gameState = GameState.Paused Then
-                    DrawPauseOverlay()
-                End If
+                If gameState = GameState.Paused Then DrawPauseOverlay()
 
             Case GameState.GameOver
                 DrawGameArea(gameManager, deltaTime)
@@ -289,10 +286,8 @@ Public NotInheritable Class Renderer
             buttonWidth,
             buttonHeight
         )
-        Dim keyboardState = Keyboard.GetState()
-        Dim isPressed = keyboardState.IsKeyDown(Keys.Enter)
-        Dim buttonColor = If(isPressed, Color.LightGray, Color.White)
-        _spriteBatch.Draw(_generalButton, buttonRect, buttonColor)
+        ' Button color is always the original
+        _spriteBatch.Draw(_generalButton, buttonRect, Color.White)
 
         Dim textSize As Vector2 = _gameFont.MeasureString(text) * scale
         Dim textPos As New Vector2(

@@ -115,9 +115,10 @@ Public NotInheritable Class GameManager
 
         For x As Integer = 0 To MAZE_WIDTH - 1
             For y As Integer = 0 To MAZE_HEIGHT - 1
-                If Maze(x, y) = MazeTile.Walkable AndAlso
+                If Maze(x, y) = MazeTile.Enemy AndAlso
                    ManhattanDistance(New Point(x, y), PlayerStartingPoint) > 5 Then
                     spawnPoints.Add(New Point(x, y))
+                    Maze(x, y) = MazeTile.Walkable
                 End If
             Next y
         Next x
@@ -187,7 +188,7 @@ Public NotInheritable Class GameManager
     ''' </summary>
     Private Sub HandleGameStateTransitions()
         If _previousGameState <> GameState Then
-            Dim oldState = _previousGameState
+            Dim oldState As GameState = _previousGameState
             _previousGameState = GameState
 
             Select Case GameState
@@ -200,7 +201,7 @@ Public NotInheritable Class GameManager
                         ScheduleEvent_GameStart()
                         ScheduleEvent_GameStateChanged(GameState)
                     ElseIf oldState = GameState.LevelCleared Then
-                        CurrentLevel += 1
+                        CurrentLevel = Math.Clamp(CurrentLevel + 1, 0, 99)
                         InitializeLevel()
                         ScheduleEvent_MovingToNextLevel()
                         ScheduleEvent_GameStateChanged(GameState)
@@ -245,7 +246,7 @@ Public NotInheritable Class GameManager
         Next
 
         For Each pesticidePos In Pesticides.ToList()
-            Dim pesticideBounds = New Rectangle(
+            Dim pesticideBounds As New Rectangle(
                 pesticidePos.X * CELL_SIZE + (CELL_SIZE - SEED_SIZE) \ 2,
                 pesticidePos.Y * CELL_SIZE + (CELL_SIZE - SEED_SIZE) \ 2,
                 SEED_SIZE,
@@ -345,13 +346,13 @@ Public NotInheritable Class GameManager
                 For Each touchLoc In touchCollection
                     If touchLoc.State = Touch.TouchLocationState.Pressed Then
                         Dim touchPos = touchLoc.Position
-                        Dim startButton = New Rectangle(
+                        Dim startButton As New Rectangle(
                             CInt((SCREEN_WIDTH \ 2 - 100) * scale + offsetX),
                             CInt(400 * scale + offsetY),
                             CInt(200 * scale),
                             CInt(80 * scale)
                         )
-                        Dim exitButton = New Rectangle(
+                        Dim exitButton As New Rectangle(
                             CInt((SCREEN_WIDTH \ 2 - 100) * scale + offsetX),
                             CInt(520 * scale + offsetY),
                             CInt(200 * scale),
@@ -367,14 +368,14 @@ Public NotInheritable Class GameManager
                 Next
 
                 If mouseState.LeftButton = ButtonState.Pressed Then
-                    Dim mousePos = New Vector2(mouseState.X, mouseState.Y)
-                    Dim startButton = New Rectangle(
+                    Dim mousePos As New Vector2(mouseState.X, mouseState.Y)
+                    Dim startButton As New Rectangle(
                         CInt((SCREEN_WIDTH \ 2 - 100) * scale + offsetX),
                         CInt(400 * scale + offsetY),
                         CInt(200 * scale),
                         CInt(80 * scale)
                     )
-                    Dim exitButton = New Rectangle(
+                    Dim exitButton As New Rectangle(
                         CInt((SCREEN_WIDTH \ 2 - 100) * scale + offsetX),
                         CInt(520 * scale + offsetY),
                         CInt(200 * scale),
@@ -419,7 +420,7 @@ Public NotInheritable Class GameManager
                 Next
 
                 If mouseState.LeftButton = ButtonState.Pressed Then
-                    Dim mousePos = New Vector2(mouseState.X, mouseState.Y)
+                    Dim mousePos As New Vector2(mouseState.X, mouseState.Y)
                     If IsPointInRect(mousePos, retryButton) Then
                         GameState = GameState.Playing
                     ElseIf IsPointInRect(mousePos, exitButton) Then
@@ -475,13 +476,13 @@ Public NotInheritable Class GameManager
                     GameState = GameState.Playing
                 End If
 
-                Dim resumeButton = New Rectangle(
+                Dim resumeButton As New Rectangle(
                     CInt((SCREEN_WIDTH \ 2 - 100) * scale + offsetX),
                     CInt((SCREEN_HEIGHT \ 2 - 40) * scale + offsetY),
                     CInt(200 * scale),
                     CInt(80 * scale)
                 )
-                Dim exitButton = New Rectangle(
+                Dim exitButton As New Rectangle(
                     CInt((SCREEN_WIDTH \ 2 - 100) * scale + offsetX),
                     CInt((SCREEN_HEIGHT \ 2 + 80) * scale + offsetY),
                     CInt(200 * scale),
@@ -500,7 +501,7 @@ Public NotInheritable Class GameManager
                 Next
 
                 If mouseState.LeftButton = ButtonState.Pressed Then
-                    Dim mousePos = New Vector2(mouseState.X, mouseState.Y)
+                    Dim mousePos As New Vector2(mouseState.X, mouseState.Y)
                     If IsPointInRect(mousePos, resumeButton) Then
                         GameState = GameState.Playing
                     ElseIf IsPointInRect(mousePos, exitButton) Then

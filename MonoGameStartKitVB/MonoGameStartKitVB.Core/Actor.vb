@@ -98,7 +98,7 @@ Public MustInherit Class Actor
                 If DeathAnimationTimer >= DEATH_ANIMATION_DURATION Then
                     CompleteDeathAnimation()
                 End If
-                Return
+                Exit Sub
             End If
 
             Dim keyboardState = Keyboard.GetState()
@@ -110,16 +110,13 @@ Public MustInherit Class Actor
             If keyboardState.IsKeyDown(Keys.Left) OrElse keyboardState.IsKeyDown(Keys.A) Then
                 NextDirection = Direction.Left
                 IsMoving = True
-            End If
-            If keyboardState.IsKeyDown(Keys.Right) OrElse keyboardState.IsKeyDown(Keys.D) Then
+            ElseIf keyboardState.IsKeyDown(Keys.Right) OrElse keyboardState.IsKeyDown(Keys.D) Then
                 NextDirection = Direction.Right
                 IsMoving = True
-            End If
-            If keyboardState.IsKeyDown(Keys.Up) OrElse keyboardState.IsKeyDown(Keys.W) Then
+            ElseIf keyboardState.IsKeyDown(Keys.Up) OrElse keyboardState.IsKeyDown(Keys.W) Then
                 NextDirection = Direction.Up
                 IsMoving = True
-            End If
-            If keyboardState.IsKeyDown(Keys.Down) OrElse keyboardState.IsKeyDown(Keys.S) Then
+            ElseIf keyboardState.IsKeyDown(Keys.Down) OrElse keyboardState.IsKeyDown(Keys.S) Then
                 NextDirection = Direction.Down
                 IsMoving = True
             End If
@@ -134,22 +131,20 @@ Public MustInherit Class Actor
                 IsMoving = True
             End If
 
-            If gamePadState.DPad.Left = ButtonState.Pressed Then
-                NextDirection = Direction.Left
-                IsMoving = True
-            End If
-            If gamePadState.DPad.Right = ButtonState.Pressed Then
-                NextDirection = Direction.Right
-                IsMoving = True
-            End If
-            If gamePadState.DPad.Up = ButtonState.Pressed Then
-                NextDirection = Direction.Up
-                IsMoving = True
-            End If
-            If gamePadState.DPad.Down = ButtonState.Pressed Then
-                NextDirection = Direction.Down
-                IsMoving = True
-            End If
+            Select Case ButtonState.Pressed
+                Case gamePadState.DPad.Left
+                    NextDirection = Direction.Left
+                    IsMoving = True
+                Case gamePadState.DPad.Right
+                    NextDirection = Direction.Right
+                    IsMoving = True
+                Case gamePadState.DPad.Up
+                    NextDirection = Direction.Up
+                    IsMoving = True
+                Case gamePadState.DPad.Down
+                    NextDirection = Direction.Down
+                    IsMoving = True
+            End Select
 
             Dim joystickCenter = New Vector2(
                 Renderer.ActualScreenWidth / 2.0F,
@@ -193,10 +188,10 @@ Public MustInherit Class Actor
                         End If
                     End If
                 End If
-            Next
+            Next touchLoc
 
             If mouseState.LeftButton = ButtonState.Pressed Then
-                Dim mousePos = New Vector2(mouseState.X, mouseState.Y)
+                Dim mousePos As New Vector2(mouseState.X, mouseState.Y)
                 If Not realPauseButtonRect.Contains(CInt(mousePos.X), CInt(mousePos.Y)) Then
                     Dim delta = mousePos - joystickCenter
                     If delta.Length() <= joystickRadius * 2 Then
@@ -241,7 +236,7 @@ Public MustInherit Class Actor
         End Sub
 
         Private Function IsValidPosition(newPosition As Vector2, maze As MazeTile(,)) As Boolean
-            Dim bounds = New Rectangle(
+            Dim bounds As New Rectangle(
                 CInt(newPosition.X - Size / 2),
                 CInt(newPosition.Y - Size / 2),
                 Size,
@@ -253,23 +248,26 @@ Public MustInherit Class Actor
             Dim startTileY = Math.Max(0, bounds.Top \ CELL_SIZE)
             Dim endTileY = Math.Min(MAZE_HEIGHT - 1, bounds.Bottom \ CELL_SIZE)
 
-            For tileX = startTileX To endTileX
-                For tileY = startTileY To endTileY
-                    Dim tile As MazeTile = maze(tileX, tileY)
-                    If tile = MazeTile.Fence OrElse
-                       tile = MazeTile.Sapling OrElse
-                       tile = MazeTile.Tree Then Return False
+            Dim specificMazeTiles = {MazeTile.Fence, MazeTile.Sapling, MazeTile.Tree}
+            For tileX As Integer = startTileX To endTileX
+                For tileY As Integer = startTileY To endTileY
+                    If specificMazeTiles.Contains(maze(tileX, tileY)) Then Return False
                 Next tileY
             Next tileX
 
             Return True
         End Function
 
+        Private Sub LimitPlayerScore()
+            Score = Math.Clamp(Score, 0, 999999)
+        End Sub
+
         Public Sub CollectSeed(seedType As SeedType)
             Score += SEED_POINTS
             CheckBonusLife()
             ScheduleEvent_PlayerScoreChanged(Score)
-            ScheduleEvent_SeedCollected(New Actor.Seed(GridPosition, seedType))
+            ScheduleEvent_SeedCollected(New Seed(GridPosition, seedType))
+            LimitPlayerScore()
         End Sub
 
         Public Sub CheckBonusLife()
@@ -285,12 +283,14 @@ Public MustInherit Class Actor
             CheckBonusLife()
             ScheduleEvent_PlayerScoreChanged(Score)
             ScheduleEvent_PesticideCollected()
+            LimitPlayerScore()
         End Sub
 
         Public Sub KillEnemy()
             Score += ENEMY_POINTS
             CheckBonusLife()
             ScheduleEvent_PlayerScoreChanged(Score)
+            LimitPlayerScore()
         End Sub
 
         Public Sub LoseLife()
@@ -366,10 +366,10 @@ Public MustInherit Class Actor
                     GracePeriodTimer = ENEMY_GRACE_PERIOD
                     ScheduleEvent_EnemyRespawned(Me)
                 End If
-                Return
+                Exit Sub
             End If
 
-            If Not IsActive Then Return
+            If Not IsActive Then Exit Sub
 
             If GracePeriodTimer > 0 Then
                 GracePeriodTimer -= deltaTime
@@ -433,14 +433,12 @@ Public MustInherit Class Actor
             Dim startTileY = Math.Max(0, bounds.Top \ CELL_SIZE)
             Dim endTileY = Math.Min(MAZE_HEIGHT - 1, bounds.Bottom \ CELL_SIZE)
 
-            For tileX = startTileX To endTileX
-                For tileY = startTileY To endTileY
-                    Dim tile = maze(tileX, tileY)
-                    If tile = MazeTile.Fence OrElse tile = MazeTile.Sapling OrElse tile = MazeTile.Tree Then
-                        Return False
-                    End If
-                Next
-            Next
+            Dim specificMazeTiles = {MazeTile.Fence, MazeTile.Sapling, MazeTile.Tree}
+            For tileX As Integer = startTileX To endTileX
+                For tileY As Integer = startTileY To endTileY
+                    If specificMazeTiles.Contains(maze(tileX, tileY)) Then Return False
+                Next tileY
+            Next tileX
 
             Return True
         End Function
