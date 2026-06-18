@@ -4,11 +4,10 @@
     "classifications": [
         "GameDev",
         "MonoGame",
-        "VB.NET",
-        "C#"
+        "VB.NET"
     ],
     "name": "MonoGame Blank 2D StartKit VB.NET",
-    "identity": "PacDessert1436.MonoGame.StartKitVB",
+    "identity": "PacDessert1436.MonoGame.BlankStartKitVB",
     "shortName": "mgblank2dstartkitvb",
     "tags": {
         "language": "VB",

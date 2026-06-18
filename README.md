@@ -2,26 +2,32 @@
 
 A **fully-functional** multi-platform game template built with **VB.NET** for [MonoGame](https://www.monogame.net/), featuring the game **Seed-Scape: Forest Planting Quest**.
 
-> **v1.2.3 Latest Update** 🎮  
-> ✅ **v1.x Feature Completion & Polish** — Final touches for _Seed-Scape: Forest Planting Quest_:
+Starting from version 1.2.0, all assets are now fully licensed and attribution-ready:
+- Main character sprite adapted from CC0-licensed art
+- All original graphics created in Aseprite (published to Open Game Art)
+- All audio assets CC0-licensed from Open Game Art
+- Font properly licensed for commercial use
+- **Blank template available from version 1.2.4** for starting your own projects
+
+> **v1.2.4 Latest Update** 🎮
+> ✅ **Critical Bug Fix** - Resolved template ID collision:
+> - **Template Identity Fix**: Changed blank template identity from `PacDessert1436.MonoGame.StartKitVB` to `PacDessert1436.MonoGame.BlankStartKitVB`
+> - **⚠️ Notice**: Versions 1.2.0 through 1.2.3 had template ID collisions that made the blank template unavailable. Please use this version (1.2.4) for blank template access.
+
+> **v1.2.3 Update**: ✅ **v1.x Feature Completion & Polish** — Final touches for _Seed-Scape: Forest Planting Quest_:
 > - **Audio Fix**: Corrected `life_gained.wav` playback to trigger only at appropriate moments
 > - **Animation Polish**: Fine-tuned death sequence and "Season Cleared" caption timing
 > - **Code Cleanup**: Removed unused `DrawFrameWithOrigin` method from `SpriteSheet.vb`
 > - **Visual Enhancement**: Updated enemy blink color to **`Color.BlueViolet`** for better visibility
 > - **Roadmap**: _Mending Garden_ (v2.0.0) development planned for post-2026
->
-> **v1.2.0 Important Update**: ✅ **Complete Copyright Safety Achieved**! All assets are now fully licensed and attribution-ready:
-> - Main character sprite adapted from CC0-licensed art
-> - All original graphics created in Aseprite (published to Open Game Art)
-> - All audio assets CC0-licensed from Open Game Art
-> - Font properly licensed for commercial use
-> - **Blank template now available** for starting your own projects
 
 ---
 
 ## 🚨 Important Notice
 
 **Versions prior to 1.2.0 have been unlisted and should not be used** due to potential copyright concerns with included assets. Always use version 1.2.0 or later for production projects.
+
+Versions 1.2.0 through 1.2.3 had template ID collisions. While the demo game template (`mg2dstartkitvb`) is available across these versions, **the blank template (`mgblank2dstartkitvb`) is unavailable until version 1.2.4**.
 
 This template is designed as a **VB.NET alternative** to the original C# MonoGame StartKit (`mg2dstartkit`), which enables VB.NET developers to leverage MonoGame's powerful game development capabilities, especially the ones transitioning from `vbPixelGameEngine` to MonoGame.
 
@@ -36,7 +42,7 @@ This template is designed as a **VB.NET alternative** to the original C# MonoGam
 _PacDessert1436.MonoGame.StartKitVB_ is a **production-ready** game template demonstrating modern MonoGame development practices using VB.NET. The package includes **two templates**:
 
 1. **Complete Demo Game**: _**Seed-Scape: Forest Planting Quest**_ - An arcade game where players collect seeds to grow a forest while dodging patrolling insects.
-2. **Blank Template (`mgblank2dstartkitvb`)**: A clean starting point for your own MonoGame projects.
+2. **Blank Template (`mgblank2dstartkitvb`)**: A clean starting point for your own MonoGame projects. Actually available from version 1.2.4.
 
 > **New to MonoGame?** Check out [BEGINNER_GUIDE.md](MonoGameStartKitVB/BEGINNER_GUIDE.md) for a comprehensive guide transitioning from `vbPixelGameEngine` to MonoGame.
 
@@ -194,12 +200,12 @@ dotnet new mgblank2dstartkitvb -n YourGameName
 
 ## Roadmap
 
-### Completed Features on 1.2.1
+### Completed Features on 1.2.x
 - ✅ Enhanced sound effects and music system
 - ✅ **High score saving** with JSON serialization
 - ✅ DesktopGL build fix (FFMPEG pipeline)
 
-### Known Issues on 1.2.1
+### Known Issues on 1.2.x
 - DesktopGL high DPI mode unavailable (game window may exceed screen height)
 - iOS untested on actual devices
 
@@ -236,11 +242,15 @@ All assets are processed through the MonoGame Content Pipeline:
 
 ## Version History
 
-### Version 1.2.3 (Latest; Final Polish & Bug Fixes)
+### Version 1.2.4 (Latest; Critical Bug Fix)
+- ✅ **Template ID Collision Fix**: Changed blank template identity from `PacDessert1436.MonoGame.StartKitVB` to `PacDessert1436.MonoGame.BlankStartKitVB`
+- ⚠️ **Important**: Versions 1.2.0 through 1.2.3 had template ID collisions. Please use this version (1.2.4) for blank template access.
+
+### Version 1.2.3 (Final Polish & Bug Fixes)
 - ✅ **Sound Playback Fix**: Corrected edge case where `life_gained.wav` played at incorrect moments
 - ✅ **Animation Timing Adjustments**: Fine-tuned death sequence duration and "Season Cleared" caption display
 - ✅ **Code Cleanup**: Removed unused `DrawFrameWithOrigin` method from `SpriteSheet.vb`
-- ✅ **Visual Polish**: Updated enemy blink color to **`Color.BlueViolet`** for better visibility
+- ✅ **Visual Polish**: Updated enemy blink color to purple for better visibility
 - ✅ **Roadmap Update**: _Mending Garden_ (v2.0.0) development planned post-2026
 
 ### Version 1.2.2 (Gameplay & Stability Improvements)
