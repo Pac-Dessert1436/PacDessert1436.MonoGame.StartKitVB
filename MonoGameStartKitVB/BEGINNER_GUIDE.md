@@ -32,17 +32,17 @@ Welcome to MonoGame! If you're coming from `vbPixelGameEngine`, this guide will 
 
 ## 2. Project Structure
 
-A typical MonoGame project utilizing VB.NET has these key components:
+A typical MonoGame project utilizing VB.NET has these key components in its core layer:
 
 ```
-YourGame/
-├── YourGame.vbproj      # Project file
-├── Content/             # All assets (images, sounds, fonts)
-│   ├── Content.mgcb     # Content pipeline config
-│   ├── Images/          # Texture assets
-│   ├── Fonts/           # SpriteFont assets
-│   └── Sounds/          # Audio assets
-└── YourGame.vb          # Main game class
+YourGame.Core/
+├── YourGame.Core.vbproj  # VB.NET project file
+├── Content/              # All assets (images, sounds, fonts)
+│   ├── Content.mgcb      # Content pipeline config
+│   ├── Images/           # Texture assets
+│   ├── Fonts/            # SpriteFont assets
+│   └── Sounds/           # Audio assets
+└── GameMain.vb           # Main game class
 ```
 
 **Main Game Class:**

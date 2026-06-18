@@ -1,14 +1,45 @@
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Input
 
+''' <summary>
+''' Base class for all actors in the game.
+''' </summary>
+''' <remarks>
+''' Actors are entities in the game that can move, interact with the environment, 
+''' and be drawn on the screen. This abstract class provides core functionality
+''' for position management, collision detection, and movement.
+''' </remarks>
 Public MustInherit Class Actor
+    ''' <summary>
+    ''' Gets or sets the actor's position on the grid.
+    ''' </summary>
     Public Property GridPosition As Point
+
+    ''' <summary>
+    ''' Gets or sets the actor's precise pixel position in the game world.
+    ''' </summary>
     Public Property PixelPosition As Vector2
+
+    ''' <summary>
+    ''' Gets or sets the actor's size in pixels.
+    ''' </summary>
     Public Property Size As Integer
+
+    ''' <summary>
+    ''' Gets or sets whether the actor is active and should be updated/drawn.
+    ''' </summary>
     Public Property IsActive As Boolean = True
 
+    ''' <summary>
+    ''' Threshold for snapping to grid cell centers (in pixels).
+    ''' </summary>
     Protected Const SNAP_THRESHOLD As Integer = 5
 
+    ''' <summary>
+    ''' Initializes a new instance of the Actor class.
+    ''' </summary>
+    ''' <param name="gridPosition">Initial grid position of the actor.</param>
+    ''' <param name="size">Size of the actor in pixels.</param>
     Public Sub New(gridPosition As Point, size As Integer)
         Me.GridPosition = gridPosition
         PixelPosition = New Vector2(
@@ -18,6 +49,13 @@ Public MustInherit Class Actor
         Me.Size = size
     End Sub
 
+    ''' <summary>
+    ''' Gets the actor's bounding rectangle.
+    ''' </summary>
+    ''' <returns>The actor's bounding rectangle.</returns>
+    ''' <remarks>
+    ''' The bounding rectangle is used to check for collisions with other actors.
+    ''' </remarks>
     Public Overridable Function GetBounds() As Rectangle
         Return New Rectangle(
             CInt(PixelPosition.X - Size / 2),
@@ -27,9 +65,26 @@ Public MustInherit Class Actor
         )
     End Function
 
+    ''' <summary>
+    ''' Updates the actor's state.
+    ''' </summary>
+    ''' <param name="deltaTime">The time interval since the last update.</param>
+    ''' <param name="maze">The maze in which the actor is moving.</param>
+    ''' <remarks>
+    ''' This method is called every frame to update the actor's position, direction,
+    ''' and other properties.
+    ''' </remarks>
     Public Overridable Sub Update(deltaTime As Single, Optional maze As MazeTile(,) = Nothing)
     End Sub
 
+    ''' <summary>
+    ''' Gets the valid directions for the actor to move in.
+    ''' </summary>
+    ''' <param name="currDir">The current direction of the actor.</param>
+    ''' <returns>An array of valid directions for the actor to move in.</returns>
+    ''' <remarks>
+    ''' This property is used to filter out invalid directions, such as the opposite direction.
+    ''' </remarks>
     Public Shared ReadOnly Property ValidDirections(currDir As Direction) As Direction()
         Get
             Dim directions As Direction() = {
@@ -43,6 +98,14 @@ Public MustInherit Class Actor
         End Get
     End Property
 
+    ''' <summary>
+    ''' Gets the opposite direction of the current direction.
+    ''' </summary>
+    ''' <param name="currDir">The current direction of the actor.</param>
+    ''' <returns>The opposite direction of the current direction.</returns>
+    ''' <remarks>
+    ''' This property is used to check for collisions with other actors.
+    ''' </remarks>
     Public Shared ReadOnly Property OppositeDirection(currDir As Direction) As Direction
         Get
             Select Case currDir
@@ -60,23 +123,76 @@ Public MustInherit Class Actor
         End Get
     End Property
 
+    ''' <summary>
+    ''' Represents the player character in the game.
+    ''' </summary>
+    ''' <remarks>
+    ''' Handles player input, movement, scoring, and life management.
+    ''' Supports multiple input methods: keyboard, mouse, touch, and gamepad.
+    ''' </remarks>
     Public NotInheritable Class Player
         Inherits Actor
 
+        ''' <summary>
+        ''' Path to the player sprite sheet.
+        ''' </summary>
         Public Const IMAGE_PATH As String = "Images/player_sheet"
+
+        ''' <summary>
+        ''' Gets or sets the player's current score.
+        ''' </summary>
         Public Property Score As Integer = 0
+
+        ''' <summary>
+        ''' Gets or sets the player's remaining lives.
+        ''' </summary>
         Public Property Lives As Integer = STARTING_LIVES
+
+        ''' <summary>
+        ''' Gets or sets whether the player has received a bonus life.
+        ''' </summary>
         Public Property HasReceivedBonusLife As Boolean = False
+
+        ''' <summary>
+        ''' Gets or sets whether the player is alive.
+        ''' </summary>
         Public Property IsAlive As Boolean = True
+
+        ''' <summary>
+        ''' Gets or sets the player's movement speed.
+        ''' </summary>
         Public Property Speed As Single = PLAYER_SPEED
+
+        ''' <summary>
+        ''' Gets or sets the player's current movement direction.
+        ''' </summary>
         Public Property CurrentDirection As Direction = Direction.Right
+
+        ''' <summary>
+        ''' Gets or sets the player's next intended movement direction.
+        ''' </summary>
         Public Property NextDirection As Direction = Direction.Right
+
+        ''' <summary>
+        ''' Gets or sets whether the player is currently moving.
+        ''' </summary>
         Public Property IsMoving As Boolean = False
+
+        ''' <summary>
+        ''' Gets or sets whether the player is in a death animation.
+        ''' </summary>
         Public Property IsInDeathAnimation As Boolean = False
+
+        ''' <summary>
+        ''' Gets or sets the timer for the death animation.
+        ''' </summary>
         Public Property DeathAnimationTimer As Single = 0.0F
 
         Private Shared _joystickBaseWidth As Integer = 64
 
+        ''' <summary>
+        ''' Gets or sets the base width of the virtual joystick.
+        ''' </summary>
         Public Shared Property JoystickBaseWidth As Integer
             Get
                 Return _joystickBaseWidth
@@ -86,10 +202,19 @@ Public MustInherit Class Actor
             End Set
         End Property
 
+        ''' <summary>
+        ''' Initializes a new instance of the Player class.
+        ''' </summary>
+        ''' <param name="gridPosition">Initial grid position of the player.</param>
         Public Sub New(gridPosition As Point)
             MyBase.New(gridPosition, PLAYER_SIZE)
         End Sub
 
+        ''' <summary>
+        ''' Updates the player's state, handling input and movement.
+        ''' </summary>
+        ''' <param name="deltaTime">Time elapsed since the last update.</param>
+        ''' <param name="maze">The maze grid for collision detection.</param>
         Public Overrides Sub Update(deltaTime As Single, Optional maze As MazeTile(,) = Nothing)
             If Not IsAlive Then Exit Sub
 
@@ -146,7 +271,7 @@ Public MustInherit Class Actor
                     IsMoving = True
             End Select
 
-            Dim joystickCenter = New Vector2(
+            Dim joystickCenter As New Vector2(
                 Renderer.ActualScreenWidth / 2.0F,
                 Renderer.ActualScreenHeight - _joystickBaseWidth * Renderer.ScreenScale * 2 - 10.0F
             )
@@ -218,6 +343,10 @@ Public MustInherit Class Actor
             End If
         End Sub
 
+        ''' <summary>
+        ''' Handles input from the virtual joystick.
+        ''' </summary>
+        ''' <param name="delta">Vector from joystick center to touch/mouse position.</param>
         Private Sub HandleJoystickInput(delta As Vector2)
             If Math.Abs(delta.X) > Math.Abs(delta.Y) Then
                 If delta.X < 0 Then
@@ -235,6 +364,12 @@ Public MustInherit Class Actor
             IsMoving = True
         End Sub
 
+        ''' <summary>
+        ''' Checks if a position is valid (not colliding with obstacles).
+        ''' </summary>
+        ''' <param name="newPosition">The position to check.</param>
+        ''' <param name="maze">The maze grid for collision detection.</param>
+        ''' <returns>True if the position is valid, False otherwise.</returns>
         Private Function IsValidPosition(newPosition As Vector2, maze As MazeTile(,)) As Boolean
             Dim bounds As New Rectangle(
                 CInt(newPosition.X - Size / 2),
@@ -258,10 +393,17 @@ Public MustInherit Class Actor
             Return True
         End Function
 
+        ''' <summary>
+        ''' Limits the player's score to a maximum of 999999.
+        ''' </summary>
         Private Sub LimitPlayerScore()
             Score = Math.Clamp(Score, 0, 999999)
         End Sub
 
+        ''' <summary>
+        ''' Collects a seed and updates the score.
+        ''' </summary>
+        ''' <param name="seedType">The type of seed collected.</param>
         Public Sub CollectSeed(seedType As SeedType)
             Score += SEED_POINTS
             CheckBonusLife()
@@ -270,6 +412,9 @@ Public MustInherit Class Actor
             LimitPlayerScore()
         End Sub
 
+        ''' <summary>
+        ''' Checks if the player qualifies for a bonus life.
+        ''' </summary>
         Public Sub CheckBonusLife()
             If Not HasReceivedBonusLife AndAlso Score >= BONUS_LIFE_AT Then
                 Lives += 1
@@ -278,6 +423,9 @@ Public MustInherit Class Actor
             End If
         End Sub
 
+        ''' <summary>
+        ''' Collects pesticide and updates the score.
+        ''' </summary>
         Public Sub CollectPesticide()
             Score += PESTICIDE_POINTS
             CheckBonusLife()
@@ -286,6 +434,9 @@ Public MustInherit Class Actor
             LimitPlayerScore()
         End Sub
 
+        ''' <summary>
+        ''' Kills an enemy and updates the score.
+        ''' </summary>
         Public Sub KillEnemy()
             Score += ENEMY_POINTS
             CheckBonusLife()
@@ -293,6 +444,9 @@ Public MustInherit Class Actor
             LimitPlayerScore()
         End Sub
 
+        ''' <summary>
+        ''' Reduces the player's life count and triggers death animation.
+        ''' </summary>
         Public Sub LoseLife()
             Lives -= 1
             ScheduleEvent_LivesChanged(Lives)
@@ -300,6 +454,9 @@ Public MustInherit Class Actor
             IsInDeathAnimation = True
         End Sub
 
+        ''' <summary>
+        ''' Completes the death animation and either respawns or ends the game.
+        ''' </summary>
         Public Sub CompleteDeathAnimation()
             IsInDeathAnimation = False
             DeathAnimationTimer = 0.0F
@@ -313,6 +470,9 @@ Public MustInherit Class Actor
             End If
         End Sub
 
+        ''' <summary>
+        ''' Resets the player to the starting position.
+        ''' </summary>
         Public Sub ResetPosition()
             GridPosition = PlayerStartingPoint
             PixelPosition = New Vector2(
@@ -325,28 +485,82 @@ Public MustInherit Class Actor
             DeathAnimationTimer = 0.0F
         End Sub
 
+        ''' <summary>
+        ''' Resets the bonus life flag for a new level.
+        ''' </summary>
         Public Sub ResetBonusLifeFlag()
             HasReceivedBonusLife = False
         End Sub
     End Class
 
+    ''' <summary>
+    ''' Represents an enemy character in the game.
+    ''' </summary>
+    ''' <remarks>
+    ''' Handles enemy movement, vulnerability state, and respawning mechanics.
+    ''' Enemies patrol the maze and can be made vulnerable by collecting pesticide.
+    ''' </remarks>
     Public NotInheritable Class Enemy
         Inherits Actor
 
+        ''' <summary>
+        ''' Path to the enemy sprite sheet.
+        ''' </summary>
         Public Const IMAGE_PATH As String = "Images/enemy_sheet"
+
+        ''' <summary>
+        ''' Gets or sets the enemy's current movement direction.
+        ''' </summary>
         Public Property Direction As Direction
+
+        ''' <summary>
+        ''' Gets or sets the enemy's movement speed.
+        ''' </summary>
         Public Property Speed As Single = ENEMY_SPEED
+
+        ''' <summary>
+        ''' Gets or sets whether the enemy is vulnerable (can be killed).
+        ''' </summary>
         Public Property IsVulnerable As Boolean = False
+
+        ''' <summary>
+        ''' Gets or sets the remaining time the enemy stays vulnerable.
+        ''' </summary>
         Public Property VulnerableTimer As Single = 0.0F
+
+        ''' <summary>
+        ''' Gets or sets the type of enemy (Beetle or Caterpillar).
+        ''' </summary>
         Public Property EnemyType As EnemyType = EnemyType.Beetle
+
+        ''' <summary>
+        ''' Gets or sets whether the enemy is respawning.
+        ''' </summary>
         Public Property IsRespawning As Boolean = False
+
+        ''' <summary>
+        ''' Gets or sets the respawn timer.
+        ''' </summary>
         Public Property RespawnTimer As Single = 0.0F
+
+        ''' <summary>
+        ''' Gets or sets the grace period timer after spawning.
+        ''' </summary>
         Public Property GracePeriodTimer As Single = 0.0F
+
+        ''' <summary>
+        ''' Gets or sets the enemy's spawn point.
+        ''' </summary>
         Public Property SpawnPoint As Point
 
-        Private ReadOnly random As New Random
+        Private ReadOnly random As Random = Random.Shared
         Private _previousDirection As Direction
 
+        ''' <summary>
+        ''' Initializes a new instance of the Enemy class.
+        ''' </summary>
+        ''' <param name="gridPosition">Initial grid position of the enemy.</param>
+        ''' <param name="enemyType">Type of enemy to create.</param>
         Public Sub New(gridPosition As Point, Optional enemyType As EnemyType = EnemyType.Beetle)
             MyBase.New(gridPosition, ENEMY_SIZE)
             Me.EnemyType = enemyType
@@ -356,6 +570,11 @@ Public MustInherit Class Actor
             IsActive = True
         End Sub
 
+        ''' <summary>
+        ''' Updates the enemy's state, handling movement and vulnerability.
+        ''' </summary>
+        ''' <param name="deltaTime">Time elapsed since the last update.</param>
+        ''' <param name="maze">The maze grid for collision detection.</param>
         Public Overrides Sub Update(deltaTime As Single, Optional maze As MazeTile(,) = Nothing)
             If IsRespawning Then
                 RespawnTimer += deltaTime
@@ -416,12 +635,19 @@ Public MustInherit Class Actor
                 ChangeDirection()
             End If
 
-            If random.Next(0, 100) < 3 Then ChangeDirection()
+            ' Change enemies' direction randomly at a 5% chance
+            If random.Next(100) < 5 Then ChangeDirection()
             _previousDirection = Direction
         End Sub
 
+        ''' <summary>
+        ''' Checks if a position is valid (not colliding with obstacles).
+        ''' </summary>
+        ''' <param name="newPosition">The position to check.</param>
+        ''' <param name="maze">The maze grid for collision detection.</param>
+        ''' <returns>True if the position is valid, False otherwise.</returns>
         Private Function IsValidPosition(newPosition As Vector2, maze As MazeTile(,)) As Boolean
-            Dim bounds = New Rectangle(
+            Dim bounds As New Rectangle(
                 CInt(newPosition.X - Size / 2),
                 CInt(newPosition.Y - Size / 2),
                 Size,
@@ -443,6 +669,9 @@ Public MustInherit Class Actor
             Return True
         End Function
 
+        ''' <summary>
+        ''' Sets a random valid direction for the enemy.
+        ''' </summary>
         Public Sub SetRandomDirection()
             Dim validDirections = Actor.ValidDirections(_previousDirection)
 
@@ -459,6 +688,9 @@ Public MustInherit Class Actor
             End If
         End Sub
 
+        ''' <summary>
+        ''' Changes the enemy's direction to a new valid direction.
+        ''' </summary>
         Private Sub ChangeDirection()
             Dim directions As Direction() = {
                 Direction.Up,
@@ -473,11 +705,17 @@ Public MustInherit Class Actor
             End If
         End Sub
 
+        ''' <summary>
+        ''' Makes the enemy vulnerable for a set duration.
+        ''' </summary>
         Public Sub MakeVulnerable()
             IsVulnerable = True
             VulnerableTimer = VULNERABLE_DURATION
         End Sub
 
+        ''' <summary>
+        ''' Kills the enemy and triggers respawn.
+        ''' </summary>
         Public Sub Die()
             IsActive = False
             IsRespawning = True
@@ -490,6 +728,10 @@ Public MustInherit Class Actor
             ScheduleEvent_EnemyKilled(Me)
         End Sub
 
+        ''' <summary>
+        ''' Immediately respawns the enemy at a new position.
+        ''' </summary>
+        ''' <param name="newPosition">The position to respawn at.</param>
         Public Sub RespawnAt(newPosition As Point)
             GridPosition = newPosition
             PixelPosition = New Vector2(
@@ -504,12 +746,31 @@ Public MustInherit Class Actor
         End Sub
     End Class
 
+    ''' <summary>
+    ''' Represents a collectible seed in the game.
+    ''' </summary>
+    ''' <remarks>
+    ''' Seeds are collected by the player to grow trees and earn points.
+    ''' Different seed types have different point values.
+    ''' </remarks>
     Public NotInheritable Class Seed
         Inherits Actor
 
+        ''' <summary>
+        ''' Path to the seed sprite sheet.
+        ''' </summary>
         Public Const IMAGE_PATH As String = "Images/object_sheet"
+
+        ''' <summary>
+        ''' Gets or sets the type of seed.
+        ''' </summary>
         Public Property SeedType As SeedType = SeedType.Acorn
 
+        ''' <summary>
+        ''' Initializes a new instance of the Seed class.
+        ''' </summary>
+        ''' <param name="gridPosition">Grid position of the seed.</param>
+        ''' <param name="seedType">Type of seed to create.</param>
         Public Sub New(gridPosition As Point, Optional seedType As SeedType = SeedType.Acorn)
             MyBase.New(gridPosition, SEED_SIZE)
             Me.SeedType = seedType

@@ -2,10 +2,10 @@
 
 A **fully-functional** multi-platform game template built with **VB.NET** for [MonoGame](https://www.monogame.net/), featuring the game **Seed-Scape: Forest Planting Quest**.
 
-> **v1.2.1 Latest Update**: **Blank Template Enhanced**! Improved structure and cross-platform compatibility:
-> - Refined `GameMain.vb` with proper viewport handling for Android
-> - Consistent screen resolution handling across all platforms
-> - Applied the latest version of `ModuleEventRaiser.Generator`
+> **v1.2.2 Latest Update**: ✅ **Gameplay & Stability Improvements**! Key fixes and enhancements:
+> - ✅ **Enemy Spawn Bug Fix**: Enemies' spawn points won't overlap with seeds or pesticides
+> - ✅ **Level & Score Limits**: Capped at Level 99 and a score of 999999 points for stability
+> - ✅ **Complete XML Documentation**: Full `<summary>` comments throughout `Actor.vb`
 >
 > **v1.2.0 Important Update**: ✅ **Complete Copyright Safety Achieved**! All assets are now fully licensed and attribution-ready:
 > - Main character sprite adapted from CC0-licensed art
@@ -233,9 +233,21 @@ All assets are processed through the MonoGame Content Pipeline:
 
 ## Version History
 
-### Version 1.2.1 (Latest; Improved)
+### Version 1.2.2 (Latest; Gameplay & Stability Improvements)
+- ✅ **Maze Creation Function Fix**: 
+  - Enemies' spawn points are now correctly chosen from available tiles, and won't overlap with seeds or pesticides
+  - Smart tile placement with proper distance constraints for seeds, pesticides, and enemies
+  - Dynamic enemy count scaling with level (5-12 enemies, clamped)
+- ✅ **Level Number Limit**: Levels capped at 99 to prevent overflow and ensure game stability
+- ✅ **Player Score Limit**: Score clamped between 0-999999 to prevent integer overflow
+- ✅ **Complete XML Documentation**: Full `<summary>` comments added to `Actor.vb`
+  - Base `Actor` class with properties and methods documented
+  - `Player` class with all input handling and game mechanics documented
+  - `Enemy` class with AI behavior and respawning mechanics documented
+  - `Seed` class with collectible item documentation
+
+### Version 1.2.1
 - ✅ Improved `GameMain.vb` in blank template, with proper viewport handling for all platforms
-- ✅ Better screen resolution handling across all platforms
 - ✅ Upgraded the `ModuleEventRaiser.Generator` library to the latest version
 
 ### Version 1.2.0 (Production-Ready)
@@ -244,9 +256,9 @@ All assets are processed through the MonoGame Content Pipeline:
 - ✅ All original graphics (seeds, trees, beetles, caterpillars) created in Aseprite
 - ✅ All audio assets replaced with CC0-licensed alternatives from Open Game Art
 - ✅ Font updated to [Fusion Pixel Font](https://github.com/TakWolf/fusion-pixel-font) by TakWolf (12px Monospace)
-- ✅ **Blank template now available** for starting new projects (`mgblank2dstartkitvb`)
-- ✅ **High score saving** with JSON serialization
-- ✅ **Bonus life sound effect** (`life_gained.wav`)
+- ✅ Blank template now available for starting new projects (`mgblank2dstartkitvb`)
+- ✅ High score saving with JSON serialization
+- ✅ Bonus life sound effect (`life_gained.wav`)
 - ✅ Fixed button interaction issue between WindowsDX and Android platforms
 - ✅ Pause button now works consistently across platforms
 - ⚠️ **Versions prior to 1.2.0 have been unlisted** due to copyright concerns

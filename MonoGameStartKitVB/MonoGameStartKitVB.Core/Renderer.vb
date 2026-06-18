@@ -401,22 +401,11 @@ Public NotInheritable Class Renderer
         Dim renderScale = CSng(SCREEN_WIDTH) / (MAZE_WIDTH * CELL_SIZE)
         
         For Each enemy In enemies
-            Dim rect As New Rectangle(
+            Dim enemyPos As New Vector2(
                 CInt(enemy.SpawnPoint.X * CELL_SIZE * renderScale),
-                CInt(enemy.SpawnPoint.Y * CELL_SIZE * renderScale + HUD_HEIGHT),
-                CInt(CELL_SIZE * renderScale),
-                CInt(CELL_SIZE * renderScale)
+                CInt(enemy.SpawnPoint.Y * CELL_SIZE * renderScale + HUD_HEIGHT)
             )
-            
-            _spriteBatch.Draw(_pixelTexture, rect, Color.Red * 0.5F)
-            
-            Dim borderThickness = CInt(2 * renderScale)
-            If borderThickness < 1 Then borderThickness = 1
-            
-            _spriteBatch.Draw(_pixelTexture, New Rectangle(rect.X, rect.Y, rect.Width, borderThickness), Color.Red)
-            _spriteBatch.Draw(_pixelTexture, New Rectangle(rect.X, rect.Y, borderThickness, rect.Height), Color.Red)
-            _spriteBatch.Draw(_pixelTexture, New Rectangle(rect.X, rect.Y + rect.Height - borderThickness, rect.Width, borderThickness), Color.Red)
-            _spriteBatch.Draw(_pixelTexture, New Rectangle(rect.X + rect.Width - borderThickness, rect.Y, borderThickness, rect.Height), Color.Red)
+            _objectSpriteSheet.DrawFrame(_spriteBatch, 9, enemyPos, renderScale, Color.White)
         Next
     End Sub
 
