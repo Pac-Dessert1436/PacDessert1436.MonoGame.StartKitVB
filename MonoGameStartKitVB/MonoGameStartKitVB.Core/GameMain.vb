@@ -40,6 +40,11 @@ Public NotInheritable Class GameMain
         _renderer = New Renderer(GraphicsDevice, Content)
         _soundManager = New SoundManager(Content)
 
+        ' Wire up the virtual joystick from renderer to player
+        If _gameManager.Player IsNot Nothing Then
+            _gameManager.Player.Joystick = _renderer.Joystick
+        End If
+
         MyBase.Initialize()
     End Sub
 

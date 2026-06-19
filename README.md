@@ -9,25 +9,23 @@ Starting from version 1.2.0, all assets are now fully licensed and attribution-r
 - Font properly licensed for commercial use
 - **Blank template available from version 1.2.4** for starting your own projects
 
-> **v1.2.4 Latest Update** 🎮
-> ✅ **Critical Bug Fix** - Resolved template ID collision:
-> - **Template Identity Fix**: Changed blank template identity from `PacDessert1436.MonoGame.StartKitVB` to `PacDessert1436.MonoGame.BlankStartKitVB`
-> - **⚠️ Notice**: Versions 1.2.0 through 1.2.3 had template ID collisions that made the blank template unavailable. Please use this version (1.2.4) for blank template access.
+> **v1.2.5 Latest Update** 🎮
+>
+> ✅ **Final Polish of User Experience (UX)** - The definitive finishing touch for _Seed-Scape: Forest Planting Quest_:
+> - **Joystick Dead Zone**: Integrated `VirtualJoystick` class into Player input handling with 25% dead zone, eliminating accidental movements from slight touches
+> - **Joystick State Tracking**: Added `IsActive` property for better input state management
+> - **Input Handling Refactored**: Now uses `VirtualJoystick.Update()` method for consistent input processing across touch and mouse
+> - **Android Touch Input Fix**: Fixed joystick center coordinate calculation for Android devices, ensuring accurate touch input detection
 
-> **v1.2.3 Update**: ✅ **v1.x Feature Completion & Polish** — Final touches for _Seed-Scape: Forest Planting Quest_:
-> - **Audio Fix**: Corrected `life_gained.wav` playback to trigger only at appropriate moments
-> - **Animation Polish**: Fine-tuned death sequence and "Season Cleared" caption timing
-> - **Code Cleanup**: Removed unused `DrawFrameWithOrigin` method from `SpriteSheet.vb`
-> - **Visual Enhancement**: Updated enemy blink color to **`Color.BlueViolet`** for better visibility
-> - **Roadmap**: _Mending Garden_ (v2.0.0) development planned for post-2026
+> **v1.2.4 Update**: ✅ **Critical Bug Fix** - Resolved template ID collision:
+> - **Template Identity Fix**: Changed blank template identity from `PacDessert1436.MonoGame.StartKitVB` to `PacDessert1436.MonoGame.BlankStartKitVB`
+> - **⚠️ Notice**: Versions 1.2.0 through 1.2.3 had template ID collisions that made the blank template unavailable. Please use 1.2.4 or later for production use, even though 1.2.3 marks the final gameplay polish of the v1.x series.
 
 ---
 
 ## 🚨 Important Notice
 
 **Versions prior to 1.2.0 have been unlisted and should not be used** due to potential copyright concerns with included assets. Always use version 1.2.0 or later for production projects.
-
-Versions 1.2.0 through 1.2.3 had template ID collisions. While the demo game template (`mg2dstartkitvb`) is available across these versions, **the blank template (`mgblank2dstartkitvb`) is unavailable until version 1.2.4**.
 
 This template is designed as a **VB.NET alternative** to the original C# MonoGame StartKit (`mg2dstartkit`), which enables VB.NET developers to leverage MonoGame's powerful game development capabilities, especially the ones transitioning from `vbPixelGameEngine` to MonoGame.
 
@@ -42,7 +40,9 @@ This template is designed as a **VB.NET alternative** to the original C# MonoGam
 _PacDessert1436.MonoGame.StartKitVB_ is a **production-ready** game template demonstrating modern MonoGame development practices using VB.NET. The package includes **two templates**:
 
 1. **Complete Demo Game**: _**Seed-Scape: Forest Planting Quest**_ - An arcade game where players collect seeds to grow a forest while dodging patrolling insects.
-2. **Blank Template (`mgblank2dstartkitvb`)**: A clean starting point for your own MonoGame projects. Actually available from version 1.2.4.
+2. **Blank Template (`mgblank2dstartkitvb`)**: A clean starting point for your own MonoGame projects. _Available from version 1.2.4._
+
+Note that versions 1.2.0 through 1.2.3 had template ID collisions that made the blank template unavailable; the demo game template (`mg2dstartkitvb`) is always available across these versions. _Additionally, v1.2.3 marks the final gameplay polish of the v1.x series (see [Version History](#version-history) for details)._
 
 > **New to MonoGame?** Check out [BEGINNER_GUIDE.md](MonoGameStartKitVB/BEGINNER_GUIDE.md) for a comprehensive guide transitioning from `vbPixelGameEngine` to MonoGame.
 
@@ -111,10 +111,10 @@ MonoGameStartKitVB/
 ## Getting Started
 
 ### Prerequisites
-- Visual Studio 2026 or later
-- [.NET 10.0](https://dotnet.microsoft.com/download/dotnet/10.0) or later
-- MonoGame 3.8+ installation
-- VB.NET development tools
+- Visual Studio 2026, Visual Studio Code, or other .NET-compatible IDE
+- [.NET SDK 10.0](https://dotnet.microsoft.com/download/dotnet/10.0) or later
+- MonoGame 3.8+ installation (see [Getting Started](https://docs.monogame.net/articles/getting_started/index.html) in MonoGame docs)
+- Essential tools and extensions for VB.NET development
 
 ### Using the NuGet Template
 
@@ -142,10 +142,10 @@ dotnet new mgblank2dstartkitvb -n YourGameName
 2. **Open** the solution in Visual Studio
 3. **Restore NuGet packages** if prompted
 4. **Set startup project** based on target platform:
-   - **WindowsDX**: For Windows desktop development (recommended)
-   - **Android**: For mobile development and testing
-   - **iOS**: For Apple mobile development (requires macOS)
-   - **DesktopGL**: Cross-platform testing (high DPI mode unavailable)
+  - **WindowsDX**: For Windows desktop development (recommended)
+  - **Android**: For mobile development and testing
+  - **iOS**: For Apple mobile development (requires macOS)
+  - **DesktopGL**: Cross-platform testing (high DPI mode unavailable)
 5. **Build and run** the project
 
 ---
@@ -194,7 +194,7 @@ dotnet new mgblank2dstartkitvb -n YourGameName
 ### ✅ DesktopGL (OpenGL)
 - **Status**: Functional
 - **Features**: All assets handled correctly, game fully playable
-- **Notes**: High DPI mode is not available, which may cause the game window height to exceed the device screen height.
+- **Notes**: High DPI mode is unavailable, which may cause the game window to exceed screen height.
 
 ---
 
@@ -210,7 +210,7 @@ dotnet new mgblank2dstartkitvb -n YourGameName
 - iOS untested on actual devices
 
 ### Version 2.0.0: _Mending Garden_ (Upcoming - Development Paused)
-> **Important Note**: Development will be paused starting July this year, since I focus on retaking the Postgraduate Entrance Exam. **This pause will continue until the end of 2026, when the exam is complete.** Updates will resume afterward, though plans for this new game template may evolve based on my focus at that time. Thank you for your understanding!
+> **Important Note**: Development will be paused starting July, as I focus on preparing for the Postgraduate Entrance Exam. **This pause will continue until the end of 2026, when the exam is complete.** Updates will resume afterward, though plans for this new game template may evolve based on my focus at that time. Thank you for your understanding!
 
 _Mending Garden_ (version 2.0.0) is a farming simulation game deeply connected to the theme of Plant Protection, set on a delightful Chinese countryside farm:
 - 🌱 **Crop Planting**: Cultivate regionally significant crops like corn, cotton, and wheat
@@ -242,11 +242,18 @@ All assets are processed through the MonoGame Content Pipeline:
 
 ## Version History
 
-### Version 1.2.4 (Latest; Critical Bug Fix)
-- ✅ **Template ID Collision Fix**: Changed blank template identity from `PacDessert1436.MonoGame.StartKitVB` to `PacDessert1436.MonoGame.BlankStartKitVB`
-- ⚠️ **Important**: Versions 1.2.0 through 1.2.3 had template ID collisions. Please use this version (1.2.4) for blank template access.
+### Version 1.2.5 (Latest; Final UX Polish)
+- ✅ **Joystick Dead Zone**: Integrated `VirtualJoystick` class into Player input handling with 25% dead zone
+- ✅ **Input Handling Refactored**: Player class now uses `VirtualJoystick.Update()` method for consistent input processing
+- ✅ **Joystick Property Added**: Added `Joystick` property to Player class for proper initialization and state management
+- ✅ **Android Touch Input Fix**: Fixed joystick center coordinate calculation to properly account for screen offset and scaling, resolving the issue where the joystick touch detection was offset from its drawn position
+- ✅ **Definitive v1.x Release**: This is the final polish for _Seed-Scape: Forest Planting Quest_, with v2.0.0 (_Mending Garden_) planned for post-2026
 
-### Version 1.2.3 (Final Polish & Bug Fixes)
+### Version 1.2.4
+- ✅ **Template ID Collision Fix**: Changed blank template identity from `PacDessert1436.MonoGame.StartKitVB` to `PacDessert1436.MonoGame.BlankStartKitVB`
+- ⚠️ **Important**: Versions 1.2.0 through 1.2.3 had template ID collisions; **v1.2.4+ is recommended for production use**
+
+### Version 1.2.3 (Definitive Gameplay Fixes)
 - ✅ **Sound Playback Fix**: Corrected edge case where `life_gained.wav` played at incorrect moments
 - ✅ **Animation Timing Adjustments**: Fine-tuned death sequence duration and "Season Cleared" caption display
 - ✅ **Code Cleanup**: Removed unused `DrawFrameWithOrigin` method from `SpriteSheet.vb`
@@ -316,7 +323,7 @@ All assets are processed through the MonoGame Content Pipeline:
 
 ### Version 1.0.1
 - ✅ Sound effects and sprite assets
-- ✅ DesktopGL support; **later broken by FFMPEG issues**
+- ✅ DesktopGL support (later broken by FFMPEG issues)
 
 ---
 
@@ -325,7 +332,7 @@ All assets are processed through the MonoGame Content Pipeline:
 ### Graphics
 - `player_sheet.png` - Adapted from [Forest Boy: Platformer Animated Character](https://opengameart.org/content/forest-boy-platformer-animated-character-24x24) (CC0, public domain)
 - All original sprites (seeds, trees, beetles, caterpillars, UI elements) - Created in Aseprite, published to Open Game Art with CC0 & OGA-BY licenses  
-  - See: [Seed-Scape: Forest Planting Quest Assets](https://opengameart.org/content/seed-scape-forest-planting-quest)
+  - See this link: [Assets of _Seed-Scape: Forest Planting Quest_](https://opengameart.org/content/seed-scape-forest-planting-quest)
 
 ### Fonts
 - `GameFont.spritefont` - 12px Monospace variant of [Fusion Pixel Font](https://github.com/TakWolf/fusion-pixel-font) by TakWolf (SIL Open Font License 1.1)
@@ -355,4 +362,4 @@ This project is licensed under the BSD-3-Clause License. See the [LICENSE](LICEN
 
 **Happy coding!** Build amazing games with MonoGame and VB.NET! 🎮
 
-> For beginners transitioning from vbPixelGameEngine, see [BEGINNER_GUIDE.md](BEGINNER_GUIDE.md).
+> For beginners transitioning from `vbPixelGameEngine`, see [BEGINNER_GUIDE.md](BEGINNER_GUIDE.md).

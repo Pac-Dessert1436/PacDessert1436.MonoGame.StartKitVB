@@ -178,6 +178,15 @@ Public NotInheritable Class Renderer
     End Sub
 
     ''' <summary>
+    ''' Gets the virtual joystick instance.
+    ''' </summary>
+    Public ReadOnly Property Joystick As VirtualJoystick
+        Get
+            Return _joystick
+        End Get
+    End Property
+
+    ''' <summary>
     ''' Renders the game scene to the screen.
     ''' </summary>
     ''' <param name="gameManager">The game manager instance.</param>
@@ -596,69 +605,27 @@ Public NotInheritable Class Renderer
 
     ''' <summary>
     ''' Draws the joystick on the screen.
+    ''' Uses the joystick state that was updated by the Player's input handling.
     ''' </summary>
     Private Sub DrawJoystick()
         Dim keyboardState = Keyboard.GetState()
-        Dim touchCollection = Touch.TouchPanel.GetState()
-        Dim mouseState = Mouse.GetState()
-        Dim joystickValue = Vector2.Zero
-
+        
+        ' Update joystick value for keyboard input (joystick position is already set by Player)
         If keyboardState.IsKeyDown(Keys.Left) OrElse keyboardState.IsKeyDown(Keys.A) Then
-            joystickValue.X = -1
+            _joystick.Value = New Vector2(-1, 0)
+        ElseIf keyboardState.IsKeyDown(Keys.Right) OrElse keyboardState.IsKeyDown(Keys.D) Then
+            _joystick.Value = New Vector2(1, 0)
+        ElseIf keyboardState.IsKeyDown(Keys.Up) OrElse keyboardState.IsKeyDown(Keys.W) Then
+            _joystick.Value = New Vector2(0, -1)
+        ElseIf keyboardState.IsKeyDown(Keys.Down) OrElse keyboardState.IsKeyDown(Keys.S) Then
+            _joystick.Value = New Vector2(0, 1)
         End If
-        If keyboardState.IsKeyDown(Keys.Right) OrElse keyboardState.IsKeyDown(Keys.D) Then
-            joystickValue.X = 1
-        End If
-        If keyboardState.IsKeyDown(Keys.Up) OrElse keyboardState.IsKeyDown(Keys.W) Then
-            joystickValue.Y = -1
-        End If
-        If keyboardState.IsKeyDown(Keys.Down) OrElse keyboardState.IsKeyDown(Keys.S) Then
-            joystickValue.Y = 1
-        End If
-
-        Dim joystickCenter = New Vector2(
+        
+        ' Draw the joystick at the correct position
+        _joystick.Position = New Vector2(
             SCREEN_WIDTH / 2.0F,
             SCREEN_HEIGHT - _joystickBase.Height * 2 - 10
         )
-        Dim maxRadius = CSng(_joystickBase.Width * 2)
-
-        For Each touchLoc In touchCollection
-            If touchLoc.State = Touch.TouchLocationState.Pressed OrElse
-               touchLoc.State = Touch.TouchLocationState.Moved Then
-                Dim screenPos = touchLoc.Position
-                Dim renderPos = New Vector2(
-                    (screenPos.X - _screenOffset.X) / _screenScale,
-                    (screenPos.Y - _screenOffset.Y) / _screenScale
-                )
-                Dim delta = renderPos - joystickCenter
-                If delta.Length() <= maxRadius * 2 Then
-                    If delta.Length() > maxRadius Then
-                        delta.Normalize()
-                        delta *= maxRadius
-                    End If
-                    joystickValue = delta / maxRadius
-                End If
-            End If
-        Next
-
-        If mouseState.LeftButton = ButtonState.Pressed Then
-            Dim screenPos = New Vector2(mouseState.X, mouseState.Y)
-            Dim renderPos = New Vector2(
-                (screenPos.X - _screenOffset.X) / _screenScale,
-                (screenPos.Y - _screenOffset.Y) / _screenScale
-            )
-            Dim delta = renderPos - joystickCenter
-            If delta.Length() <= maxRadius * 2 Then
-                If delta.Length() > maxRadius Then
-                    delta.Normalize()
-                    delta *= maxRadius
-                End If
-                joystickValue = delta / maxRadius
-            End If
-        End If
-
-        _joystick.Position = joystickCenter
-        _joystick.Value = joystickValue
         _joystick.Draw(_spriteBatch, 1.0F)
     End Sub
 

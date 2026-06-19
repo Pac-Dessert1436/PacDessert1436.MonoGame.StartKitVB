@@ -5,7 +5,7 @@ Imports Microsoft.Xna.Framework.Input
 ''' Base class for all actors in the game.
 ''' </summary>
 ''' <remarks>
-''' Actors are entities in the game that can move, interact with the environment, 
+''' Actors are entities in the game that can move, interact with the environment,
 ''' and be drawn on the screen. This abstract class provides core functionality
 ''' for position management, collision detection, and movement.
 ''' </remarks>
@@ -189,6 +189,7 @@ Public MustInherit Class Actor
         Public Property DeathAnimationTimer As Single = 0.0F
 
         Private Shared _joystickBaseWidth As Integer = 64
+        Private _joystick As VirtualJoystick = Nothing
 
         ''' <summary>
         ''' Gets or sets the base width of the virtual joystick.
@@ -199,6 +200,18 @@ Public MustInherit Class Actor
             End Get
             Set(value As Integer)
                 _joystickBaseWidth = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Gets the virtual joystick instance.
+        ''' </summary>
+        Public Property Joystick As VirtualJoystick
+            Get
+                Return _joystick
+            End Get
+            Set(value As VirtualJoystick)
+                _joystick = value
             End Set
         End Property
 
@@ -270,8 +283,8 @@ Public MustInherit Class Actor
             End Select
 
             Dim joystickCenter As New Vector2(
-                Renderer.ActualScreenWidth / 2.0F,
-                Renderer.ActualScreenHeight - _joystickBaseWidth * Renderer.ScreenScale * 2 - 10.0F
+                Renderer.ScreenOffset.X + SCREEN_WIDTH * Renderer.ScreenScale / 2.0F,
+                Renderer.ScreenOffset.Y + SCREEN_HEIGHT * Renderer.ScreenScale - _joystickBaseWidth * Renderer.ScreenScale * 2 - 10.0F * Renderer.ScreenScale
             )
             Dim joystickRadius = _joystickBaseWidth * Renderer.ScreenScale * 2
 
@@ -300,24 +313,37 @@ Public MustInherit Class Actor
                 realPauseButtonRect.Height + (touchPadding * 2)
             )
 
+            ' Update virtual joystick with dead zone support
+            Dim activeTouchPoint As Vector2? = Nothing
             For Each touchLoc In touchCollection
                 If touchLoc.State = Touch.TouchLocationState.Pressed OrElse
                    touchLoc.State = Touch.TouchLocationState.Moved Then
                     Dim touchPos = touchLoc.Position
                     If Not expandedPauseButtonRect.Contains(CInt(touchPos.X), CInt(touchPos.Y)) Then
                         Dim delta = touchPos - joystickCenter
-                        If delta.Length() <= joystickRadius * 2 Then HandleJoystickInput(delta)
+                        If delta.Length() <= joystickRadius * 2 Then
+                            activeTouchPoint = touchPos
+                            Exit For
+                        End If
                     End If
                 End If
             Next touchLoc
 
-            If mouseState.LeftButton = ButtonState.Pressed Then
+            If activeTouchPoint Is Nothing AndAlso mouseState.LeftButton = ButtonState.Pressed Then
                 Dim mousePos As New Vector2(mouseState.X, mouseState.Y)
                 If Not realPauseButtonRect.Contains(CInt(mousePos.X), CInt(mousePos.Y)) Then
                     Dim delta = mousePos - joystickCenter
-                    If delta.Length() <= joystickRadius * 2 Then HandleJoystickInput(delta)
+                    If delta.Length() <= joystickRadius * 2 Then
+                        activeTouchPoint = mousePos
+                    End If
                 End If
             End If
+
+            ' Use VirtualJoystick class for input processing with dead zone
+            ArgumentNullException.ThrowIfNull(_joystick)
+            _joystick.Position = joystickCenter
+            _joystick.Update(activeTouchPoint, joystickRadius)
+            If _joystick.IsActive Then HandleJoystickInput(_joystick.Value)
 
             If IsMoving Then
                 Dim nextPosition = PixelPosition + NextDirection.ToVector2() * Speed * deltaTime
@@ -335,22 +361,27 @@ Public MustInherit Class Actor
         End Sub
 
         ''' <summary>
-        ''' Handles input from the virtual joystick.
+        ''' Dead zone threshold for virtual joystick input (in pixels).
+        ''' Prevents accidental movement from slight touches.
         ''' </summary>
-        ''' <param name="delta">Vector from joystick center to touch/mouse position.</param>
-        Private Sub HandleJoystickInput(delta As Vector2)
-            If Math.Abs(delta.X) > Math.Abs(delta.Y) Then
-                If delta.X < 0 Then
-                    NextDirection = Direction.Left
-                Else
-                    NextDirection = Direction.Right
-                End If
+        Private Const JOYSTICK_DEAD_ZONE As Single = 15.0F
+
+        ''' <summary>
+        ''' Handles input from the virtual joystick using normalized values.
+        ''' Dead zone is handled by the VirtualJoystick class.
+        ''' </summary>
+        ''' <param name="joystickValue">Normalized joystick value (-1 to 1).</param>
+        Private Sub HandleJoystickInput(joystickValue As Vector2)
+            ' Only process input if joystick is active (beyond dead zone)
+            If joystickValue.Length() < 0.01F Then
+                IsMoving = False
+                Return
+            End If
+
+            If Math.Abs(joystickValue.X) > Math.Abs(joystickValue.Y) Then
+                NextDirection = If(joystickValue.X < 0, Direction.Left, Direction.Right)
             Else
-                If delta.Y < 0 Then
-                    NextDirection = Direction.Up
-                Else
-                    NextDirection = Direction.Down
-                End If
+                NextDirection = If(joystickValue.Y < 0, Direction.Up, Direction.Down)
             End If
             IsMoving = True
         End Sub
