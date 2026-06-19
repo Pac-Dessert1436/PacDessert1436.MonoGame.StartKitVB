@@ -1,5 +1,18 @@
 # MonoGame 2D StartKit VB.NET
 
+> ## ⚠️ Crash Warning for v1.2.5 Users
+> Version 1.2.5 contains a critical **null-reference crash** when pausing, exiting to menu and restarting the demo game. _A manual code edit is required on 1.2.5._
+> ### Two Fix Paths:
+> 1. **Best Choice**: Update NuGet package to 1.2.5.1 with critical fix built-in (no manual code edits needed).
+> 2. **If you cannot upgrade v1.2.5**: Paste the following snippet at the top of `GameMain.vb` Update() method:
+> ```vb
+> With _gameManager
+>     If .Player IsNot Nothing AndAlso .Player.Joystick Is Nothing Then
+>         .Player.Joystick = _renderer.Joystick
+>     End If
+> End With
+> ```
+
 A **fully-functional** multi-platform game template built with **VB.NET** for [MonoGame](https://www.monogame.net/), featuring the game **Seed-Scape: Forest Planting Quest**.
 
 Starting from version 1.2.0, all assets are now fully licensed and attribution-ready:
@@ -17,15 +30,6 @@ Starting from version 1.2.0, all assets are now fully licensed and attribution-r
 > - **Input Handling Refactored**: Now uses `VirtualJoystick.Update()` method for consistent input processing across touch and mouse
 > - **Android Touch Input Fix**: Fixed joystick center coordinate calculation for Android devices, ensuring accurate touch input detection
 > - **Critical Hot Fix**: Resolved null reference exception in `GameMain.vb` that occurred when restarting the game after pausing and exiting to menu
->
-> **⚠️ Notice**: If you are using version **1.2.5**, apply this quick fix by adding the following code at the top of the `Update` method in `GameMain.vb`:
-```vb
-With _gameManager
-    If .Player IsNot Nothing AndAlso .Player.Joystick Is Nothing Then
-        .Player.Joystick = _renderer.Joystick
-    End If
-End With
-```
 
 > **v1.2.4 Update**: ✅ **Critical Bug Fix** - Resolved template ID collision:
 > - **Template Identity Fix**: Changed blank template identity from `PacDessert1436.MonoGame.StartKitVB` to `PacDessert1436.MonoGame.BlankStartKitVB`
