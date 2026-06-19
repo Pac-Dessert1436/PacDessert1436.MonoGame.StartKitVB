@@ -9,13 +9,23 @@ Starting from version 1.2.0, all assets are now fully licensed and attribution-r
 - Font properly licensed for commercial use
 - **Blank template available from version 1.2.4** for starting your own projects
 
-> **v1.2.5 Latest Update** 🎮
+> **v1.2.5.1 Latest Update** 🎮
 >
 > ✅ **Final Polish of User Experience (UX)** - The definitive finishing touch for _Seed-Scape: Forest Planting Quest_:
 > - **Joystick Dead Zone**: Integrated `VirtualJoystick` class into Player input handling with 25% dead zone, eliminating accidental movements from slight touches
 > - **Joystick State Tracking**: Added `IsActive` property for better input state management
 > - **Input Handling Refactored**: Now uses `VirtualJoystick.Update()` method for consistent input processing across touch and mouse
 > - **Android Touch Input Fix**: Fixed joystick center coordinate calculation for Android devices, ensuring accurate touch input detection
+> - **Critical Hot Fix**: Resolved null reference exception in `GameMain.vb` that occurred when restarting the game after pausing and exiting to menu
+>
+> **⚠️ Notice**: If you are using version 1.2.5, apply this quick fix by adding the following code at the top of the `Update` method in `GameMain.vb`:
+```vb
+With _gameManager
+    If .Player IsNot Nothing AndAlso .Player.Joystick Is Nothing Then
+        .Player.Joystick = _renderer.Joystick
+    End If
+End With
+```
 
 > **v1.2.4 Update**: ✅ **Critical Bug Fix** - Resolved template ID collision:
 > - **Template Identity Fix**: Changed blank template identity from `PacDessert1436.MonoGame.StartKitVB` to `PacDessert1436.MonoGame.BlankStartKitVB`
@@ -27,7 +37,7 @@ Starting from version 1.2.0, all assets are now fully licensed and attribution-r
 
 **Versions prior to 1.2.0 have been unlisted and should not be used** due to potential copyright concerns with included assets. Always use version 1.2.0 or later for production projects.
 
-This template is designed as a **VB.NET alternative** to the original C# MonoGame StartKit (`mg2dstartkit`), which enables VB.NET developers to leverage MonoGame's powerful game development capabilities, especially the ones transitioning from `vbPixelGameEngine` to MonoGame.
+This template is designed as a **VB.NET alternative** to the original C# MonoGame StartKit (`mg2dstartkit`), enabling VB.NET developers—especially those transitioning from `vbPixelGameEngine`—to leverage MonoGame's powerful game development capabilities.
 
 ---
 
@@ -242,7 +252,19 @@ All assets are processed through the MonoGame Content Pipeline:
 
 ## Version History
 
-### Version 1.2.5 (Latest; Final UX Polish)
+### Version 1.2.5.1 (Hot Fix)
+- ✅ **Joystick Null Reference Fix**: Added defensive check in `GameMain.Update()` to ensure the joystick is always properly wired to the player after game restarts, preventing null reference exceptions when pausing, exiting to menu, and starting a new game
+
+**Note for v1.2.5 users**: If you are using version 1.2.5, apply this hot fix by adding the following code at the top of the `Update` method in `GameMain.vb`:
+```vb
+With _gameManager
+    If .Player IsNot Nothing AndAlso .Player.Joystick Is Nothing Then
+        .Player.Joystick = _renderer.Joystick
+    End If
+End With
+```
+
+### Version 1.2.5 (Final UX Polish)
 - ✅ **Joystick Dead Zone**: Integrated `VirtualJoystick` class into Player input handling with 25% dead zone
 - ✅ **Input Handling Refactored**: Player class now uses `VirtualJoystick.Update()` method for consistent input processing
 - ✅ **Joystick Property Added**: Added `Joystick` property to Player class for proper initialization and state management

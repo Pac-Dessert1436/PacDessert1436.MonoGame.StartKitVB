@@ -53,6 +53,14 @@ Public NotInheritable Class GameMain
         If GamePad.GetState(PlayerIndex.One).Buttons.Back = ButtonState.Pressed OrElse
            Keyboard.GetState().IsKeyDown(Keys.Escape) Then [Exit]()
 
+        ' New in 1.2.5.1: Ensure joystick is always wired to the player
+        ' This is a hot fix for null reference after game restart
+        With _gameManager
+            If .Player IsNot Nothing AndAlso .Player.Joystick Is Nothing Then
+                .Player.Joystick = _renderer.Joystick
+            End If
+        End With
+
         ' Handle input for game state transitions
         _gameManager.HandleInput()
 
