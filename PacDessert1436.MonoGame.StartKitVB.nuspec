@@ -26,6 +26,9 @@
     <file src="MonoGameStartKitVB/**/*"
       exclude="**/bin/**/*;**/obj/**/*;**/.git/**/*;**/*.user;**/*.suo;**/*.vsidx;**/*.dtbcache.v2;**/*.slnx;**/*.nupkg;**/*.nuspec;**/.vs/**/*;**/project.assets.json;**/*.AssemblyInfo.vb;**/.NETCoreApp*;**/Content/bin/**/*"
       target="content" />
+    <file src="MGStartKitVBNew/**/*"
+      exclude="**/bin/**/*;**/obj/**/*;**/.git/**/*;**/*.user;**/*.suo;**/*.vsidx;**/*.dtbcache.v2;**/*.slnx;**/*.nupkg;**/*.nuspec;**/.vs/**/*;**/project.assets.json;**/*.AssemblyInfo.vb;**/.NETCoreApp*;**/Content/bin/**/*"
+      target="content" />
     <file src="README.md" target="README.md" />
   </files>
 </package>

@@ -18,7 +18,7 @@ Starting from version 1.2.0, all assets are now fully licensed and attribution-r
 > - **Android Touch Input Fix**: Fixed joystick center coordinate calculation for Android devices, ensuring accurate touch input detection
 > - **Critical Hot Fix**: Resolved null reference exception in `GameMain.vb` that occurred when restarting the game after pausing and exiting to menu
 >
-> **⚠️ Notice**: If you are using version 1.2.5, apply this quick fix by adding the following code at the top of the `Update` method in `GameMain.vb`:
+> **⚠️ Notice**: If you are using version **1.2.5**, apply this quick fix by adding the following code at the top of the `Update` method in `GameMain.vb`:
 ```vb
 With _gameManager
     If .Player IsNot Nothing AndAlso .Player.Joystick Is Nothing Then
