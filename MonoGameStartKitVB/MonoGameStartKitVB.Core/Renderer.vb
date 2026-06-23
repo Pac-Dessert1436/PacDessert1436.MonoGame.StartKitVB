@@ -30,8 +30,8 @@ Public NotInheritable Class Renderer
     Private _playerAnimations As Dictionary(Of Direction, Animation)
     Private _playerDeathAnimation As Animation
     Private _enemyAnimations As Dictionary(Of (EnemyType, Direction), Animation)
-    Private _joystick As VirtualJoystick
 
+    Private Shared _joystick As VirtualJoystick
     Private Shared _screenScale As Single = 1.0F
     Private Shared _screenOffset As Vector2 = Vector2.Zero
     Private Const HUD_HEIGHT As Integer = 100
@@ -69,7 +69,7 @@ Public NotInheritable Class Renderer
         Get
             Return _pauseButtonWidth
         End Get
-        Set(value As Integer)
+        Private Set(value As Integer)
             _pauseButtonWidth = value
         End Set
     End Property
@@ -78,7 +78,7 @@ Public NotInheritable Class Renderer
         Get
             Return _pauseButtonHeight
         End Get
-        Set(value As Integer)
+        Private Set(value As Integer)
             _pauseButtonHeight = value
         End Set
     End Property
@@ -180,7 +180,7 @@ Public NotInheritable Class Renderer
     ''' <summary>
     ''' Gets the virtual joystick instance.
     ''' </summary>
-    Public ReadOnly Property Joystick As VirtualJoystick
+    Public Shared ReadOnly Property Joystick As VirtualJoystick
         Get
             Return _joystick
         End Get
@@ -408,7 +408,7 @@ Public NotInheritable Class Renderer
     ''' <param name="enemies">The list of enemies to draw.</param>
     Private Sub DrawSpawnPoints(enemies As List(Of Actor.Enemy))
         Dim renderScale = CSng(SCREEN_WIDTH) / (MAZE_WIDTH * CELL_SIZE)
-        
+
         For Each enemy In enemies
             Dim enemyPos As New Vector2(
                 CInt(enemy.SpawnPoint.X * CELL_SIZE * renderScale),
@@ -609,7 +609,7 @@ Public NotInheritable Class Renderer
     ''' </summary>
     Private Sub DrawJoystick()
         Dim keyboardState = Keyboard.GetState()
-        
+
         ' Update joystick value for keyboard input (joystick position is already set by Player)
         If keyboardState.IsKeyDown(Keys.Left) OrElse keyboardState.IsKeyDown(Keys.A) Then
             _joystick.Value = New Vector2(-1, 0)
@@ -620,7 +620,7 @@ Public NotInheritable Class Renderer
         ElseIf keyboardState.IsKeyDown(Keys.Down) OrElse keyboardState.IsKeyDown(Keys.S) Then
             _joystick.Value = New Vector2(0, 1)
         End If
-        
+
         ' Draw the joystick at the correct position
         _joystick.Position = New Vector2(
             SCREEN_WIDTH / 2.0F,

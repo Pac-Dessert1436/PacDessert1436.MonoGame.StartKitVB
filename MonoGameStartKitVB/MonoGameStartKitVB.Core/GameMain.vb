@@ -40,11 +40,6 @@ Public NotInheritable Class GameMain
         _renderer = New Renderer(GraphicsDevice, Content)
         _soundManager = New SoundManager(Content)
 
-        ' Wire up the virtual joystick from renderer to player
-        If _gameManager.Player IsNot Nothing Then
-            _gameManager.Player.Joystick = _renderer.Joystick
-        End If
-
         MyBase.Initialize()
     End Sub
 
@@ -52,14 +47,6 @@ Public NotInheritable Class GameMain
         ' Handle exit condition
         If GamePad.GetState(PlayerIndex.One).Buttons.Back = ButtonState.Pressed OrElse
            Keyboard.GetState().IsKeyDown(Keys.Escape) Then [Exit]()
-
-        ' New in 1.2.5.1: Ensure joystick is always wired to the player
-        ' This is a hot fix for null reference after game restart
-        With _gameManager
-            If .Player IsNot Nothing AndAlso .Player.Joystick Is Nothing Then
-                .Player.Joystick = _renderer.Joystick
-            End If
-        End With
 
         ' Handle input for game state transitions
         _gameManager.HandleInput()
