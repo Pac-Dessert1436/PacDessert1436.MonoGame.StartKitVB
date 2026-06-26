@@ -47,19 +47,22 @@ Note that versions 1.2.0 through 1.2.3 had template ID collisions that made the 
 
 ## What's New in v1.2.5+
 
-> **v1.2.5.2 Code Quality Enhancements** 🎮
->
-> 1. Removed unused hidden variable `JOYSTICK_DEAD_ZONE` from `Actor.vb`
-> 2. Implemented the `{ get; private set; }` pattern for `PauseButtonWidth` and `PauseButtonHeight` in `Renderer.vb`
-> 3. Made `Renderer.Joystick` property shared, with this logic applied to `Player.vb`'s `Update()` method: `If Joystick Is Nothing Then Joystick = Renderer.Joystick`
->
-> These improvements have been verified across multiple platforms (DesktopGL, WindowsDX, and Android) and do not impact the demo game's functionality.
+> **Note**: Version 1.2.5.2 was the feature-complete 1.x version, but unexpectedly included the unfinished 2.0.0 template project. It has been deprecated and should not be used - please upgrade to 1.2.5.3.
 
-> ✅ **Final User Experience (UX) Polish in 1.2.5** - The definitive finishing touches for _Seed-Scape: Forest Planting Quest_:
-> - **Joystick Dead Zone**: Integrated `VirtualJoystick` class into player input handling with a 25% dead zone, eliminating accidental movements from slight touches
-> - **Joystick State Tracking**: Added `IsActive` property for improved input state management
-> - **Refactored Input Handling**: Now uses `VirtualJoystick.Update()` for consistent input processing across touch and mouse
-> - **Android Touch Input Fix**: Corrected joystick center coordinate calculation for Android devices, ensuring accurate touch input detection
+**v1.2.5.3 Code Quality Enhancements** 🎮
+
+1. Removed unused hidden variable `JOYSTICK_DEAD_ZONE` from `Actor.vb`
+2. Implemented the `{ get; private set; }` pattern for `PauseButtonWidth` and `PauseButtonHeight` in `Renderer.vb`
+3. Made `Renderer.Joystick` property shared, with this logic applied to `Player.vb`'s `Update()` method: 
+  - `If Joystick Is Nothing Then Joystick = Renderer.Joystick`
+
+These improvements have been verified across multiple platforms (DesktopGL, WindowsDX, and Android) and do not impact the demo game's functionality.
+
+✅ **Final User Experience (UX) Polish in 1.2.5** - The definitive finishing touches for _Seed-Scape: Forest Planting Quest_:
+- **Joystick Dead Zone**: Integrated `VirtualJoystick` class into player input handling with a 25% dead zone, eliminating accidental movements from slight touches
+- **Joystick State Tracking**: Added `IsActive` property for improved input state management
+- **Refactored Input Handling**: Now uses `VirtualJoystick.Update()` for consistent input processing across touch and mouse
+- **Android Touch Input Fix**: Corrected joystick center coordinate calculation for Android devices, ensuring accurate touch input detection
 
 ---
 
@@ -257,11 +260,14 @@ All assets are processed through the MonoGame Content Pipeline:
 
 ## Version History
 
-### Version 1.2.5.2
+### Version 1.2.5.3 (Latest)
 - **Code Cleanup**: Removed unused hidden variable `JOYSTICK_DEAD_ZONE` from `Actor.vb`
 - **Encapsulation Improvements**: Implemented the `{ get; private set; }` pattern for `PauseButtonWidth` and `PauseButtonHeight` in `Renderer.vb`
 - **Input Handling Refinement**: Made `Renderer.Joystick` property shared, with this logic applied to `Player.vb`'s `Update()` method: `If Joystick Is Nothing Then Joystick = Renderer.Joystick`
 - **Cross-Platform Verification**: All improvements verified across DesktopGL, WindowsDX, and Android platforms without impacting game functionality
+
+### Version 1.2.5.2 (Deprecated)
+⚠️ This version unexpectedly **included unfinished v2.0.0 template project** and has been deprecated. Please use v1.2.5.3 instead.
 
 ### Version 1.2.5.1 (Hotfix)
 - **Joystick Null Reference Fix**: Added a defensive check in `GameMain.Update()` to ensure the joystick is always properly connected to the player after game restarts, preventing null reference exceptions when pausing, returning to the menu, and starting a new game

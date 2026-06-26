@@ -6,9 +6,9 @@
         "MonoGame",
         "VB.NET"
     ],
-    "name": "MonoGame 2D StartKit VB.NET (Old)",
-    "identity": "PacDessert1436.MonoGame.StartKitVB.Old",
-    "shortName": "mg2dstartkitvb-old",
+    "name": "MonoGame 2D StartKit VB.NET",
+    "identity": "PacDessert1436.MonoGame.StartKitVB",
+    "shortName": "mg2dstartkitvb",
     "tags": {
         "language": "VB",
         "type": "project"

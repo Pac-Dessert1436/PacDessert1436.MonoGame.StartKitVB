@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>PacDessert1436.MonoGame.StartKitVB</id>
-    <version>1.2.5.2</version>
+    <version>1.2.5.3</version>
     <title>MonoGame StartKit VB.NET</title>
     <authors>Pac-Dessert1436</authors>
     <owners>Pac-Dessert1436</owners>
@@ -24,9 +24,6 @@
       exclude="**/bin/**/*;**/obj/**/*;**/.git/**/*;**/*.user;**/*.suo;**/*.vsidx;**/*.dtbcache.v2;**/*.slnx;**/*.nupkg;**/*.nuspec;**/.vs/**/*;**/project.assets.json;**/*.AssemblyInfo.vb;**/.NETCoreApp*;**/Content/bin/**/*"
       target="content" />
     <file src="MonoGameStartKitVB/**/*"
-      exclude="**/bin/**/*;**/obj/**/*;**/.git/**/*;**/*.user;**/*.suo;**/*.vsidx;**/*.dtbcache.v2;**/*.slnx;**/*.nupkg;**/*.nuspec;**/.vs/**/*;**/project.assets.json;**/*.AssemblyInfo.vb;**/.NETCoreApp*;**/Content/bin/**/*"
-      target="content" />
-    <file src="MGStartKitVBNew/**/*"
       exclude="**/bin/**/*;**/obj/**/*;**/.git/**/*;**/*.user;**/*.suo;**/*.vsidx;**/*.dtbcache.v2;**/*.slnx;**/*.nupkg;**/*.nuspec;**/.vs/**/*;**/project.assets.json;**/*.AssemblyInfo.vb;**/.NETCoreApp*;**/Content/bin/**/*"
       target="content" />
     <file src="README.md" target="README.md" />
