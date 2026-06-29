@@ -27,6 +27,7 @@ Public NotInheritable Class GameManager
     Public Property LevelClearedTimer As Single = 0.0F
 
     Private _previousKeyboardState As KeyboardState
+    Private _previousGamePadState As GamePadState
 
     Public Sub New()
         HighScore = LoadHighScore()
@@ -191,6 +192,13 @@ Public NotInheritable Class GameManager
             Dim oldState As GameState = _previousGameState
             _previousGameState = GameState
 
+            ' Reset the virtual joystick position when transitioning to a new game state
+            With Renderer.Joystick
+                .Value = Vector2.Zero
+                .IsActive = False
+                .Update(Nothing, Actor.Player.JoystickRadius)
+            End With
+
             Select Case GameState
                 Case GameState.Playing
                     If oldState = GameState.Title Then
@@ -325,22 +333,48 @@ Public NotInheritable Class GameManager
     End Sub
 
     ''' <summary>
-    ''' Handles keyboard, touch and mouse input from the player.
+    ''' Handles keyboard, touch, mouse and gamepad input from the player.
     ''' </summary>
     Public Sub HandleInput()
         Dim keyboardState = Keyboard.GetState()
         Dim touchCollection = Touch.TouchPanel.GetState()
         Dim mouseState = Mouse.GetState()
+        Dim gamePadState = GamePad.GetState(PlayerIndex.One)
 
         Dim scale = Renderer.ScreenScale
         Dim offsetX = Renderer.ScreenOffset.X
         Dim offsetY = Renderer.ScreenOffset.Y
+
+        Dim aPressed = gamePadState.Buttons.A = ButtonState.Pressed AndAlso
+                       _previousGamePadState.Buttons.A = ButtonState.Released
+        Dim bPressed = gamePadState.Buttons.B = ButtonState.Pressed AndAlso
+                       _previousGamePadState.Buttons.B = ButtonState.Released
+        Dim startPressed = gamePadState.Buttons.Start = ButtonState.Pressed AndAlso
+                           _previousGamePadState.Buttons.Start = ButtonState.Released
+        Dim backPressed = gamePadState.Buttons.Back = ButtonState.Pressed AndAlso
+                          _previousGamePadState.Buttons.Back = ButtonState.Released
+
+        Dim zPressed = keyboardState.IsKeyDown(Keys.Z) AndAlso
+                       Not _previousKeyboardState.IsKeyDown(Keys.Z)
+        Dim xPressed = keyboardState.IsKeyDown(Keys.X) AndAlso
+                       Not _previousKeyboardState.IsKeyDown(Keys.X)
 
         Select Case GameState
             Case GameState.Title
                 If keyboardState.IsKeyDown(Keys.Enter) AndAlso
                     Not _previousKeyboardState.IsKeyDown(Keys.Enter) Then
                     GameState = GameState.Playing
+                ElseIf keyboardState.IsKeyDown(Keys.Escape) AndAlso
+                       Not _previousKeyboardState.IsKeyDown(Keys.Escape) Then
+                    ScheduleEvent_GameStateChanged(GameState.Title)
+                    Environment.Exit(0)
+                End If
+
+                If aPressed OrElse zPressed Then
+                    GameState = GameState.Playing
+                ElseIf bPressed OrElse xPressed Then
+                    ScheduleEvent_GameStateChanged(GameState.Title)
+                    Environment.Exit(0)
                 End If
 
                 For Each touchLoc In touchCollection
@@ -395,6 +429,12 @@ Public NotInheritable Class GameManager
                     GameState = GameState.Playing
                 End If
 
+                If aPressed OrElse zPressed Then
+                    GameState = GameState.Playing
+                ElseIf bPressed OrElse xPressed Then
+                    GameState = GameState.Title
+                End If
+
                 Dim retryButton = New Rectangle(
                     CInt((SCREEN_WIDTH \ 2 - 100) * scale + offsetX),
                     CInt((SCREEN_HEIGHT \ 2 + 10) * scale + offsetY),
@@ -429,7 +469,12 @@ Public NotInheritable Class GameManager
                 End If
 
             Case GameState.Playing
-                If keyboardState.IsKeyDown(Keys.P) OrElse keyboardState.IsKeyDown(Keys.Escape) Then
+                If keyboardState.IsKeyDown(Keys.P) OrElse
+                   (keyboardState.IsKeyDown(Keys.Escape) AndAlso Not _previousKeyboardState.IsKeyDown(Keys.Escape)) Then
+                    GameState = GameState.Paused
+                End If
+
+                If startPressed OrElse backPressed Then
                     GameState = GameState.Paused
                 End If
 
@@ -471,9 +516,18 @@ Public NotInheritable Class GameManager
                 End If
 
             Case GameState.Paused
-                If keyboardState.IsKeyDown(Keys.P) OrElse keyboardState.IsKeyDown(Keys.Escape) OrElse
-                   keyboardState.IsKeyDown(Keys.Enter) Then
+                If keyboardState.IsKeyDown(Keys.P) OrElse
+                   (keyboardState.IsKeyDown(Keys.Escape) AndAlso Not _previousKeyboardState.IsKeyDown(Keys.Escape)) Then
                     GameState = GameState.Playing
+                ElseIf keyboardState.IsKeyDown(Keys.Enter) AndAlso
+                       Not _previousKeyboardState.IsKeyDown(Keys.Enter) Then
+                    GameState = GameState.Playing
+                End If
+
+                If aPressed OrElse zPressed OrElse startPressed Then
+                    GameState = GameState.Playing
+                ElseIf bPressed OrElse xPressed Then
+                    GameState = GameState.Title
                 End If
 
                 Dim resumeButton As New Rectangle(
@@ -511,5 +565,6 @@ Public NotInheritable Class GameManager
         End Select
 
         _previousKeyboardState = keyboardState
+        _previousGamePadState = gamePadState
     End Sub
 End Class

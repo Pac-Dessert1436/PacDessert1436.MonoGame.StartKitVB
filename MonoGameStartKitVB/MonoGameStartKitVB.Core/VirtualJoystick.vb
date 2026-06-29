@@ -53,7 +53,7 @@ Public NotInheritable Class VirtualJoystick
         If touchPoint.HasValue Then
             Dim delta = touchPoint.Value - Position
             Dim distance = delta.Length()
-            
+
             ' Apply dead zone: only register input if beyond dead zone threshold
             If distance > maxRadius * DEAD_ZONE Then
                 If distance > maxRadius Then
@@ -70,7 +70,8 @@ Public NotInheritable Class VirtualJoystick
                 IsActive = False
             End If
         Else
-            Value = Vector2.Zero
+            ' Only reset joystick if it's not currently active via keyboard
+            If Not IsActive Then Value = Vector2.Zero
             IsActive = False
         End If
     End Sub
@@ -85,7 +86,7 @@ Public NotInheritable Class VirtualJoystick
         Dim scaledWidth = _baseTexture.Width * scale
         Dim scaledHeight = _baseTexture.Height * scale
 
-        Dim baseRect = New Rectangle(
+        Dim baseRect As New Rectangle(
             CInt(Position.X - scaledWidth / 2),
             CInt(Position.Y - scaledHeight / 2),
             CInt(scaledWidth),
@@ -97,7 +98,7 @@ Public NotInheritable Class VirtualJoystick
         Dim knobScaledWidth = _knobTexture.Width * scale
         Dim knobScaledHeight = _knobTexture.Height * scale
 
-        Dim knobRect = New Rectangle(
+        Dim knobRect As New Rectangle(
             CInt(knobPos.X - knobScaledWidth / 2),
             CInt(knobPos.Y - knobScaledHeight / 2),
             CInt(knobScaledWidth),

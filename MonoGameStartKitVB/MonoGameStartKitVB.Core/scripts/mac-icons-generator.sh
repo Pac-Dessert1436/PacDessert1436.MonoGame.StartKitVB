@@ -1,8 +1,21 @@
 #!/bin/zsh
 
-# Declare a constant variables
-readonly top_level_path="../../MonoGameStartKitVB.Desktop/AppIcon.xcassets"
+# Get the directory of the current script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Declare constant variables
+readonly top_level_path="$SCRIPT_DIR/../../MonoGameStartKitVB.Desktop/AppIcon.xcassets"
 readonly xcassets_path="$top_level_path/AppIcon.appiconset"
+readonly content_dir="$SCRIPT_DIR/../Content"
+
+# Paths to the source images
+readonly icon_source_path="$content_dir/icon-1024.png"
+
+# Verify source files exist
+if [ ! -f "$icon_source_path" ]; then
+    echo "Error: Source icon file not found at $icon_source_path"
+    exit 1
+fi
 
 while true; do
   # Prompt for user confirmation
@@ -35,14 +48,14 @@ mkdir -p "$xcassets_path"
 
 # Generate the required icon sizes
 echo "Generating macOS icons"
-sips -Z 16 icon-1024.png -o "$xcassets_path/icon_16x16.png"
-sips -Z 32 icon-1024.png -o "$xcassets_path/icon_32x32.png"
-sips -Z 64 icon-1024.png -o "$xcassets_path/icon_64x64.png"
-sips -Z 128 icon-1024.png -o "$xcassets_path/icon_128x128.png"
-sips -Z 256 icon-1024.png -o "$xcassets_path/icon_256x256.png"
-sips -Z 512 icon-1024.png -o "$xcassets_path/icon_512x512.png"
+sips -Z 16 "$icon_source_path" -o "$xcassets_path/icon_16x16.png"
+sips -Z 32 "$icon_source_path" -o "$xcassets_path/icon_32x32.png"
+sips -Z 64 "$icon_source_path" -o "$xcassets_path/icon_64x64.png"
+sips -Z 128 "$icon_source_path" -o "$xcassets_path/icon_128x128.png"
+sips -Z 256 "$icon_source_path" -o "$xcassets_path/icon_256x256.png"
+sips -Z 512 "$icon_source_path" -o "$xcassets_path/icon_512x512.png"
 # yes I know it's the same size
-sips -Z 1024 icon-1024.png -o "$xcassets_path/icon_1024x1024.png"
+sips -Z 1024 "$icon_source_path" -o "$xcassets_path/icon_1024x1024.png"
 
 # Create the Contents.json file
 echo "Generating Contents.json file"

@@ -189,7 +189,7 @@ Public MustInherit Class Actor
         Public Property DeathAnimationTimer As Single = 0.0F
 
         ''' <summary>
-        ''' Gets or sets the base width of the virtual joystick.
+        ''' Gets or sets the base width of the virtual joystick (default: 64).
         ''' </summary>
         Public Shared Property JoystickBaseWidth As Integer = 64
 
@@ -197,6 +197,32 @@ Public MustInherit Class Actor
         ''' Gets the virtual joystick instance.
         ''' </summary>
         Public Property Joystick As VirtualJoystick
+
+        ''' <summary>
+        ''' Gets the center position of the virtual joystick.
+        ''' This property is used to calculate the position of the virtual joystick on the screen.
+        ''' </summary>
+        ''' <returns>The center position of the virtual joystick.</returns>
+        Public Shared ReadOnly Property JoystickCenter As Vector2
+            Get
+                Return New Vector2(
+                    Renderer.ScreenOffset.X + SCREEN_WIDTH * Renderer.ScreenScale / 2.0F,
+                    Renderer.ScreenOffset.Y + SCREEN_HEIGHT * Renderer.ScreenScale -
+                        JoystickBaseWidth * Renderer.ScreenScale * 2 - 10.0F * Renderer.ScreenScale
+                )
+            End Get
+        End Property
+
+        ''' <summary>
+        ''' Gets the radius of the virtual joystick.
+        ''' This property is used to calculate the position of the virtual joystick on the screen.
+        ''' </summary>
+        ''' <returns>The radius of the virtual joystick.</returns>
+        Public Shared ReadOnly Property JoystickRadius As Single
+            Get
+                Return JoystickBaseWidth * Renderer.ScreenScale * 2
+            End Get
+        End Property
 
         ''' <summary>
         ''' Initializes a new instance of the Player class.
@@ -267,12 +293,6 @@ Public MustInherit Class Actor
                     IsMoving = True
             End Select
 
-            Dim joystickCenter As New Vector2(
-                Renderer.ScreenOffset.X + SCREEN_WIDTH * Renderer.ScreenScale / 2.0F,
-                Renderer.ScreenOffset.Y + SCREEN_HEIGHT * Renderer.ScreenScale - JoystickBaseWidth * Renderer.ScreenScale * 2 - 10.0F * Renderer.ScreenScale
-            )
-            Dim joystickRadius = JoystickBaseWidth * Renderer.ScreenScale * 2
-
             Dim scale = Renderer.ScreenScale
             Dim offsetX = Renderer.ScreenOffset.X
             Dim offsetY = Renderer.ScreenOffset.Y
@@ -326,8 +346,8 @@ Public MustInherit Class Actor
 
             ' Use VirtualJoystick class for input processing with dead zone
             ArgumentNullException.ThrowIfNull(Joystick)
-            Joystick.Position = joystickCenter
-            Joystick.Update(activeTouchPoint, joystickRadius)
+            Joystick.Position = JoystickCenter
+            Joystick.Update(activeTouchPoint, JoystickRadius)
             If Joystick.IsActive Then HandleJoystickInput(Joystick.Value)
 
             If IsMoving Then

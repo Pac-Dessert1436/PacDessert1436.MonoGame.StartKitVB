@@ -1,10 +1,8 @@
 # MonoGame 2D StartKit VB.NET
 
-> ## ⚠️ Crash Warning for v1.2.5 Users
-> Version 1.2.5 contains a critical **null-reference crash** that occurs when pausing, returning to the menu, and restarting the demo game. _A manual code edit is required if using v1.2.5._
-> ### Two Fix Paths:
-> 1. **Best Choice**: Update to NuGet package 1.2.5.1 or later, which includes the critical fix (no manual code changes needed).
-> 2. **If you cannot upgrade from v1.2.5**: Paste the following snippet at the top of the `Update()` method in `GameMain.vb`:
+> ## ⚠️ Special Notes
+>
+> **For v1.2.5 users**: Version 1.2.5 contains a critical **null-reference crash** that occurs when pausing, returning to the menu, and restarting the demo game. _A manual code edit is required if using v1.2.5, by pasting the following snippet at the top of the `Update()` method in `GameMain.vb`:_
 > ```vb
 > With _gameManager
 >     If .Player IsNot Nothing AndAlso .Player.Joystick Is Nothing Then
@@ -12,8 +10,13 @@
 >     End If
 > End With
 > ```
+>
+> **About the icon generator scripts**:
+> - The `scripts/` folder has included both Python and Shell scripts since 1.2.0 for generating platform-specific app icons and splash screens from source images in the `Content/` folder.
+> - **Python scripts are recommended** because they are cross-platform (Windows, macOS, Linux) and have always worked correctly up to now. Shell scripts use the macOS `sips` command and are intended for **macOS only**, but were _broken from 1.2.0 through 1.2.5_ due to path resolution issues, which is now fixed in 1.2.6.
+> - For how to use the icon generator scripts, please refer to [Script Usage Instructions](#script-usage-instructions).
 
-A **fully-functional** multi-platform game template built with **VB.NET** for [MonoGame](https://www.monogame.net/), featuring the demo game **Seed-Scape: Forest Planting Quest**.
+A **fully-functional** multi-platform game template built with **VB.NET** for [MonoGame](https://www.monogame.net/), featuring the demo game **Seed-Scape: Forest Planting Quest**. Version 2.0.0 will feature an entirely new demo game, _Mending Garden_ (development paused for now; see [Roadmap → Version 2.0.0](#version-200-mending-garden-upcoming---development-paused) for details).
 
 Starting from version 1.2.0, all assets are fully licensed and attribution-ready:
 - Main character sprite adapted from CC0-licensed art
@@ -45,24 +48,57 @@ Note that versions 1.2.0 through 1.2.3 had template ID collisions that made the 
 
 > **New to MonoGame?** Check out [BEGINNER_GUIDE.md](MonoGameStartKitVB/BEGINNER_GUIDE.md) for a comprehensive guide to transitioning from `vbPixelGameEngine` to MonoGame.
 
-## What's New in v1.2.5+
+## What's New in Version 1.2.6
 
-> **Note**: Version 1.2.5.2 was the feature-complete 1.x version, but unexpectedly included the unfinished 2.0.0 template project. It has been deprecated and should not be used - please upgrade to 1.2.5.3.
+**Comprehensive Gamepad Support** 🎮
 
-**v1.2.5.3 Code Quality Enhancements** 🎮
+UI navigation is now fully playable with a gamepad. The **A** button activates the primary action (START, RETRY, RESUME) and the **B** button activates the secondary action (EXIT, MENU). The **Start** button pauses or resumes the game, and the **Back** button pauses during gameplay or returns to the title screen from menus. On desktop/laptop keyboard, **Z** and **X** simulate the A and B buttons respectively. Buttons are labeled `[A]` and `[B]` on-screen for clarity.
 
-1. Removed unused hidden variable `JOYSTICK_DEAD_ZONE` from `Actor.vb`
-2. Implemented the `{ get; private set; }` pattern for `PauseButtonWidth` and `PauseButtonHeight` in `Renderer.vb`
-3. Made `Renderer.Joystick` property shared, with this logic applied to `Player.vb`'s `Update()` method: 
-  - `If Joystick Is Nothing Then Joystick = Renderer.Joystick`
+**Shell Script Fixes & `requirements.txt`** 🔧
 
-These improvements have been verified across multiple platforms (DesktopGL, WindowsDX, and Android) and do not impact the demo game's functionality.
+The `scripts/` folder has been included since v1.2.0 with icon and splash screen generation utilities for all supported platforms. These scripts read source images (`Content/icon-1024.png` and `Content/splash.png`) and output properly sized assets for each platform's resource directories. 
 
-✅ **Final User Experience (UX) Polish in 1.2.5** - The definitive finishing touches for _Seed-Scape: Forest Planting Quest_:
-- **Joystick Dead Zone**: Integrated `VirtualJoystick` class into player input handling with a 25% dead zone, eliminating accidental movements from slight touches
-- **Joystick State Tracking**: Added `IsActive` property for improved input state management
-- **Refactored Input Handling**: Now uses `VirtualJoystick.Update()` for consistent input processing across touch and mouse
-- **Android Touch Input Fix**: Corrected joystick center coordinate calculation for Android devices, ensuring accurate touch input detection
+Python scripts have always worked correctly across all platforms, with the dependency file for easy setup (`pip install -r scripts/requirements.txt`). However, Shell scripts were broken from 1.2.0 through 1.2.5 due to path resolution issues, which is now fixed.
+
+### Fixes in Shell Scripts
+1. **Path Resolution**: Shell scripts now correctly resolve paths to source images in the `Content/` folder, regardless of the working directory they are run from
+2. **Error Handling**: Shell scripts now verify source files exist before execution
+
+> **Note**: Shell scripts use the macOS `sips` command and require macOS. For Windows and Linux, use the Python scripts instead.
+
+### Script Usage Instructions
+
+#### Python Scripts (Recommended for All Platforms)
+```bash
+# Install dependencies (one-time setup)
+pip install -r scripts/requirements.txt
+
+# Generate Android icons and splash screens
+python3 scripts/android-icons-generator.py
+
+# Generate iOS icons  
+python3 scripts/ios-icons-generator.py
+
+# Generate macOS icons
+python3 scripts/mac-icons-generator.py
+```
+
+#### Shell Scripts (macOS Only)
+```bash
+# Make scripts executable (one-time setup)
+chmod +x scripts/*.sh
+
+# Generate Android icons and splash screens
+./scripts/android-icons-generator.sh
+
+# Generate iOS icons
+./scripts/ios-icons-generator.sh
+
+# Generate macOS icons
+./scripts/mac-icons-generator.sh
+```
+
+> **Note**: Shell scripts require the macOS `sips` command. Python scripts are recommended for cross-platform use as they provide better error handling and work on all operating systems including Windows and Linux.
 
 ---
 
@@ -107,7 +143,15 @@ MonoGameStartKitVB/
 │   ├── Renderer.vb                   # Graphics rendering
 │   ├── SoundManager.vb               # Audio management
 │   ├── SpriteSheet.vb                # Sprite and animation system
-│   └── VirtualJoystick.vb            # Input handling
+│   ├── VirtualJoystick.vb            # Input handling
+│   └── scripts/                      # Icon generator scripts
+│       ├── android-icons-generator.py
+│       ├── android-icons-generator.sh
+│       ├── ios-icons-generator.py
+│       ├── ios-icons-generator.sh
+│       ├── mac-icons-generator.py
+│       ├── mac-icons-generator.sh
+│       └── requirements.txt
 ├── MonoGameStartKitVB.WindowsDX/     # Windows desktop launcher
 ├── MonoGameStartKitVB.Android/       # Android mobile launcher
 ├── MonoGameStartKitVB.iOS/           # iOS mobile launcher
@@ -260,14 +304,19 @@ All assets are processed through the MonoGame Content Pipeline:
 
 ## Version History
 
-### Version 1.2.5.3 (Latest)
+### Version 1.2.6 (Latest)
+- **Shell Script Functionality**: Shell scripts (included since 1.2.0 but broken through 1.2.5) now correctly resolve paths to source images regardless of execution directory. They also verify source files exist before execution.
+- **Joystick Visual State Fix**: The virtual joystick knob now returns to center position when the game transitions away from the Playing state (e.g., pausing, game over), preventing the knob from appearing displaced without touch input on restart.
+- **Full Gamepad Support**: UI buttons can now be activated with gamepad — **A** for the primary action (START, RETRY, RESUME), **B** for the secondary action (EXIT, MENU), **Start** to pause/resume, and **Back** to pause or return to title. Keyboard equivalents: **Z** = A, **X** = B. Buttons are labeled `[A]`/`[B]` on-screen.
+
+### Version 1.2.5.3
 - **Code Cleanup**: Removed unused hidden variable `JOYSTICK_DEAD_ZONE` from `Actor.vb`
 - **Encapsulation Improvements**: Implemented the `{ get; private set; }` pattern for `PauseButtonWidth` and `PauseButtonHeight` in `Renderer.vb`
 - **Input Handling Refinement**: Made `Renderer.Joystick` property shared, with this logic applied to `Player.vb`'s `Update()` method: `If Joystick Is Nothing Then Joystick = Renderer.Joystick`
 - **Cross-Platform Verification**: All improvements verified across DesktopGL, WindowsDX, and Android platforms without impacting game functionality
 
 ### Version 1.2.5.2 (Deprecated)
-⚠️ This version unexpectedly **included unfinished v2.0.0 template project** and has been deprecated. Please use v1.2.5.3 instead.
+> **Note**: This version unexpectedly included unfinished 2.0.0 template code and has been deprecated. Please use 1.2.5.3 or later.
 
 ### Version 1.2.5.1 (Hotfix)
 - **Joystick Null Reference Fix**: Added a defensive check in `GameMain.Update()` to ensure the joystick is always properly connected to the player after game restarts, preventing null reference exceptions when pausing, returning to the menu, and starting a new game

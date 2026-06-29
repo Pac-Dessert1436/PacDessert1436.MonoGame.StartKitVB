@@ -1,6 +1,5 @@
 Imports Microsoft.Xna.Framework
 Imports Microsoft.Xna.Framework.Graphics
-Imports Microsoft.Xna.Framework.Input
 
 ''' <summary>
 ''' Main game class that coordinates all game systems using proper object-oriented patterns.
@@ -44,10 +43,6 @@ Public NotInheritable Class GameMain
     End Sub
 
     Protected Overrides Sub Update(gameTime As GameTime)
-        ' Handle exit condition
-        If GamePad.GetState(PlayerIndex.One).Buttons.Back = ButtonState.Pressed OrElse
-           Keyboard.GetState().IsKeyDown(Keys.Escape) Then [Exit]()
-
         ' Handle input for game state transitions
         _gameManager.HandleInput()
 

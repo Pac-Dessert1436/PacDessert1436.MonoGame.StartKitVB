@@ -251,8 +251,8 @@ Public NotInheritable Class Renderer
         )
         _spriteBatch.Draw(_titleCard, titleRect, Color.White)
 
-        DrawButton("START", CInt(SCREEN_WIDTH / 2), 400, 1.0F)
-        DrawButton("EXIT", CInt(SCREEN_WIDTH / 2), 520, 1.0F)
+        DrawButton("START", CInt(SCREEN_WIDTH / 2), 400, "A"c)
+        DrawButton("EXIT", CInt(SCREEN_WIDTH / 2), 520, "B"c)
 
         Static instructions As String() = {
             "--- HOW TO PLAY ---",
@@ -285,20 +285,19 @@ Public NotInheritable Class Renderer
     ''' <param name="text">The text to display on the button.</param>
     ''' <param name="centerX">The center X coordinate of the button.</param>
     ''' <param name="y">The Y coordinate of the button.</param>
-    ''' <param name="scale">The scale factor for the button.</param>
-    Private Sub DrawButton(text As String, centerX As Integer, y As Integer, Optional scale As Single = 1.0F)
-        Dim buttonWidth = CInt(_generalButton.Width * 2 * scale)
-        Dim buttonHeight = CInt(_generalButton.Height * 2 * scale)
+    ''' <param name="buttonMarker">The button marker to display on the button.</param>
+    Private Sub DrawButton(text As String, centerX As Integer, y As Integer, buttonMarker As Char)
+        Dim buttonWidth = _generalButton.Width * 2
+        Dim buttonHeight = _generalButton.Height * 2
         Dim buttonRect As New Rectangle(
             centerX - buttonWidth \ 2,
             y,
             buttonWidth,
             buttonHeight
         )
-        ' Button color is always the original
         _spriteBatch.Draw(_generalButton, buttonRect, Color.White)
 
-        Dim textSize As Vector2 = _gameFont.MeasureString(text) * scale
+        Dim textSize As Vector2 = _gameFont.MeasureString(text)
         Dim textPos As New Vector2(
             centerX - textSize.X / 2.0F,
             y + buttonHeight / 2.0F - textSize.Y / 2.0F
@@ -310,7 +309,18 @@ Public NotInheritable Class Renderer
             Color.Wheat,
             0,
             Vector2.Zero,
-            scale,
+            1,
+            SpriteEffects.None,
+            0
+        )
+        _spriteBatch.DrawString(
+            _gameFont,
+            $"[{buttonMarker}]",
+            New Vector2(buttonRect.X - 50, textPos.Y),
+            Color.LightGreen,
+            0,
+            Vector2.Zero,
+            1,
             SpriteEffects.None,
             0
         )
@@ -613,12 +623,19 @@ Public NotInheritable Class Renderer
         ' Update joystick value for keyboard input (joystick position is already set by Player)
         If keyboardState.IsKeyDown(Keys.Left) OrElse keyboardState.IsKeyDown(Keys.A) Then
             _joystick.Value = New Vector2(-1, 0)
+            _joystick.IsActive = True
         ElseIf keyboardState.IsKeyDown(Keys.Right) OrElse keyboardState.IsKeyDown(Keys.D) Then
             _joystick.Value = New Vector2(1, 0)
+            _joystick.IsActive = True
         ElseIf keyboardState.IsKeyDown(Keys.Up) OrElse keyboardState.IsKeyDown(Keys.W) Then
             _joystick.Value = New Vector2(0, -1)
+            _joystick.IsActive = True
         ElseIf keyboardState.IsKeyDown(Keys.Down) OrElse keyboardState.IsKeyDown(Keys.S) Then
             _joystick.Value = New Vector2(0, 1)
+            _joystick.IsActive = True
+        Else
+            ' Reset joystick value if no keyboard input is detected
+            If Not _joystick.IsActive Then _joystick.Value = Vector2.Zero
         End If
 
         ' Draw the joystick at the correct position
@@ -651,8 +668,8 @@ Public NotInheritable Class Renderer
         _spriteBatch.Draw(_pixelTexture, overlayRect, New Color(0, 0, 0, 150))
 
         DrawCenteredText("PAUSED", -80, Color.White, 2.0F)
-        DrawButton("RESUME", CInt(SCREEN_WIDTH / 2), CInt(SCREEN_HEIGHT / 2), 1.0F)
-        DrawButton("MENU", CInt(SCREEN_WIDTH / 2), CInt(SCREEN_HEIGHT / 2) + 120, 1.0F)
+        DrawButton("RESUME", CInt(SCREEN_WIDTH / 2), CInt(SCREEN_HEIGHT / 2), "A"c)
+        DrawButton("MENU", CInt(SCREEN_WIDTH / 2), CInt(SCREEN_HEIGHT / 2) + 120, "B"c)
     End Sub
 
     ''' <summary>
@@ -667,8 +684,8 @@ Public NotInheritable Class Renderer
         DrawCenteredText($"Final Score: {gameManager.Player.Score}", -50, Color.White, 1.0F)
         DrawCenteredText($"Highest Score: {gameManager.HighScore}", -20, Color.White, 1.0F)
 
-        DrawButton("RETRY", CInt(SCREEN_WIDTH / 2), CInt(SCREEN_HEIGHT / 2) + 50, 1.0F)
-        DrawButton("MENU", CInt(SCREEN_WIDTH / 2), CInt(SCREEN_HEIGHT / 2) + 170, 1.0F)
+        DrawButton("RETRY", CInt(SCREEN_WIDTH / 2), CInt(SCREEN_HEIGHT / 2) + 50, "A"c)
+        DrawButton("MENU", CInt(SCREEN_WIDTH / 2), CInt(SCREEN_HEIGHT / 2) + 170, "B"c)
     End Sub
 
     ''' <summary>
