@@ -443,3 +443,5 @@ All audio assets are **CC0-licensed** (public domain), sourced from [Open Game A
 | `at_next_level.wav` | _Fanfare Sound #3_ (0.25x speed) | [512 Sound Effects (8-Bit Style)](https://opengameart.org/content/512-sound-effects-8-bit-style) by SubspaceAudio |
 
 ## License
+
+This project is licensed under BSD 3-Clause License. See the [LICENSE](LICENSE) file for details.
