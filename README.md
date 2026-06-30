@@ -13,7 +13,7 @@
 >
 > **About the icon generator scripts**:
 > - The `scripts/` folder has included both Python and Shell scripts since 1.2.0 for generating platform-specific app icons and splash screens from source images in the `Content/` folder.
-> - **Python scripts are recommended** because they are cross-platform (Windows, macOS, Linux) and have always worked correctly up to now. Shell scripts use the macOS `sips` command and are intended for **macOS only**, but were _broken from 1.2.0 through 1.2.5_ due to path resolution issues, which is now fixed in 1.2.6.
+> - **Python scripts are recommended** because they are cross-platform (Windows, macOS, Linux) and have always worked correctly up to now. Shell scripts use the macOS `sips` command and are intended for **macOS only**, but were _broken from 1.2.0 through 1.2.5_ due to path resolution issues, which is now fixed in this version (1.2.7).
 > - For how to use the icon generator scripts, please refer to [Script Usage Instructions](#script-usage-instructions).
 
 A **fully-functional** multi-platform game template built with **VB.NET** for [MonoGame](https://www.monogame.net/), featuring the demo game **Seed-Scape: Forest Planting Quest**. Version 2.0.0 will feature an entirely new demo game, _Mending Garden_ (development paused for now; see [Roadmap → Version 2.0.0](#version-200-mending-garden-upcoming---development-paused) for details).
@@ -25,7 +25,9 @@ Starting from version 1.2.0, all assets are fully licensed and attribution-ready
 - Font properly licensed for commercial use
 - **Blank template available from version 1.2.4** for starting your own projects
 
-> **🚨 Important Notice**: **Versions prior to 1.2.0 have been unlisted and should not be used** due to potential copyright concerns with included assets. Always use version 1.2.0 or later for production projects.
+> **🚨 Important Notice**:
+> 1. **Versions prior to 1.2.0 have been unlisted and should not be used** due to potential copyright concerns with included assets. Always use version 1.2.0 or later for production projects.
+> 2. **Version 1.2.6 Deprecated**: This version had incomplete license documentation in its README (only showing "License" without specifying the license type). The license information has been properly documented in version 1.2.7 and later. The package is consistently licensed under the **BSD 3-Clause License** across all versions.
 
 ---
 
@@ -35,11 +37,11 @@ Starting from version 1.2.0, all assets are fully licensed and attribution-ready
 - **Template Short Name**: `mg2dstartkitvb`
 - **Game Name**: Seed-Scape: Forest Planting Quest
 
-_PacDessert1436.MonoGame.StartKitVB_ is a **production-ready** game template demonstrating modern MonoGame development practices using VB.NET. 
+_PacDessert1436.MonoGame.StartKitVB_ is a **production-ready** game template demonstrating modern MonoGame development practices using VB.NET.
 
 Designed as a VB.NET alternative to the original C# MonoGame StartKit (`mg2dstartkit`), this template enables VB.NET developers - especially those transitioning from `vbPixelGameEngine` - to leverage MonoGame's powerful game development capabilities.
 
-The package includes **two templates**:
+This package consistently uses C# platform hosting projects for Android compatibility (required by MonoGame's Android binding source generators), while all game logic and core implementation is in VB.NET. **The package includes two templates**:
 
 1. **Complete Demo Game**: _**Seed-Scape: Forest Planting Quest**_ - An arcade game where players collect seeds to grow a forest while dodging patrolling insects.
 2. **Blank Template (`mgblank2dstartkitvb`)**: A clean starting point for your own MonoGame projects. _Available from version 1.2.4._
@@ -48,11 +50,18 @@ Note that versions 1.2.0 through 1.2.3 had template ID collisions that made the 
 
 > **New to MonoGame?** Check out [BEGINNER_GUIDE.md](MonoGameStartKitVB/BEGINNER_GUIDE.md) for a comprehensive guide to transitioning from `vbPixelGameEngine` to MonoGame.
 
-## What's New in Version 1.2.6
+## What's New in Version 1.2.7
+
+**Blank Template Improvements** 🔄
+- Added proper letterboxing support to maintain aspect ratio across all screen sizes
+- Implemented tap/click input to increment counter with cross-platform support
+- Cleaned up Draw method with organized rendering workflow
+
+**Dependency Update** 📦
+- Upgraded `ModuleEventRaiser.Generator` to version 1.2.2 for improved source generation
 
 **Comprehensive Gamepad Support** 🎮
-
-UI navigation is now fully playable with a gamepad. The **A** button activates the primary action (START, RETRY, RESUME) and the **B** button activates the secondary action (EXIT, MENU). The **Start** button pauses or resumes the game, and the **Back** button pauses during gameplay or returns to the title screen from menus. On desktop/laptop keyboard, **Z** and **X** simulate the A and B buttons respectively. Buttons are labeled `[A]` and `[B]` on-screen for clarity.
+UI navigation is now fully playable with a gamepad. The **A** button activates the primary action (Start, Retry, Resume) and the **B** button activates the secondary action (Exit, Menu). The **Start** button pauses or resumes the game, and the **Back** button pauses during gameplay or returns to the title screen from menus. On desktop/laptop keyboard, **Z** and **X** simulate the A and B buttons respectively. Buttons are labeled `[A]` and `[B]` on-screen for clarity.
 
 **Shell Script Fixes & `requirements.txt`** 🔧
 
@@ -152,10 +161,10 @@ MonoGameStartKitVB/
 │       ├── mac-icons-generator.py
 │       ├── mac-icons-generator.sh
 │       └── requirements.txt
-├── MonoGameStartKitVB.WindowsDX/     # Windows desktop launcher
-├── MonoGameStartKitVB.Android/       # Android mobile launcher
-├── MonoGameStartKitVB.iOS/           # iOS mobile launcher
-└── MonoGameStartKitVB.DesktopGL/     # Cross-platform OpenGL launcher
+├── MonoGameStartKitVB.WindowsDX/     # Windows desktop launcher (C#-hosted)
+├── MonoGameStartKitVB.Android/       # Android mobile launcher (C#-hosted)
+├── MonoGameStartKitVB.iOS/           # iOS mobile launcher (C#-hosted)
+└── MonoGameStartKitVB.DesktopGL/     # Cross-platform OpenGL launcher (C#-hosted)
 ```
 
 ### Key Components
@@ -304,10 +313,14 @@ All assets are processed through the MonoGame Content Pipeline:
 
 ## Version History
 
-### Version 1.2.6 (Latest)
+### Version 1.2.7 (Latest)
 - **Shell Script Functionality**: Shell scripts (included since 1.2.0 but broken through 1.2.5) now correctly resolve paths to source images regardless of execution directory. They also verify source files exist before execution.
 - **Joystick Visual State Fix**: The virtual joystick knob now returns to center position when the game transitions away from the Playing state (e.g., pausing, game over), preventing the knob from appearing displaced without touch input on restart.
-- **Full Gamepad Support**: UI buttons can now be activated with gamepad — **A** for the primary action (START, RETRY, RESUME), **B** for the secondary action (EXIT, MENU), **Start** to pause/resume, and **Back** to pause or return to title. Keyboard equivalents: **Z** = A, **X** = B. Buttons are labeled `[A]`/`[B]` on-screen.
+- **Full Gamepad Support**: UI buttons can now be activated with gamepad — **A** for the primary action (Start, Retry, Resume), **B** for the secondary action (Exit, Menu), **Start** to pause/resume, and **Back** to pause or return to title. Keyboard equivalents: **Z** = A, **X** = B. Buttons are labeled `[A]`/`[B]` on-screen.
+
+### Version 1.2.6 (Deprecated)
+- **README documentation issue**: This version is functionally identical to version 1.2.7, but had incomplete license documentation in its README (only showing "License" without specifying the BSD 3-Clause License type).
+> **Note**: The above issue has been corrected in version 1.2.7 and later. The package remains licensed under the **BSD 3-Clause License** across all versions.
 
 ### Version 1.2.5.3
 - **Code Cleanup**: Removed unused hidden variable `JOYSTICK_DEAD_ZONE` from `Actor.vb`
