@@ -144,7 +144,7 @@ _spriteBatch.DrawString(font, "Hello World!", New Vector2(10, 10), Color.White)
 
 **vbPixelGameEngine:**
 ```vb
-DrawSprite(New Vector2(100, 100), New Sprite("player.png"))
+DrawSprite(New Vi2d(100, 100), New Sprite("player.png"))
 ```
 
 **⭐ MonoGame:**

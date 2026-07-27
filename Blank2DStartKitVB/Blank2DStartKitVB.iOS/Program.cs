@@ -7,7 +7,7 @@ namespace Blank2DStartKitVB.iOS
     [Register("AppDelegate")]
     internal class Program : UIApplicationDelegate
     {
-        private static Blank2DStartKitVBGame _game;
+        private static GameMain _game;
 
         /// <summary>
         /// Initializes and starts the game by creating an instance of the 
@@ -15,7 +15,7 @@ namespace Blank2DStartKitVB.iOS
         /// </summary>
         internal static void RunGame()
         {
-            _game = new Blank2DStartKitVBGame();
+            _game = new GameMain();
             _game.Run();
         }
 

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0-ios</TargetFramework>
+    <TargetFramework>net10.0-ios</TargetFramework>
     <SupportedOSPlatformVersion>12.2</SupportedOSPlatformVersion>
     <CodesignKey>iPhone Developer</CodesignKey>
     <Configurations>Release;Debug</Configurations>
@@ -12,7 +12,7 @@
     </MonoGameContentReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Blank2DStartKitVB.Core\Blank2DStartKitVB.Core.csproj" />
+    <ProjectReference Include="..\Blank2DStartKitVB.Core\Blank2DStartKitVB.Core.vbproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.*" />

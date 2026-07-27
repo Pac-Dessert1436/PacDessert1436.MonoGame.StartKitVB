@@ -2,14 +2,14 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>PacDessert1436.MonoGame.StartKitVB</id>
-    <version>1.2.7</version>
-    <title>MonoGame StartKit VB.NET</title>
+    <version>1.2.7.1</version>
+    <title>MonoGame 2D StartKit VB.NET</title>
     <authors>Pac-Dessert1436</authors>
     <owners>Pac-Dessert1436</owners>
     <license type="expression">BSD-3-Clause</license>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <readme>README.md</readme>
-    <description>A multi-platform game template built with VB.NET for MonoGame, including both a
+    <description>A multi-platform 2D game template built with VB.NET for MonoGame, including both a
       complete demo game and a blank template. All game assets are properly licensed and
       attribution-ready.</description>
     <tags>monogame;vbnet;gamedev;tree-planting;startkit;template;2d-game;cross-platform</tags>
@@ -20,12 +20,8 @@
       url="https://github.com/Pac-Dessert1436/PacDessert1436.MonoGame.StartKitVB" />
   </metadata>
   <files>
-    <file src="Blank2DStartKitVB/**/*"
-      exclude="**/bin/**/*;**/obj/**/*;**/.git/**/*;**/*.user;**/*.suo;**/*.vsidx;**/*.dtbcache.v2;**/*.slnx;**/*.nupkg;**/*.nuspec;**/.vs/**/*;**/project.assets.json;**/*.AssemblyInfo.vb;**/.NETCoreApp*;**/Content/bin/**/*"
-      target="content" />
-    <file src="MonoGameStartKitVB/**/*"
-      exclude="**/bin/**/*;**/obj/**/*;**/.git/**/*;**/*.user;**/*.suo;**/*.vsidx;**/*.dtbcache.v2;**/*.slnx;**/*.nupkg;**/*.nuspec;**/.vs/**/*;**/project.assets.json;**/*.AssemblyInfo.vb;**/.NETCoreApp*;**/Content/bin/**/*"
-      target="content" />
+    <file src="Blank2DStartKitVB/**/*" target="content" exclude="**/.vs/**/*;**/bin/**/*;**/obj/**/*;**/Content/bin/**/*;**/Content/obj/**/*" />
+    <file src="MonoGameStartKitVB/**/*" target="content" exclude="**/.vs/**/*;**/bin/**/*;**/obj/**/*;**/Content/bin/**/*;**/Content/obj/**/*" />
     <file src="README.md" target="README.md" />
   </files>
 </package>

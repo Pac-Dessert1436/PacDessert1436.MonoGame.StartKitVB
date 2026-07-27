@@ -13,10 +13,10 @@
 >
 > **About the icon generator scripts**:
 > - The `scripts/` folder has included both Python and Shell scripts since 1.2.0 for generating platform-specific app icons and splash screens from source images in the `Content/` folder.
-> - **Python scripts are recommended** because they are cross-platform (Windows, macOS, Linux) and have always worked correctly up to now. Shell scripts use the macOS `sips` command and are intended for **macOS only**, but were _broken from 1.2.0 through 1.2.5_ due to path resolution issues, which is now fixed in this version (1.2.7).
-> - For how to use the icon generator scripts, please refer to [Script Usage Instructions](#script-usage-instructions).
+> - **Python scripts are recommended** because they are cross-platform (Windows, macOS, Linux) and have always worked correctly up to now. Shell scripts use the macOS `sips` command and are intended for **macOS only**, but were _broken from 1.2.0 through 1.2.5_ due to path resolution issues, which is now fixed in this version (1.2.7.1).
+> - For how to use the icon generator scripts, please refer to [Script Usage Instructions](#script-usage-instructions). _Note that Shell scripts will be removed in future versions (2.0.0 and later)._
 
-A **fully-functional** multi-platform game template built with **VB.NET** for [MonoGame](https://www.monogame.net/), featuring the demo game **Seed-Scape: Forest Planting Quest**. Version 2.0.0 will feature an entirely new demo game, _Mending Garden_ (development paused for now; see [Roadmap → Version 2.0.0](#version-200-mending-garden-upcoming---development-paused) for details).
+A **fully-functional** multi-platform game template built with **VB.NET** for [MonoGame](https://www.monogame.net/), featuring the demo game **Seed-Scape: Forest Planting Quest** and a blank starter template for building your own projects. Version 2.0.0 will introduce an entirely new demo game, _Mending Garden_ (development is currently paused; see [Roadmap → Version 2.0.0](#version-200-mending-garden-upcoming---development-paused) for details).
 
 Starting from version 1.2.0, all assets are fully licensed and attribution-ready:
 - Main character sprite adapted from CC0-licensed art
@@ -39,41 +39,44 @@ Starting from version 1.2.0, all assets are fully licensed and attribution-ready
 
 _PacDessert1436.MonoGame.StartKitVB_ is a **production-ready** game template demonstrating modern MonoGame development practices using VB.NET.
 
-Designed as a VB.NET alternative to the original C# MonoGame StartKit (`mg2dstartkit`), this template enables VB.NET developers - especially those transitioning from `vbPixelGameEngine` - to leverage MonoGame's powerful game development capabilities.
+Designed as a VB.NET alternative to the original C# MonoGame StartKit (`mg2dstartkit`), this template enables VB.NET developers — especially those transitioning from `vbPixelGameEngine` — to leverage MonoGame's powerful game development capabilities.
 
-This package consistently uses C# platform hosting projects for Android compatibility (required by MonoGame's Android binding source generators), while all game logic and core implementation is in VB.NET. **The package includes two templates**:
+This package uses C# platform hosting projects for Android compatibility (required by MonoGame's Android binding source generators), while keeping the game logic and core implementation in VB.NET. **The repository includes two template variants**:
 
-1. **Complete Demo Game**: _**Seed-Scape: Forest Planting Quest**_ - An arcade game where players collect seeds to grow a forest while dodging patrolling insects.
-2. **Blank Template (`mgblank2dstartkitvb`)**: A clean starting point for your own MonoGame projects. _Available from version 1.2.4._
+1. **Complete Demo Game**: _**Seed-Scape: Forest Planting Quest**_ — an arcade game where players collect seeds to grow a forest while dodging patrolling insects.
+2. **Blank Template (`mgblank2dstartkitvb`)**: a clean starting point for your own MonoGame projects. _Available from version 1.2.4._
 
-Note that versions 1.2.0 through 1.2.3 had template ID collisions that made the blank template unavailable; the demo game template (`mg2dstartkitvb`) remains accessible across all these versions. _Additionally, v1.2.3 marks the final gameplay polish for the v1.x series (see [Version History](#version-history) for details)._
+Versions 1.2.0 through 1.2.3 had template ID collisions that made the blank template unavailable; the demo-game template (`mg2dstartkitvb`) remains available across all these versions. _Additionally, v1.2.3 marks the final gameplay polish for the v1.x series (see [Version History](#version-history) for details)._ 
 
 > **New to MonoGame?** Check out [BEGINNER_GUIDE.md](MonoGameStartKitVB/BEGINNER_GUIDE.md) for a comprehensive guide to transitioning from `vbPixelGameEngine` to MonoGame.
 
-## What's New in Version 1.2.7
+## What's New in Version 1.2.7.1
 
 **Blank Template Improvements** 🔄
 - Added proper letterboxing support to maintain aspect ratio across all screen sizes
 - Implemented tap/click input to increment counter with cross-platform support
 - Cleaned up Draw method with organized rendering workflow
+- _Integrated **iOS hosting project** into the blank template solution_
 
 **Dependency Update** 📦
-- Upgraded `ModuleEventRaiser.Generator` to version 1.2.2 for improved source generation
+- Upgraded `ModuleEventRaiser.Generator` to version 1.2.4 for improved source generation
+- Corrected the note in `Essentials.vb` within the demo game project, to clarify that the scheduling methods are auto-generated (`RaiseEvent` helpers themselves are not thread-safe)
 
 **Comprehensive Gamepad Support** 🎮
+
 UI navigation is now fully playable with a gamepad. The **A** button activates the primary action (Start, Retry, Resume) and the **B** button activates the secondary action (Exit, Menu). The **Start** button pauses or resumes the game, and the **Back** button pauses during gameplay or returns to the title screen from menus. On desktop/laptop keyboard, **Z** and **X** simulate the A and B buttons respectively. Buttons are labeled `[A]` and `[B]` on-screen for clarity.
 
 **Shell Script Fixes & `requirements.txt`** 🔧
 
-The `scripts/` folder has been included since v1.2.0 with icon and splash screen generation utilities for all supported platforms. These scripts read source images (`Content/icon-1024.png` and `Content/splash.png`) and output properly sized assets for each platform's resource directories. 
+The `scripts/` folder has been included since v1.2.0 to generate icons and splash screens for the supported platforms. These scripts read source images (`Content/icon-1024.png` and `Content/splash.png`) and output properly sized assets for each platform's resource directories.
 
-Python scripts have always worked correctly across all platforms, with the dependency file for easy setup (`pip install -r scripts/requirements.txt`). However, Shell scripts were broken from 1.2.0 through 1.2.5 due to path resolution issues, which is now fixed.
+Python scripts have always worked correctly across all platforms, and the dependency file makes setup straightforward (`pip install -r scripts/requirements.txt`). Shell scripts, however, were broken from 1.2.0 through 1.2.5 because of path-resolution issues, which are now fixed.
 
 ### Fixes in Shell Scripts
-1. **Path Resolution**: Shell scripts now correctly resolve paths to source images in the `Content/` folder, regardless of the working directory they are run from
-2. **Error Handling**: Shell scripts now verify source files exist before execution
+1. Correctly resolved paths to the source images in the `Content/` folder, regardless of the working directory from which they are run.
+2. Verified that the required source files exist before execution.
 
-> **Note**: Shell scripts use the macOS `sips` command and require macOS. For Windows and Linux, use the Python scripts instead.
+Keep in mind that Shell scripts use the macOS `sips` command and require macOS. _For Windows and Linux, please use the Python scripts instead._
 
 ### Script Usage Instructions
 
@@ -92,7 +95,7 @@ python3 scripts/ios-icons-generator.py
 python3 scripts/mac-icons-generator.py
 ```
 
-#### Shell Scripts (macOS Only)
+#### Shell Scripts (macOS Only, Will Be Removed in Version 2.x)
 ```bash
 # Make scripts executable (one-time setup)
 chmod +x scripts/*.sh
@@ -140,8 +143,28 @@ chmod +x scripts/*.sh
 
 ---
 
-## Project Architecture
+## Project Structure
 
+**Blank Starter Template (`mgblank2dstartkitvb`)**
+```
+Blank2DStartKitVB/
+├── Blank2DStartKitVB.Core/       # Shared VB.NET game logic
+│   ├── GameMain.vb               # Main game class
+│   └── scripts/                  # Icon generator scripts
+│       ├── android-icons-generator.py
+│       ├── android-icons-generator.sh
+│       ├── ios-icons-generator.py
+│       ├── ios-icons-generator.sh
+│       ├── mac-icons-generator.py
+│       ├── mac-icons-generator.sh
+│       └── requirements.txt
+├── Blank2DStartKitVB.WindowsDX/   # Windows desktop launcher (C# host)
+├── Blank2DStartKitVB.Android/     # Android mobile launcher (C# host)
+├── Blank2DStartKitVB.iOS/         # iOS mobile launcher (C# host)
+└── Blank2DStartKitVB.DesktopGL/   # Cross-platform OpenGL launcher (C# host)
+```
+
+**Full Demo Game Template (`mg2dstartkitvb`)**:
 ```
 MonoGameStartKitVB/
 ├── MonoGameStartKitVB.Core/          # Shared VB.NET game logic
@@ -161,10 +184,10 @@ MonoGameStartKitVB/
 │       ├── mac-icons-generator.py
 │       ├── mac-icons-generator.sh
 │       └── requirements.txt
-├── MonoGameStartKitVB.WindowsDX/     # Windows desktop launcher (C#-hosted)
-├── MonoGameStartKitVB.Android/       # Android mobile launcher (C#-hosted)
-├── MonoGameStartKitVB.iOS/           # iOS mobile launcher (C#-hosted)
-└── MonoGameStartKitVB.DesktopGL/     # Cross-platform OpenGL launcher (C#-hosted)
+├── MonoGameStartKitVB.WindowsDX/     # Windows desktop launcher (C# host)
+├── MonoGameStartKitVB.Android/       # Android mobile launcher (C# host)
+├── MonoGameStartKitVB.iOS/           # iOS mobile launcher (C# host)
+└── MonoGameStartKitVB.DesktopGL/     # Cross-platform OpenGL launcher (C# host)
 ```
 
 ### Key Components
@@ -258,9 +281,9 @@ dotnet new mgblank2dstartkitvb -n YourGameName
 - **Notes**: Touch controls have been thoroughly tested and function properly
 
 ### ⚠️ iOS
-- **Status**: Planned
-- **Features**: Basic compatibility implemented
-- **Notes**: Requires macOS for development; untested on physical devices
+- **Status**: Included for the blank template solution; device validation remains pending
+- **Features**: Basic project scaffolding and platform support are in place
+- **Notes**: Requires macOS for development and still benefits from additional real-device verification
 
 ### ✅ DesktopGL (OpenGL)
 - **Status**: Functional
@@ -313,7 +336,13 @@ All assets are processed through the MonoGame Content Pipeline:
 
 ## Version History
 
-### Version 1.2.7 (Latest)
+### Version 1.2.7.1 (Latest)
+- **Blank Template iOS Support**: Added an iOS hosting project to the blank template solution and aligned its settings with .NET 10 so the VB.NET core logic can be reused more cleanly across platforms.
+- **Dependency Update**: Upgraded `ModuleEventRaiser.Generator` to version 1.2.4 for improved source generation.
+- **Documentation Clarification**: Corrected the note in `Essentials.vb` within the demo game project, to clarify that the scheduling methods are auto-generated, whereas the `RaiseEvent` helpers themselves are not thread-safe.
+
+### Version 1.2.7
+- **Blank Template UX Improvements**: Added letterboxing support, tap/click input handling, and a cleaner draw/render flow for the blank starter project.
 - **Shell Script Functionality**: Shell scripts (included since 1.2.0 but broken through 1.2.5) now correctly resolve paths to source images regardless of execution directory. They also verify source files exist before execution.
 - **Joystick Visual State Fix**: The virtual joystick knob now returns to center position when the game transitions away from the Playing state (e.g., pausing, game over), preventing the knob from appearing displaced without touch input on restart.
 - **Full Gamepad Support**: UI buttons can now be activated with gamepad — **A** for the primary action (Start, Retry, Resume), **B** for the secondary action (Exit, Menu), **Start** to pause/resume, and **Back** to pause or return to title. Keyboard equivalents: **Z** = A, **X** = B. Buttons are labeled `[A]`/`[B]` on-screen.
