@@ -13,7 +13,7 @@
 >
 > **About the icon generator scripts**:
 > - The `scripts/` folder has included both Python and Shell scripts since 1.2.0 for generating platform-specific app icons and splash screens from source images in the `Content/` folder.
-> - **Python scripts are recommended** because they are cross-platform (Windows, macOS, Linux) and have always worked correctly up to now. Shell scripts use the macOS `sips` command and are intended for **macOS only**, but were _broken from 1.2.0 through 1.2.5_ due to path resolution issues, which is now fixed in this version (1.2.7.1).
+> - **Python scripts are recommended** because they are cross-platform (Windows, macOS, Linux) and have always worked correctly up to now. Shell scripts use the macOS `sips` command and are intended for **macOS only**, but were _broken from 1.2.0 through 1.2.5_ due to path resolution issues, which is now fixed in 1.2.7 or later.
 > - For how to use the icon generator scripts, please refer to [Script Usage Instructions](#script-usage-instructions). _Note that Shell scripts will be removed in future versions (2.0.0 and later)._
 
 A **fully-functional** multi-platform game template built with **VB.NET** for [MonoGame](https://www.monogame.net/), featuring the demo game **Seed-Scape: Forest Planting Quest** and a blank starter template for building your own projects. Version 2.0.0 will introduce an entirely new demo game, _Mending Garden_ (development is currently paused; see [Roadmap → Version 2.0.0](#version-200-mending-garden-upcoming---development-paused) for details).
@@ -50,7 +50,7 @@ Versions 1.2.0 through 1.2.3 had template ID collisions that made the blank temp
 
 > **New to MonoGame?** Check out [BEGINNER_GUIDE.md](MonoGameStartKitVB/BEGINNER_GUIDE.md) for a comprehensive guide to transitioning from `vbPixelGameEngine` to MonoGame.
 
-## What's New in Version 1.2.7.1
+## What's New in Version 1.2.7+
 
 **Blank Template Improvements** 🔄
 - Added proper letterboxing support to maintain aspect ratio across all screen sizes
@@ -60,7 +60,7 @@ Versions 1.2.0 through 1.2.3 had template ID collisions that made the blank temp
 
 **Dependency Update** 📦
 - Upgraded `ModuleEventRaiser.Generator` to version 1.2.4 for improved source generation
-- Corrected the note in `Essentials.vb` within the demo game project, to clarify that the scheduling methods are auto-generated (`RaiseEvent` helpers themselves are not thread-safe)
+- Corrected the note in `Essentials.vb` within the demo game project, to clarify that the scheduling methods are auto-generated (`RaiseEvent` helper methods are not thread-safe in themselves).
 
 **Comprehensive Gamepad Support** 🎮
 
@@ -95,7 +95,7 @@ python3 scripts/ios-icons-generator.py
 python3 scripts/mac-icons-generator.py
 ```
 
-#### Shell Scripts (macOS Only, Will Be Removed in Version 2.x)
+#### Shell Scripts for macOS Only (Will Be Removed in Version 2.x)
 ```bash
 # Make scripts executable (one-time setup)
 chmod +x scripts/*.sh
@@ -148,9 +148,9 @@ chmod +x scripts/*.sh
 **Blank Starter Template (`mgblank2dstartkitvb`)**
 ```
 Blank2DStartKitVB/
-├── Blank2DStartKitVB.Core/       # Shared VB.NET game logic
-│   ├── GameMain.vb               # Main game class
-│   └── scripts/                  # Icon generator scripts
+├── Blank2DStartKitVB.Core/        # Shared VB.NET game logic
+│   ├── GameMain.vb                # Main game class
+│   └── scripts/                   # Icon generator scripts
 │       ├── android-icons-generator.py
 │       ├── android-icons-generator.sh
 │       ├── ios-icons-generator.py
@@ -167,16 +167,16 @@ Blank2DStartKitVB/
 **Full Demo Game Template (`mg2dstartkitvb`)**:
 ```
 MonoGameStartKitVB/
-├── MonoGameStartKitVB.Core/          # Shared VB.NET game logic
-│   ├── Actor.vb                      # Entity framework (Player, Enemy, Seed)
-│   ├── Essentials.vb                 # Constants, enums, events, utilities
-│   ├── GameMain.vb                   # Main game class
-│   ├── GameManager.vb                # Game state and logic
-│   ├── Renderer.vb                   # Graphics rendering
-│   ├── SoundManager.vb               # Audio management
-│   ├── SpriteSheet.vb                # Sprite and animation system
-│   ├── VirtualJoystick.vb            # Input handling
-│   └── scripts/                      # Icon generator scripts
+├── MonoGameStartKitVB.Core/         # Shared VB.NET game logic
+│   ├── Actor.vb                     # Entity framework (Player, Enemy, Seed)
+│   ├── Essentials.vb                # Constants, enums, events, utilities
+│   ├── GameMain.vb                  # Main game class
+│   ├── GameManager.vb               # Game state and logic
+│   ├── Renderer.vb                  # Graphics rendering
+│   ├── SoundManager.vb              # Audio management
+│   ├── SpriteSheet.vb               # Sprite and animation system
+│   ├── VirtualJoystick.vb           # Input handling
+│   └── scripts/                     # Icon generator scripts
 │       ├── android-icons-generator.py
 │       ├── android-icons-generator.sh
 │       ├── ios-icons-generator.py
@@ -184,10 +184,10 @@ MonoGameStartKitVB/
 │       ├── mac-icons-generator.py
 │       ├── mac-icons-generator.sh
 │       └── requirements.txt
-├── MonoGameStartKitVB.WindowsDX/     # Windows desktop launcher (C# host)
-├── MonoGameStartKitVB.Android/       # Android mobile launcher (C# host)
-├── MonoGameStartKitVB.iOS/           # iOS mobile launcher (C# host)
-└── MonoGameStartKitVB.DesktopGL/     # Cross-platform OpenGL launcher (C# host)
+├── MonoGameStartKitVB.WindowsDX/    # Windows desktop launcher (C# host)
+├── MonoGameStartKitVB.Android/      # Android mobile launcher (C# host)
+├── MonoGameStartKitVB.iOS/          # iOS mobile launcher (C# host)
+└── MonoGameStartKitVB.DesktopGL/    # Cross-platform OpenGL launcher (C# host)
 ```
 
 ### Key Components
@@ -336,10 +336,11 @@ All assets are processed through the MonoGame Content Pipeline:
 
 ## Version History
 
-### Version 1.2.7.1 (Latest)
+### Version 1.2.7.2 (Latest)
 - **Blank Template iOS Support**: Added an iOS hosting project to the blank template solution and aligned its settings with .NET 10 so the VB.NET core logic can be reused more cleanly across platforms.
 - **Dependency Update**: Upgraded `ModuleEventRaiser.Generator` to version 1.2.4 for improved source generation.
-- **Documentation Clarification**: Corrected the note in `Essentials.vb` within the demo game project, to clarify that the scheduling methods are auto-generated, whereas the `RaiseEvent` helpers themselves are not thread-safe.
+- **Documentation Clarification**: Corrected the note in `Essentials.vb` within the demo game project, to clarify that the scheduling methods are auto-generated, whereas the `RaiseEvent` helper methods are not thread-safe in themselves.
+> **Note**: This version is functionally identical to version 1.2.7.1, but has the `<summary>` comments enhanced in the `Essentials.vb` module within the demo game template.
 
 ### Version 1.2.7
 - **Blank Template UX Improvements**: Added letterboxing support, tap/click input handling, and a cleaner draw/render flow for the blank starter project.

@@ -7,10 +7,17 @@ Imports Microsoft.Xna.Framework
 ''' Contains essential constants, functions, enums, etc. used throughout the game.
 ''' </summary>
 ''' <remarks>
+''' <para>
 ''' This module defines events that are recognized by the source generator <c>ModuleEventRaiser.Generator</c>,
-''' which automatically creates thread-safe event raising/scheduling methods for all declared events.
-''' Although the <see langword="Partial"/> keyword is not mandatory, using it improves code clarity 
-''' and consistency.
+''' which automatically creates thread-safe <b>event scheduling methods</b> for events declared in <see langword="Module"/>s.
+''' <em>Note that <see langword="RaiseEvent"/> helper methods generated from the source generator are not 
+''' thread-safe in themselves.</em>
+''' </para>
+''' <para>
+''' Meanwhile, the <see langword="Partial"/> keyword is not mandatory for the current module, but using 
+''' this keyword improves code clarity and consistency (which highlights the fact that the module contains 
+''' source-generated methods).
+''' </para>
 ''' </remarks>
 Partial Public Module Essentials
 #Region "Constants"
