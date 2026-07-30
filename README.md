@@ -50,7 +50,15 @@ Versions 1.2.0 through 1.2.3 had template ID collisions that made the blank temp
 
 > **New to MonoGame?** Check out [BEGINNER_GUIDE.md](MonoGameStartKitVB/BEGINNER_GUIDE.md) for a comprehensive guide to transitioning from `vbPixelGameEngine` to MonoGame.
 
-## What's New in Version 1.2.7+
+## What's New in Version 1.2.8
+
+**Real-Time High Score Display** 🏆
+
+During gameplay, the high score display in the full demo game now **updates in real time**. When the player sets a new high score, it is highlighted in `Color.Wheat` until the next round begins. If no new record is set, the display returns to `Color.MintCream`.
+
+In earlier versions, the HUD showed a temporary `-NEW BEST-` style indicator when a new high score was achieved. Now, the current high score is reflected immediately on the HUD instead. This change is implemented in `Renderer.vb` in the full demo game template.
+
+### Existing Updates in Version 1.2.7+
 
 **Blank Template Improvements** 🔄
 - Added proper letterboxing support to maintain aspect ratio across all screen sizes
@@ -337,11 +345,16 @@ All assets are processed through the MonoGame Content Pipeline:
 
 ## Version History
 
-### Version 1.2.7.3 (Latest)
+### Version 1.2.8 (Latest)
+- **Real-Time High Score HUD Update**: Improved the full demo game's HUD so the high score now updates immediately during play, rather than showing the previous value or a temporary `-NEW BEST-` style display.
+- **Visual Highlight for New Records**: When the player sets a new high score, the value is highlighted in `Color.Wheat` until the next round begins; otherwise it returns to `Color.MintCream`.
+> **Note**: This update is only implemented in the full demo game project, specifically in `Renderer.vb`, and does not affect the blank template.
+
+### Version 1.2.7.3
 - **Blank Template iOS Support**: Added an iOS hosting project to the blank template solution and aligned its settings with .NET 10 so the VB.NET core logic can be reused more cleanly across platforms.
 - **Dependency Update**: Upgraded `ModuleEventRaiser.Generator` to version 1.2.5 for improved source generation, with all MonoGame packages pinned to version 3.8.5.
-- **Documentation Clarification**: Corrected the note in `Essentials.vb` within the demo game project, to clarify that the scheduling methods are auto-generated, whereas the `RaiseEvent` helper methods are not thread-safe in themselves.
-> **Note**: The current version of the game template is functionally identical to 1.2.7.1 and 1.2.7.2, except for the `<summary>` comments enhanced in the `Essentials.vb` module within the demo game template, along with the dependency update and pinned MonoGame packages.
+- **Documentation Clarification**: Corrected the note in `Essentials.vb` within the demo game project to clarify that the scheduling methods are auto-generated, while the `RaiseEvent` helper methods are not thread-safe by themselves.
+> **Note**: This version of the game template is functionally identical to 1.2.7.1 and 1.2.7.2, except for the enhanced `<summary>` comments in the `Essentials.vb` module within the demo game template, along with the dependency update and pinned MonoGame packages.
 
 ### Version 1.2.7
 - **Blank Template UX Improvements**: Added letterboxing support, tap/click input handling, and a cleaner draw/render flow for the blank starter project.

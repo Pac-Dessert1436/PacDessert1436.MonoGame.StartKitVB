@@ -333,10 +333,11 @@ Public NotInheritable Class Renderer
     Private Sub DrawHUD(gameManager As GameManager)
         With gameManager
             DrawText($"1UP { .Player.Score,6}", New Vector2(10, 10), Color.MintCream, 1.0F)
+            Dim isHighScore As Boolean = .Player.Score > .HighScore
             DrawText(
-                If(.Player.Score > .HighScore, "-NEW BEST-", $"HI. { .HighScore,6}"),
+                "HI. " & If(isHighScore, $"{ .Player.Score,6}", $"{ .HighScore,6}"),
                 New Vector2(SCREEN_WIDTH \ 2 + 10, 10),
-                Color.MintCream, 1.0F)
+                If(isHighScore, Color.Wheat, Color.MintCream), 1.0F)
         End With
 
         Dim lifeIconRect As New Rectangle(0, 0, ICON_SIZE, ICON_SIZE)
