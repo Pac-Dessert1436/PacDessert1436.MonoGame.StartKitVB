@@ -59,8 +59,9 @@ Versions 1.2.0 through 1.2.3 had template ID collisions that made the blank temp
 - _Integrated **iOS hosting project** into the blank template solution_
 
 **Dependency Update** 📦
-- Upgraded `ModuleEventRaiser.Generator` to version 1.2.4 for improved source generation
-- Corrected the note in `Essentials.vb` within the demo game project, to clarify that the scheduling methods are auto-generated (`RaiseEvent` helper methods are not thread-safe in themselves).
+- Upgraded `ModuleEventRaiser.Generator` to version 1.2.5 for improved source generation
+- Pinned the MonoGame packages to version 3.8.5 in every project file (see [Getting Started → Prerequisites](#prerequisites) for details)
+- Corrected the note in `Essentials.vb` within the demo game project, to clarify that the scheduling methods are auto-generated (`RaiseEvent` helper methods are not thread-safe in themselves)
 
 **Comprehensive Gamepad Support** 🎮
 
@@ -207,7 +208,7 @@ MonoGameStartKitVB/
 ### Prerequisites
 - Visual Studio 2026, Visual Studio Code, or another .NET-compatible IDE
 - [.NET SDK 10.0](https://dotnet.microsoft.com/download/dotnet/10.0) or later
-- MonoGame 3.8+ installation (see [Getting Started](https://docs.monogame.net/articles/getting_started/index.html) in the MonoGame documentation)
+- **MonoGame 3.8.5** installation (see [Getting Started](https://docs.monogame.net/articles/getting_started/index.html) in the MonoGame documentation)
 - Essential tools and extensions for VB.NET development
 
 ### Using the NuGet Template
@@ -336,11 +337,11 @@ All assets are processed through the MonoGame Content Pipeline:
 
 ## Version History
 
-### Version 1.2.7.2 (Latest)
+### Version 1.2.7.3 (Latest)
 - **Blank Template iOS Support**: Added an iOS hosting project to the blank template solution and aligned its settings with .NET 10 so the VB.NET core logic can be reused more cleanly across platforms.
-- **Dependency Update**: Upgraded `ModuleEventRaiser.Generator` to version 1.2.4 for improved source generation.
+- **Dependency Update**: Upgraded `ModuleEventRaiser.Generator` to version 1.2.5 for improved source generation, with all MonoGame packages pinned to version 3.8.5.
 - **Documentation Clarification**: Corrected the note in `Essentials.vb` within the demo game project, to clarify that the scheduling methods are auto-generated, whereas the `RaiseEvent` helper methods are not thread-safe in themselves.
-> **Note**: This version is functionally identical to version 1.2.7.1, but has the `<summary>` comments enhanced in the `Essentials.vb` module within the demo game template.
+> **Note**: The current version of the game template is functionally identical to 1.2.7.1 and 1.2.7.2, except for the `<summary>` comments enhanced in the `Essentials.vb` module within the demo game template, along with the dependency update and pinned MonoGame packages.
 
 ### Version 1.2.7
 - **Blank Template UX Improvements**: Added letterboxing support, tap/click input handling, and a cleaner draw/render flow for the blank starter project.
