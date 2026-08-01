@@ -36,6 +36,17 @@ Public NotInheritable Class Renderer
     Private Shared _screenOffset As Vector2 = Vector2.Zero
     Private Const HUD_HEIGHT As Integer = 100
 
+    ' Cached UI instruction strings and their measured sizes (computed after font load)
+    Private Shared ReadOnly _instructions As String() = {
+        "--- HOW TO PLAY ---",
+        "Move with joystick/keyboard",
+        "Collect seeds to plant trees",
+        "Pesticide weakens enemies",
+        "Survive as long as possible"
+    }
+    ' Cached sizes for each instruction text
+    Private ReadOnly _instructionSizes(_instructions.Length - 1) As Vector2
+
     Public Shared ReadOnly Property ScreenScale As Single
         Get
             Return _screenScale
@@ -127,17 +138,21 @@ Public NotInheritable Class Renderer
     End Sub
 
     ''' <summary>
-    ''' Returns an array of 1-based indices from start to stop, inclusive.
+    ''' Returns a sequence of zero-based indices from the given inclusive range.
     ''' </summary>
-    ''' <param name="start">The 1-based start index.</param>
-    ''' <param name="stop">The 1-based stop index.</param>
-    ''' <returns>An array of 1-based indices from start to stop, inclusive.</returns>
-    Private Shared Function OneBasedIndices(start As Integer, [stop] As Integer) As Integer()
-        Return Enumerable.Range(start - 1, [stop] - start + 1).ToArray()
+    ''' <param name="startIndex">The first index in the range.</param>
+    ''' <param name="endIndex">The last index in the range.</param>
+    ''' <returns>An array of zero-based indices from <paramref name="startIndex"/> to 
+    ''' <paramref name="endIndex"/>, inclusive.</returns>
+    Private Shared Function BuildIndexRange(startIndex As Integer, endIndex As Integer) As Integer()
+        Dim length = endIndex - startIndex + 1
+        Dim result(length - 1) As Integer
+        For i As Integer = 0 To length - 1 : result(i) = startIndex + i - 1 : Next i
+        Return result
     End Function
 
     ''' <summary>
-    ''' Loads the game content.
+    ''' Loads the game content (called manually in the constructor).
     ''' </summary>
     Private Sub LoadContent()
         _playerSpriteSheet = New SpriteSheet(_content, "Images/player_sheet", CELL_SIZE, CELL_SIZE)
@@ -145,22 +160,22 @@ Public NotInheritable Class Renderer
         _objectSpriteSheet = New SpriteSheet(_content, "Images/object_sheet", CELL_SIZE, CELL_SIZE)
 
         _playerAnimations = New Dictionary(Of Direction, Animation) From {
-            {Direction.Left, New Animation(_playerSpriteSheet, OneBasedIndices(1, 2), 0.1F)},
-            {Direction.Right, New Animation(_playerSpriteSheet, OneBasedIndices(3, 4), 0.1F)},
-            {Direction.Up, New Animation(_playerSpriteSheet, OneBasedIndices(5, 6), 0.1F)},
-            {Direction.Down, New Animation(_playerSpriteSheet, OneBasedIndices(7, 8), 0.1F)}
+            {Direction.Left, New Animation(_playerSpriteSheet, BuildIndexRange(1, 2), 0.1F)},
+            {Direction.Right, New Animation(_playerSpriteSheet, BuildIndexRange(3, 4), 0.1F)},
+            {Direction.Up, New Animation(_playerSpriteSheet, BuildIndexRange(5, 6), 0.1F)},
+            {Direction.Down, New Animation(_playerSpriteSheet, BuildIndexRange(7, 8), 0.1F)}
         }
-        _playerDeathAnimation = New Animation(_playerSpriteSheet, OneBasedIndices(9, 16), 0.1F)
+        _playerDeathAnimation = New Animation(_playerSpriteSheet, BuildIndexRange(9, 16), 0.1F)
 
         _enemyAnimations = New Dictionary(Of (EnemyType, Direction), Animation) From {
-            {(EnemyType.Beetle, Direction.Left), New Animation(_enemySpriteSheet, OneBasedIndices(1, 2), 0.1F)},
-            {(EnemyType.Beetle, Direction.Right), New Animation(_enemySpriteSheet, OneBasedIndices(3, 4), 0.1F)},
-            {(EnemyType.Beetle, Direction.Up), New Animation(_enemySpriteSheet, OneBasedIndices(5, 6), 0.1F)},
-            {(EnemyType.Beetle, Direction.Down), New Animation(_enemySpriteSheet, OneBasedIndices(7, 8), 0.1F)},
-            {(EnemyType.Caterpillar, Direction.Left), New Animation(_enemySpriteSheet, OneBasedIndices(9, 10), 0.1F)},
-            {(EnemyType.Caterpillar, Direction.Right), New Animation(_enemySpriteSheet, OneBasedIndices(11, 12), 0.1F)},
-            {(EnemyType.Caterpillar, Direction.Up), New Animation(_enemySpriteSheet, OneBasedIndices(13, 14), 0.1F)},
-            {(EnemyType.Caterpillar, Direction.Down), New Animation(_enemySpriteSheet, OneBasedIndices(15, 16), 0.1F)}
+            {(EnemyType.Beetle, Direction.Left), New Animation(_enemySpriteSheet, BuildIndexRange(1, 2), 0.1F)},
+            {(EnemyType.Beetle, Direction.Right), New Animation(_enemySpriteSheet, BuildIndexRange(3, 4), 0.1F)},
+            {(EnemyType.Beetle, Direction.Up), New Animation(_enemySpriteSheet, BuildIndexRange(5, 6), 0.1F)},
+            {(EnemyType.Beetle, Direction.Down), New Animation(_enemySpriteSheet, BuildIndexRange(7, 8), 0.1F)},
+            {(EnemyType.Caterpillar, Direction.Left), New Animation(_enemySpriteSheet, BuildIndexRange(9, 10), 0.1F)},
+            {(EnemyType.Caterpillar, Direction.Right), New Animation(_enemySpriteSheet, BuildIndexRange(11, 12), 0.1F)},
+            {(EnemyType.Caterpillar, Direction.Up), New Animation(_enemySpriteSheet, BuildIndexRange(13, 14), 0.1F)},
+            {(EnemyType.Caterpillar, Direction.Down), New Animation(_enemySpriteSheet, BuildIndexRange(15, 16), 0.1F)}
         }
 
         _iconSpriteSheet = _content.Load(Of Texture2D)("Images/icon_sheet")
@@ -175,6 +190,11 @@ Public NotInheritable Class Renderer
         PauseButtonWidth = _pauseButton.Width
         PauseButtonHeight = _pauseButton.Height
         _joystick = New VirtualJoystick(_joystickBase, _joystickKnob, New Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 100))
+
+        ' Precompute instruction text sizes to avoid per-frame `MeasureString` calls
+        For i As Integer = 0 To _instructions.Length - 1
+            _instructionSizes(i) = _gameFont.MeasureString(_instructions(i))
+        Next i
     End Sub
 
     ''' <summary>
@@ -254,29 +274,25 @@ Public NotInheritable Class Renderer
         DrawButton("START", CInt(SCREEN_WIDTH / 2), 400, "A"c)
         DrawButton("EXIT", CInt(SCREEN_WIDTH / 2), 520, "B"c)
 
-        Static instructions As String() = {
-            "--- HOW TO PLAY ---",
-            "Move with joystick/keyboard",
-            "Collect seeds to plant trees",
-            "Pesticide weakens enemies",
-            "Survive as long as possible"
-        }
-
         Dim bonusLifeStr = $"BONUS LIFE AT {BONUS_LIFE_AT} PTS."
+        Dim bonusSize = _gameFont.MeasureString(bonusLifeStr)
         _spriteBatch.DrawString(_gameFont,
             bonusLifeStr,
-            New Vector2((SCREEN_WIDTH - _gameFont.MeasureString(bonusLifeStr).X) / 2, 300),
+            New Vector2((SCREEN_WIDTH - bonusSize.X) / 2, 300),
             Color.MintCream
         )
+
         Dim instrY As Integer = 700
-        For Each instr As String In instructions
+        For i As Integer = 0 To _instructions.Length - 1
+            Dim instr = _instructions(i)
+            Dim instrSize = If(_instructionSizes IsNot Nothing AndAlso i < _instructionSizes.Length, _instructionSizes(i), _gameFont.MeasureString(instr))
             Dim instructionPos As New Vector2(
-                (SCREEN_WIDTH - _gameFont.MeasureString(instr).X) / 2,
+                (SCREEN_WIDTH - instrSize.X) / 2,
                 instrY
             )
             _spriteBatch.DrawString(_gameFont, instr, instructionPos, Color.White)
             instrY += 50
-        Next
+        Next i
     End Sub
 
     ''' <summary>
@@ -353,7 +369,7 @@ Public NotInheritable Class Renderer
                 lifeIconRect,
                 Color.White
             )
-        Next
+        Next i
 
         Dim seedType = SeedTypeForLevel(gameManager.CurrentLevel)
         Dim seedIconIndex = GetSeedIconIndex(seedType)
@@ -420,13 +436,13 @@ Public NotInheritable Class Renderer
     Private Sub DrawSpawnPoints(enemies As List(Of Actor.Enemy))
         Dim renderScale = CSng(SCREEN_WIDTH) / (MAZE_WIDTH * CELL_SIZE)
 
-        For Each enemy In enemies
+        For Each enemy As Actor.Enemy In enemies
             Dim enemyPos As New Vector2(
                 CInt(enemy.SpawnPoint.X * CELL_SIZE * renderScale),
                 CInt(enemy.SpawnPoint.Y * CELL_SIZE * renderScale + HUD_HEIGHT)
             )
             _objectSpriteSheet.DrawFrame(_spriteBatch, 9, enemyPos, renderScale, Color.White)
-        Next
+        Next enemy
     End Sub
 
     ''' <summary>
@@ -512,14 +528,14 @@ Public NotInheritable Class Renderer
     ''' <param name="seeds">The list of seeds to draw.</param>
     Private Sub DrawSeeds(seeds As List(Of Actor.Seed))
         Dim renderScale = CSng(SCREEN_WIDTH) / (MAZE_WIDTH * CELL_SIZE)
-        For Each seed In From s In seeds Where s.IsActive
-            Dim scale = CSng(CELL_SIZE / _objectSpriteSheet.FrameWidth) * renderScale
-            ' Frame index for a seed type equals its enum value plus 1
-            Dim frameIndex As Integer = seed.SeedType + 1
-            Dim gridPos As New Point(seed.GridPosition.X, seed.GridPosition.Y)
-            Dim drawPos As New Vector2(gridPos.X * CELL_SIZE * renderScale, gridPos.Y * CELL_SIZE * renderScale + HUD_HEIGHT)
-            _objectSpriteSheet.DrawFrame(_spriteBatch, frameIndex, drawPos, scale, Color.White)
-        Next
+        Dim scaleFactor = CSng(CELL_SIZE / _objectSpriteSheet.FrameWidth) * renderScale
+        For Each seed As Actor.Seed In seeds
+            If seed.IsActive Then
+                Dim frameIndex As Integer = seed.SeedType + 1
+                Dim drawPos As New Vector2(seed.GridPosition.X * CELL_SIZE * renderScale, seed.GridPosition.Y * CELL_SIZE * renderScale + HUD_HEIGHT)
+                _objectSpriteSheet.DrawFrame(_spriteBatch, frameIndex, drawPos, scaleFactor, Color.White)
+            End If
+        Next seed
     End Sub
 
     ''' <summary>
@@ -528,12 +544,11 @@ Public NotInheritable Class Renderer
     ''' <param name="pesticides">The list of pesticides to draw.</param>
     Private Sub DrawPesticides(pesticides As List(Of Point))
         Dim renderScale = CSng(SCREEN_WIDTH) / (MAZE_WIDTH * CELL_SIZE)
-        For Each item In pesticides
-            Dim scale = CSng(CELL_SIZE / _objectSpriteSheet.FrameWidth) * renderScale
-            Dim gridPos As New Point(item.X, item.Y)
-            Dim drawPos As New Vector2(gridPos.X * CELL_SIZE * renderScale, gridPos.Y * CELL_SIZE * renderScale + HUD_HEIGHT)
-            _objectSpriteSheet.DrawFrame(_spriteBatch, 8, drawPos, scale, Color.White)
-        Next
+        Dim scaleFactor = CSng(CELL_SIZE / _objectSpriteSheet.FrameWidth) * renderScale
+        For Each item As Point In pesticides
+            Dim drawPos As New Vector2(item.X * CELL_SIZE * renderScale, item.Y * CELL_SIZE * renderScale + HUD_HEIGHT)
+            _objectSpriteSheet.DrawFrame(_spriteBatch, 8, drawPos, scaleFactor, Color.White)
+        Next item
     End Sub
 
     ''' <summary>
@@ -573,30 +588,11 @@ Public NotInheritable Class Renderer
     ''' <param name="deltaTime">The time interval since the last frame.</param>
     Private Sub DrawEnemies(enemies As List(Of Actor.Enemy), deltaTime As Single)
         Dim renderScale = CSng(SCREEN_WIDTH) / (MAZE_WIDTH * CELL_SIZE)
+        Dim hasWeakEnemies As Boolean = False
 
-        For Each enemy In From e In enemies Where e.IsActive AndAlso Not e.IsVulnerable
-            Dim direction = enemy.Direction
-            Dim key = (enemy.EnemyType, direction)
-            Dim animation = _enemyAnimations(key)
-            animation.Update(deltaTime)
-            Dim frameIndex = animation.CurrentFrameIndex
-
-            Dim scale = CSng(ENEMY_SIZE / animation.SpriteSheet.FrameWidth) * renderScale
-            Dim drawPos As New Vector2(
-                enemy.PixelPosition.X * renderScale - ENEMY_SIZE * renderScale / 2,
-                enemy.PixelPosition.Y * renderScale - ENEMY_SIZE * renderScale / 2 + HUD_HEIGHT
-            )
-
-            Dim enemyColor = If(enemy.GracePeriodTimer > 0, New Color(200, 200, 255, 128), Color.White)
-            animation.SpriteSheet.DrawFrame(_spriteBatch, frameIndex, drawPos, scale, enemyColor)
-        Next
-
-        Dim weakEnemies = From e In enemies Where e.IsActive AndAlso e.IsVulnerable
-        If weakEnemies.Any() Then
-            Dim blinkValue = Math.Abs(Math.Sin(Date.Now.TimeOfDay.TotalSeconds * 8.0))
-            Dim blinkColor = If(blinkValue > 0.5, Color.White, Color.BlueViolet)
-
-            For Each enemy In weakEnemies
+        ' First pass: draw normal (non-vulnerable) enemies and detect weak ones
+        For Each enemy As Actor.Enemy In enemies
+            If enemy.IsActive AndAlso Not enemy.IsVulnerable Then
                 Dim direction = enemy.Direction
                 Dim key = (enemy.EnemyType, direction)
                 Dim animation = _enemyAnimations(key)
@@ -609,8 +605,35 @@ Public NotInheritable Class Renderer
                     enemy.PixelPosition.Y * renderScale - ENEMY_SIZE * renderScale / 2 + HUD_HEIGHT
                 )
 
-                animation.SpriteSheet.DrawFrame(_spriteBatch, frameIndex, drawPos, scale, blinkColor)
-            Next
+                Dim enemyColor = If(enemy.GracePeriodTimer > 0, New Color(200, 200, 255, 128), Color.White)
+                animation.SpriteSheet.DrawFrame(_spriteBatch, frameIndex, drawPos, scale, enemyColor)
+            ElseIf enemy.IsActive AndAlso enemy.IsVulnerable Then
+                hasWeakEnemies = True
+            End If
+        Next enemy
+
+        ' Second pass: draw vulnerable enemies with blink effect if any
+        If hasWeakEnemies Then
+            Dim blinkValue = Math.Abs(Math.Sin(Date.Now.TimeOfDay.TotalSeconds * 8.0))
+            Dim blinkColor = If(blinkValue > 0.5, Color.White, Color.BlueViolet)
+
+            For Each enemy As Actor.Enemy In enemies
+                If enemy.IsActive AndAlso enemy.IsVulnerable Then
+                    Dim direction = enemy.Direction
+                    Dim key = (enemy.EnemyType, direction)
+                    Dim animation = _enemyAnimations(key)
+                    animation.Update(deltaTime)
+                    Dim frameIndex = animation.CurrentFrameIndex
+
+                    Dim scale = CSng(ENEMY_SIZE / animation.SpriteSheet.FrameWidth) * renderScale
+                    Dim drawPos As New Vector2(
+                        enemy.PixelPosition.X * renderScale - ENEMY_SIZE * renderScale / 2,
+                        enemy.PixelPosition.Y * renderScale - ENEMY_SIZE * renderScale / 2 + HUD_HEIGHT
+                    )
+
+                    animation.SpriteSheet.DrawFrame(_spriteBatch, frameIndex, drawPos, scale, blinkColor)
+                End If
+            Next enemy
         End If
     End Sub
 

@@ -85,18 +85,20 @@ Public MustInherit Class Actor
     ''' <remarks>
     ''' This property is used to filter out invalid directions, such as the opposite direction.
     ''' </remarks>
-    Public Shared ReadOnly Property ValidDirections(currDir As Direction) As Direction()
-        Get
-            Dim directions As Direction() = {
-                Direction.Up,
-                Direction.Down,
-                Direction.Left,
-                Direction.Right
-            }
-            Return Aggregate dir As Direction In directions
-                   Where dir <> OppositeDirection(currDir) Into ToArray()
-        End Get
-    End Property
+    Public Shared Function ValidDirections(currDir As Direction) As Direction()
+        Select Case currDir
+            Case Direction.Up
+                Return {Direction.Left, Direction.Right, Direction.Down}
+            Case Direction.Down
+                Return {Direction.Left, Direction.Right, Direction.Up}
+            Case Direction.Left
+                Return {Direction.Up, Direction.Down, Direction.Right}
+            Case Direction.Right
+                Return {Direction.Up, Direction.Down, Direction.Left}
+            Case Else
+                Return {Direction.Up, Direction.Down, Direction.Left}
+        End Select
+    End Function
 
     ''' <summary>
     ''' Gets the opposite direction of the current direction.
@@ -325,8 +327,8 @@ Public MustInherit Class Actor
                    touchLoc.State = Touch.TouchLocationState.Moved Then
                     Dim touchPos = touchLoc.Position
                     If Not expandedPauseButtonRect.Contains(CInt(touchPos.X), CInt(touchPos.Y)) Then
-                        Dim delta = touchPos - joystickCenter
-                        If delta.Length() <= joystickRadius * 2 Then
+                        Dim delta = touchPos - JoystickCenter
+                        If delta.Length() <= JoystickRadius * 2 Then
                             activeTouchPoint = touchPos
                             Exit For
                         End If
@@ -337,8 +339,8 @@ Public MustInherit Class Actor
             If activeTouchPoint Is Nothing AndAlso mouseState.LeftButton = ButtonState.Pressed Then
                 Dim mousePos As New Vector2(mouseState.X, mouseState.Y)
                 If Not realPauseButtonRect.Contains(CInt(mousePos.X), CInt(mousePos.Y)) Then
-                    Dim delta = mousePos - joystickCenter
-                    If delta.Length() <= joystickRadius * 2 Then
+                    Dim delta = mousePos - JoystickCenter
+                    If delta.Length() <= JoystickRadius * 2 Then
                         activeTouchPoint = mousePos
                     End If
                 End If
@@ -404,10 +406,10 @@ Public MustInherit Class Actor
             Dim startTileY = Math.Max(0, bounds.Top \ CELL_SIZE)
             Dim endTileY = Math.Min(MAZE_HEIGHT - 1, bounds.Bottom \ CELL_SIZE)
 
-            Dim specificMazeTiles = {MazeTile.Fence, MazeTile.Sapling, MazeTile.Tree}
             For tileX As Integer = startTileX To endTileX
                 For tileY As Integer = startTileY To endTileY
-                    If specificMazeTiles.Contains(maze(tileX, tileY)) Then Return False
+                    Dim tile = maze(tileX, tileY)
+                    If tile = MazeTile.Fence OrElse tile = MazeTile.Sapling OrElse tile = MazeTile.Tree Then Return False
                 Next tileY
             Next tileX
 
@@ -680,15 +682,20 @@ Public MustInherit Class Actor
             Dim startTileY = Math.Max(0, bounds.Top \ CELL_SIZE)
             Dim endTileY = Math.Min(MAZE_HEIGHT - 1, bounds.Bottom \ CELL_SIZE)
 
-            Dim specificMazeTiles = {MazeTile.Fence, MazeTile.Sapling, MazeTile.Tree}
             For tileX As Integer = startTileX To endTileX
                 For tileY As Integer = startTileY To endTileY
-                    If specificMazeTiles.Contains(maze(tileX, tileY)) Then Return False
+                    Dim tile = maze(tileX, tileY)
+                    If tile = MazeTile.Fence OrElse tile = MazeTile.Sapling OrElse tile = MazeTile.Tree Then Return False
                 Next tileY
             Next tileX
 
             Return True
         End Function
+
+        ' List of all possible directions
+        Private ReadOnly _directions As Direction() = {
+            Direction.Up, Direction.Down, Direction.Left, Direction.Right
+        }
 
         ''' <summary>
         ''' Sets a random valid direction for the enemy.
@@ -696,16 +703,10 @@ Public MustInherit Class Actor
         Public Sub SetRandomDirection()
             Dim validDirections = Actor.ValidDirections(_previousDirection)
 
-            If validDirections.Length > 0 Then
+            If validDirections IsNot Nothing AndAlso validDirections.Length > 0 Then
                 Direction = validDirections(random.Next(validDirections.Length))
             Else
-                Dim directions As Direction() = {
-                    Direction.Up,
-                    Direction.Down,
-                    Direction.Left,
-                    Direction.Right
-                }
-                Direction = directions(random.Next(directions.Length))
+                Direction = _directions(random.Next(_directions.Length))
             End If
         End Sub
 
@@ -713,15 +714,8 @@ Public MustInherit Class Actor
         ''' Changes the enemy's direction to a new valid direction.
         ''' </summary>
         Private Sub ChangeDirection()
-            Dim directions As Direction() = {
-                Direction.Up,
-                Direction.Down,
-                Direction.Left,
-                Direction.Right
-            }
-
             Dim validDirections = Actor.ValidDirections(Direction)
-            If validDirections.Length > 0 Then
+            If validDirections IsNot Nothing AndAlso validDirections.Length > 0 Then
                 Direction = validDirections(random.Next(validDirections.Length))
             End If
         End Sub

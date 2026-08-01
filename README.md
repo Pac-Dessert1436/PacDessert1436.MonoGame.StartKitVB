@@ -1,6 +1,6 @@
 # MonoGame 2D StartKit VB.NET
 
-> ## ⚠️ Special Notes
+> ## ⚠️ Special Reminders
 >
 > **For v1.2.5, v1.2.8, and v1.2.8.1 users**:
 > - Version 1.2.5 contains a critical **null-reference crash** that occurs when pausing, returning to the menu, and then restarting the demo game. _If you are using v1.2.5, a manual code edit is required: paste the following snippet at the top of the `Update()` method in `GameMain.vb`._
@@ -13,14 +13,16 @@
 > ```
 > - Versions 1.2.8 and 1.2.8.1 contain two issues: a **design flaw in `ModuleEventRaiser.Generator`**, where the `RaiseScheduledEvents` method can swallow exceptions when the `loggerAction` parameter is not provided (fixed in v1.2.8.1); and **empty `Catch` blocks when loading and saving high scores** in the `Essentials.vb` module, which silently swallowed exceptions without logging (fixed in v1.2.8.2).
 >
-> _If you are using v1.2.8, please upgrade `ModuleEventRaiser.Generator` to v1.2.5.1 immediately when creating new projects. Version 1.2.8.2 is highly recommended for the high score error logging fix, whereas all prior versions require extending the `Catch` blocks._
+> _If you are using v1.2.8, please upgrade `ModuleEventRaiser.Generator` to v1.2.5.1 immediately when creating new projects. Version 1.2.8.2 (or the latest release 1.2.8.3) is highly recommended for the high score error logging fix, whereas all prior versions require extending the `Catch` blocks._
 >
 > **About the icon generator scripts**:
 > - Since version 1.2.0, the `scripts/` folder has included both Python and Shell scripts for generating platform-specific app icons and splash screens from source images in the `Content/` folder.
 > - **Python scripts are recommended** because they are cross-platform (Windows, macOS, Linux) and have always worked correctly. Shell scripts use the macOS `sips` command and are intended for **macOS only**; however, they were _broken from v1.2.0 through v1.2.5_ due to path resolution issues. This has been fixed in v1.2.7 and later.
 > - For instructions on using the icon generator scripts, please refer to [Script Usage Instructions](#script-usage-instructions). _Note that Shell scripts will be removed in version 2.0.0 and later._
 
-A **fully functional** multi-platform game template built with **VB.NET** for [MonoGame](https://www.monogame.net/), featuring the demo game **Seed-Scape: Forest Planting Quest** and a blank starter template for building your own projects. Version 2.0.0 will introduce an entirely new demo game, _Mending Garden_ (development is currently paused; see [Roadmap → Version 2.0.0](#version-200-mending-garden-upcoming---development-paused) for details).
+A **fully functional** multi-platform game template built with **VB.NET** for [MonoGame](https://www.monogame.net/), featuring the demo game **Seed-Scape: Forest Planting Quest** and a blank starter template for building your own projects. 
+
+Having undergone so many edge cases, this version (1.2.8.3) is the truly final release of the 1.x series. Version 2.0.0 will introduce an entirely new demo game, _Mending Garden_ (development is currently paused; see [Roadmap → Version 2.0.0](#version-200-mending-garden-upcoming---development-paused) for details).
 
 Starting from version 1.2.0, all assets are fully licensed and attribution-ready:
 - Main character sprite adapted from CC0-licensed art
@@ -53,6 +55,16 @@ Versions 1.2.0 through 1.2.3 had template ID collisions that made the blank temp
 > **New to MonoGame?** Check out [BEGINNER_GUIDE.md](MonoGameStartKitVB/BEGINNER_GUIDE.md) for a comprehensive guide to transitioning from `vbPixelGameEngine` to MonoGame.
 
 ## What's New in Version 1.2.8+
+
+**Ultimate Performance Update on v1.2.8.3 (The Real Final 1.x Release)** 🎮
+
+This release landed on August 1st 2026 and focuses on performance: reduced per-frame allocations, precomputed UI metrics, renderer and actor-loop optimizations, and minor API cleanups. No gameplay changes. After all those edge cases that kept surfacing, 1.2.8.3 is the truly definitive release of the 1.x series.
+
+Up to this point, I've also cleaned up a couple of helper names for clarity:
+- `OneBasedIndices` → `BuildIndexRange` (in `Renderer.vb`)
+- `RestartMusicOnPause` → `ResumeMusicOnPause` (in `SoundManager.vb`)
+
+2.0.0 will only come to life after I finish the Postgraduate Entrance Exam, so this project will stay on the 1.x line until that chapter is closed.
 
 **Real-Time High Score Display** 🏆
 
@@ -321,7 +333,7 @@ dotnet new mgblank2dstartkitvb -n YourGameName
 - iOS compatibility untested on physical devices
 
 ### Version 2.0.0: _Mending Garden_ (Upcoming - Development Paused)
-> **Important Note**: Development will be paused starting July 2026 as I focus on preparing for the Postgraduate Entrance Exam. **This pause will continue until the end of 2026, when the exam is complete.** Updates will resume afterward, though plans for this new game template may evolve depending on my focus at that time. Thank you for your understanding!
+> **Important Note**: Development will be paused starting from August 1st 2026, since I focus on preparing for the Postgraduate Entrance Exam. **This pause will continue until the end of 2026, when the exam is complete.** Updates will resume afterward, though plans for this new game template may evolve depending on my focus at that time. Thank you for your understanding!
 
 _Mending Garden_ (version 2.0.0) is a farming simulation game deeply rooted in the theme of Plant Protection, set on a charming Chinese countryside farm:
 - 🌱 **Crop Planting**: Cultivate regionally significant crops like corn, cotton, and wheat
@@ -353,135 +365,41 @@ All assets are processed through the MonoGame Content Pipeline:
 
 ## Version History
 
-### Version 1.2.8.2 (Latest)
-- **Real-Time High Score HUD Update**: Improved the full demo game's HUD so the high score now updates immediately during play, rather than displaying the previous value or a temporary `-NEW BEST-` indicator.
-- **Visual Highlight for New Records**: When the player sets a new high score, the value is highlighted in `Color.Wheat` until the next round begins; otherwise, it reverts to `Color.MintCream`.
-- **Fixed a Design Flaw in `ModuleEventRaiser.Generator`**: Upgraded to version 1.2.5.1 to resolve an exception-swallowing issue in the `RaiseScheduledEvents` method.
-- **High Score Load/Save Error Logging**: Added `Trace.TraceError` logging to the previously empty `Catch` blocks in the `Essentials.vb` module when loading and saving high scores, so exceptions are no longer silently swallowed.
-> **Note**: This version is functionally identical to version 1.2.8 and 1.2.8.1, except for the `ModuleEventRaiser.Generator` dependency upgrade and the error logging added to the high score `Catch` blocks in `Essentials.vb`.
+### Version 1.2.8.3
+This is the truly definitive final release of the 1.x series. It focuses on performance and cleanup, including reduced per-frame allocations, precomputed UI metrics, renderer and actor-loop optimizations, and a final pass of naming and clarity improvements.
+
+### Version 1.2.8.2
+This patch improved the HUD with real-time high score updates, highlighted new records in the display, upgraded the event generator dependency, and added logging for high score load/save failures instead of silently swallowing them.
 
 ### Version 1.2.8.1
-- **Fixed a Design Flaw in `ModuleEventRaiser.Generator`**: Upgraded to version 1.2.5.1 to resolve an exception-swallowing issue in the `RaiseScheduledEvents` method. _This version is functionally identical to version 1.2.8 except for this dependency upgrade._
-
-### Version 1.2.7.3
-- **Blank Template iOS Support**: Added an iOS hosting project to the blank template solution and aligned its settings with .NET 10 so the VB.NET core logic can be reused more cleanly across platforms.
-- **Dependency Update**: Upgraded `ModuleEventRaiser.Generator` to version 1.2.5 for improved source generation, with all MonoGame packages pinned to version 3.8.5.
-- **Documentation Clarification**: Corrected the note in `Essentials.vb` within the demo game project to clarify that the scheduling methods are auto-generated, while the `RaiseEvent` helper methods are not inherently thread-safe.
-> **Note**: This version of the game template is functionally identical to 1.2.7.1 and 1.2.7.2, except for the enhanced `<summary>` comments in the `Essentials.vb` module within the demo game template, along with the dependency update and pinned MonoGame packages.
+This hotfix addressed the exception-swallowing flaw in the scheduled-event generator by upgrading the dependency to 1.2.5.1, while keeping the release otherwise aligned with 1.2.8.
 
 ### Version 1.2.7
-- **Blank Template UX Improvements**: Added letterboxing support, tap/click input handling, and a cleaner draw/render flow for the blank starter project.
-- **Shell Script Functionality**: Shell scripts (included since 1.2.0 but broken through 1.2.5) now correctly resolve paths to source images regardless of execution directory. They also verify source files exist before execution.
-- **Joystick Visual State Fix**: The virtual joystick knob now returns to center position when the game transitions away from the Playing state (e.g., pausing, game over), preventing the knob from appearing displaced without touch input on restart.
-- **Full Gamepad Support**: UI buttons can now be activated with a gamepad — **A** for the primary action (Start, Retry, Resume), **B** for the secondary action (Exit, Menu), **Start** to pause/resume, and **Back** to pause or return to the title screen. Keyboard equivalents: **Z** = A, **X** = B. Buttons are labeled `[A]`/`[B]` on-screen.
+The 1.2.7 line improved the blank template experience with letterboxing, tap/click input, cleaner rendering flow, iOS hosting support, shell script fixes, and broader gamepad support.
 
 ### Version 1.2.6 (Deprecated)
-- **README documentation issue**: This version is functionally identical to version 1.2.7 but had incomplete license documentation in its README (showing only "License" without specifying the BSD 3-Clause License type).
-> **Note**: The above issue has been corrected in version 1.2.7 and later. The package remains licensed under the **BSD 3-Clause License** across all versions.
+This release only corrected packaging notes in the README and is effectively the same as 1.2.7.
 
-### Version 1.2.5.3
-- **Code Cleanup**: Removed unused hidden variable `JOYSTICK_DEAD_ZONE` from `Actor.vb`
-- **Encapsulation Improvements**: Implemented the `{ get; private set; }` pattern for `PauseButtonWidth` and `PauseButtonHeight` in `Renderer.vb`
-- **Input Handling Refinement**: Made the `Renderer.Joystick` property shared, with the following logic applied to `Player.vb`'s `Update()` method: `If Joystick Is Nothing Then Joystick = Renderer.Joystick`
-- **Cross-Platform Verification**: All improvements were verified across DesktopGL, WindowsDX, and Android platforms without impacting game functionality
-
-### Version 1.2.5.2 (Deprecated)
-> **Note**: This version unexpectedly included unfinished 2.0.0 template code and has been deprecated. Please use 1.2.5.3 or later.
-
-### Version 1.2.5.1 (Hotfix)
-- **Joystick Null Reference Fix**: Added a defensive check in `GameMain.Update()` to ensure the joystick is always properly connected to the player after game restarts, preventing null-reference exceptions when pausing, returning to the menu, and starting a new game
-
-**Note for v1.2.5 users**: If you are using version 1.2.5, apply this hotfix by adding the following code at the top of the `Update` method in `GameMain.vb`:
-```vb
-With _gameManager
-    If .Player IsNot Nothing AndAlso .Player.Joystick Is Nothing Then
-        .Player.Joystick = _renderer.Joystick
-    End If
-End With
-```
-
-### Version 1.2.5 (Final UX Polish)
-- **Joystick Dead Zone**: Integrated the `VirtualJoystick` class into player input handling with a 25% dead zone
-- **Refactored Input Handling**: The Player class now uses `VirtualJoystick.Update()` for consistent input processing
-- **Joystick Property Added**: Added a `Joystick` property to the Player class for proper initialization and state management
-- **Android Touch Input Fix**: Corrected the joystick center coordinate calculation to account for screen offset and scaling, resolving the issue where joystick touch detection was misaligned with its drawn position
-- **Definitive v1.x Release**: This marks the final polish for _Seed-Scape: Forest Planting Quest_, with v2.0.0 (_Mending Garden_) planned for post-2026
+### Version 1.2.5.x
+The 1.2.5 line polished input and stability across desktop and mobile scenarios, including joystick handling, null-reference protections, and cross-platform verification. It was an important polish stage, but 1.2.8.3 is the truly definitive end of the 1.x line.
 
 ### Version 1.2.4
-- **Template ID Collision Fix**: Changed the blank template identity from `PacDessert1436.MonoGame.StartKitVB` to `PacDessert1436.MonoGame.BlankStartKitVB`
-- ⚠️ **Important**: Versions 1.2.0 through 1.2.3 had template ID collisions; **v1.2.4+ is recommended for production use**
+This release fixed the blank-template identity collision and made the template safe for production use.
 
-### Version 1.2.3 (Definitive Gameplay Fixes)
-- **Sound Playback Fix**: Resolved an edge case where `life_gained.wav` played at incorrect times
-- **Animation Timing Adjustments**: Fine-tuned the death sequence duration and "Season Cleared" caption display
-- **Code Cleanup**: Removed the unused `DrawFrameWithOrigin` method from `SpriteSheet.vb`
-- **Visual Polish**: Updated enemy blink color to purple for improved visibility
-- **Roadmap Update**: _Mending Garden_ (v2.0.0) development planned for post-2026
+### Version 1.2.3
+The game received gameplay and visual polish, including audio timing fixes, animation adjustments, and a purple enemy blink effect.
 
-### Version 1.2.2 (Gameplay & Stability Improvements)
-- **Maze Generation Fix**: Enemies now spawn correctly without overlapping seeds or pesticides
-  - Smart tile placement with proper distance constraints
-  - Dynamic enemy count scaling with level (5-12 enemies, clamped)
-- **Level & Score Limits**: Levels capped at 99, score clamped between 0-999999 to prevent overflow
-- **Complete XML Documentation**: Full `<summary>` comments added to `Actor.vb`
-  - `Actor` base class with properties and methods documented
-  - `Player` class with input handling and game mechanics documented
-  - `Enemy` class with AI behavior and respawning mechanics documented
-  - `Seed` class with collectible item documentation
+### Version 1.2.2
+This update improved maze generation, level and score safety limits, and the documentation around the actor system.
 
 ### Version 1.2.1
-- Improved `GameMain.vb` in the blank template with proper viewport handling for all platforms
-- Upgraded the `ModuleEventRaiser.Generator` library to the latest version
+This release updated the blank template viewport handling and refreshed the event generator dependency.
 
-### Version 1.2.0 (Production-Ready)
-- **Complete Copyright Safety**: All assets are now properly licensed
-- Main character `player_sheet.png` adapted from CC0-licensed [Forest Boy](https://opengameart.org/content/forest-boy-platformer-animated-character-24x24)
-- All original graphics (seeds, trees, beetles, caterpillars) created in Aseprite
-- All audio assets replaced with CC0-licensed alternatives from Open Game Art
-- Font updated to [Fusion Pixel Font](https://github.com/TakWolf/fusion-pixel-font) by TakWolf (12px Monospace)
-- Blank template now available for starting new projects (`mgblank2dstartkitvb`)
-- High score saving with JSON serialization
-- Bonus life sound effect (`life_gained.wav`)
-- Fixed button interaction issues between WindowsDX and Android platforms
-- Pause button now works consistently across platforms
-- ⚠️ **Versions prior to 1.2.0 have been unlisted** due to copyright concerns
+### Version 1.2.0
+The project became production-ready with fully licensed assets, a new blank template, improved audio and UI, and high score persistence.
 
-### Version 1.1.3
-- Improved touch detection accuracy for mobile devices
-- Better coordinate system alignment between rendering and input handling
-
-### Version 1.1.1 to 1.1.2
-- Fully functional game template ready for production use
-- Complete Android touch input support with virtual joystick
-- Clean architecture pattern implementation
-- Event-driven design with comprehensive event system
-- Polymorphic actor system with Player, Enemy, and Seed classes
-- Sprite sheet animations for all game entities
-- WindowsDX and Android platforms fully supported
-- ⚠️ DesktopGL build issues (FFMPEG pipeline - known limitation)
-
-### Version 1.1.0
-- Clean architecture pattern implementation
-- Event-driven design with comprehensive event system
-- Polymorphic actor system
-- Sprite sheet animations
-- Android touch controls tested and working
-- ❌ DesktopGL build issues (FFMPEG pipeline)
-
-### Version 1.0.3
-- IDisposable implementation for sound manager and renderer
-- Backward-compatible solution file format
-- ❌ DesktopGL build issues (FFMPEG pipeline)
-
-### Version 1.0.2
-- Object-oriented architecture refactoring
-- Improved code structure and maintainability
-- Event-driven design implementation
-- ❌ DesktopGL build issues (FFMPEG pipeline)
-
-### Version 1.0.1
-- Sound effects and sprite assets added
-- DesktopGL support (later broken by FFMPEG issues)
+### Version 1.1.x and earlier
+These early releases established the first playable prototype, Android touch support, and the initial architecture before the DesktopGL pipeline issue surfaced.
 
 ---
 

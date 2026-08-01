@@ -82,7 +82,7 @@ Public NotInheritable Class SoundManager
     Private Sub OnGameStateChanged(newState As GameState)
         Select Case newState
             Case GameState.Playing
-                RestartMusicOnPause()
+                ResumeMusicOnPause()
             Case GameState.GameOver
                 StopBackgroundMusic()
             Case GameState.Title
@@ -106,14 +106,14 @@ Public NotInheritable Class SoundManager
     ''' Handles death animation complete for audio.
     ''' </summary>
     Private Sub OnDeathAnimationComplete()
-        RestartMusicOnPause()
+        ResumeMusicOnPause()
     End Sub
 
     ''' <summary>
     ''' Handles get ready message for audio.
     ''' </summary>
     Private Sub OnGetReadyMessage()
-        RestartMusicOnPause()
+        ResumeMusicOnPause()
     End Sub
 
     ''' <summary>
@@ -221,9 +221,9 @@ Public NotInheritable Class SoundManager
     End Sub
 
     ''' <summary>
-    ''' Restarts background music on paused state.
+    ''' Resumes background music on paused state.
     ''' </summary>
-    Private Sub RestartMusicOnPause()
+    Private Sub ResumeMusicOnPause()
         If _isMusicPlaying AndAlso MediaPlayer.State = MediaState.Paused Then
             MediaPlayer.Resume()
         End If

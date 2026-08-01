@@ -61,14 +61,12 @@ Public NotInheritable Class SpriteSheet
     ''' <param name="scale">The scale to apply to the sprite.</param>
     ''' <param name="color">The color to tint the sprite.</param>
     Public Sub DrawFrame(spriteBatch As SpriteBatch, frameIndex As Integer, position As Vector2,
-                         Optional scale As Single = 1.0F, Optional color As Color = Nothing)
-        If color = Nothing Then color = Color.White
-
+                         Optional scale As Single = 1.0F, Optional drawColor As Color? = Nothing)
         spriteBatch.Draw(
             _texture,
             position,
             GetFrameRectangle(frameIndex),
-            color,
+            If(drawColor, Color.White),
             0.0F,
             Vector2.Zero,
             scale,
