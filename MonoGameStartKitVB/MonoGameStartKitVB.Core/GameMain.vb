@@ -24,9 +24,9 @@ Public NotInheritable Class GameMain
         If OperatingSystem.IsAndroid() Then
             _graphics.IsFullScreen = True
             With GraphicsDevice.PresentationParameters
-                GraphicsDevice.Viewport =
-                    New Viewport(0, 0, .BackBufferWidth, .BackBufferHeight) _
-                    With {.MinDepth = 0.0F, .MaxDepth = 1.0F}
+                ' The Viewport constructor defaults `MinDepth` to 0.0 and `MaxDepth` to 1.0.
+                ' We rely on these defaults here.
+                GraphicsDevice.Viewport = New Viewport(0, 0, .BackBufferWidth, .BackBufferHeight)
             End With
         Else
             _graphics.PreferredBackBufferWidth = SCREEN_WIDTH

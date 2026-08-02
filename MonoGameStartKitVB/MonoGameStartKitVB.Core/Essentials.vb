@@ -13,8 +13,8 @@ Imports Microsoft.Xna.Framework
 ''' <em>The <see langword="RaiseEvent"/> helper methods generated from the source generator are not inherently thread-safe.</em>
 ''' </para>
 ''' <para>
-''' Meanwhile, the <see langword="Partial"/> keyword is not mandatory for the current module, but using 
-''' this keyword improves code clarity and consistency (which highlights the fact that the module contains 
+''' Meanwhile, the <see langword="Partial"/> keyword is not mandatory for the current module, but using
+''' this keyword improves code clarity and consistency (which highlights the fact that the module contains
 ''' source-generated methods).
 ''' </para>
 ''' </remarks>
@@ -306,11 +306,26 @@ Partial Public Module Essentials
     ''' <returns>The full file path.</returns>
     Private ReadOnly Property HighScoreFilePath As String
         Get
-            Const HIGH_SCORE_FILE As String = "high_score.json"
+            Const HIGH_SCORE_FILENAME As String = "HighScore.json"
             Dim appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
-            Dim gameFolderPath As String = Path.Combine(appDataPath, "SeedScape")
+            Dim gameFolderPath = Path.Combine(appDataPath, HighScoreStorageFolderName)
             If Not Directory.Exists(gameFolderPath) Then Directory.CreateDirectory(gameFolderPath)
-            Return Path.Combine(gameFolderPath, HIGH_SCORE_FILE)
+            Return Path.Combine(gameFolderPath, HIGH_SCORE_FILENAME)
+        End Get
+    End Property
+
+    ''' <summary>
+    ''' Builds a project-specific folder name for storing high score data.
+    ''' </summary>
+    ''' <returns>A sanitized folder name based on the entry assembly.</returns>
+    Private ReadOnly Property HighScoreStorageFolderName As String
+        Get
+            Dim assemblyName = Reflection.Assembly.GetEntryAssembly()?.GetName()?.Name
+            If Not String.IsNullOrWhiteSpace(assemblyName) Then
+                Dim sanitizedName = assemblyName.Replace(" ", "_").Replace(".", "_").Replace("-", "_")
+                If Not String.IsNullOrWhiteSpace(sanitizedName) Then Return sanitizedName
+            End If
+            Return "MonoGameStartKitVB"  ' Fallback to your project name if no valid name is found
         End Get
     End Property
 
