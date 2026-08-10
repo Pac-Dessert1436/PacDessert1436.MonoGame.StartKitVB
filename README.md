@@ -2,6 +2,13 @@
 
 > ## ⚠️ Special Reminders
 >
+> **Extra edge-case fix for iOS users**:
+> - The 1.x line previously lacked the iOS platform check in `GameMain.vb`. If you are using version 1.2.9 or earlier and targeting iOS, add this line of code inside the `Initialize()` method:
+> ```vb
+> If OperatingSystem.IsAndroid() OrElse OperatingSystem.IsIOS() Then
+> ```
+> - This fix is included in version 1.2.10 for both templates (blank and full demo). _Direct iOS device validation is still limited because an iOS test device has not yet been available, so iOS support should be considered provisional._ No action is required if you only deploy to Android, Windows, Linux, or macOS.
+>
 > **For users of v1.2.5, v1.2.8, and v1.2.8.1**:
 > - v1.2.5 contains a critical **null-reference crash** that can occur when pausing, returning to the menu, and then restarting the demo game. If you are still using v1.2.5, add the following snippet at the top of the `Update()` method in `GameMain.vb`:
 > ```vb
@@ -21,9 +28,9 @@
 
 A multi-platform game template built with **VB.NET** and [MonoGame](https://www.monogame.net/), featuring the demo game _**Seed-Scape: Forest Planting Quest**_ and a blank starter template for creating new projects.
 
-The 1.x line is now in its final stage after dozens of edge-case fixes, and version 1.2.8.3 is the performance-focused release of the line. Version 1.2.9 is the truly definitive polish release, focusing on **a small improvement that resolves high-score save path collisions**, so the template is easier to reuse across different projects.
+The 1.x line is now in its final release phase with the last edge-case fix. Version 1.2.10 is the current recommended release that includes the iOS platform check. Version 1.2.9 remains the previous polish release with the high-score save path fix.
 
-Version 2.0.0, which will introduce the new demo game known as _Mending Garden_, is planned but currently paused while the author prepares for the Postgraduate Entrance Exam. See [Roadmap → Version 2.0.0](#version-200-mending-garden-upcoming---development-paused) for more details.
+Version 2.0.0, which will introduce the new demo game _Mending Garden_, is planned but currently paused while the author prepares for the Postgraduate Entrance Exam. See [Roadmap → Version 2.0.0](#version-200-mending-garden-upcoming---development-paused) for details.
 
 Starting from version 1.2.0, all assets are fully licensed and attribution-ready:
 - Main character sprite adapted from CC0-licensed art
@@ -57,12 +64,13 @@ Versions 1.2.0 through 1.2.3 had template ID collisions that made the blank temp
 
 ## Release Status and Chronology
 
-_The 1.x line is now 100% complete with the last edge case resolved._ The current recommended version is **1.2.9**, which is the final 1.x release and the **only** version that resolves the shared high-score save path conflict.
+_The 1.x line is now in its final release phase._ The current recommended version is **1.2.10**, the definitive 1.x release with the last edge case resolved. Version 1.2.9 is the prior polish release and remains a stable choice if you do not need the iOS support.
 
-- **Version 1.2.8.3 is the prior performance-focused release.** It improves runtime efficiency, reduces overhead in the renderer and actor loop, and includes a small internal cleanup pass, but it does not include the project-specific high-score storage fix.
-- Version 2.0.0 is planned for a new demo game, _Mending Garden_, but development is currently paused until the exam period is over.
+- Version 1.2.10 includes the iOS adapter fix in `GameMain.vb`, which is the ultimate cleanup pass for the 1.x line, along with high-score save path resolution in v1.2.9.
+- **Version 1.2.8.3 is the previous performance-focused release.** It improves runtime efficiency, reduces overhead in the renderer and actor loop, and includes a small internal cleanup pass, but it does not include the project-specific high-score storage fix.
+- Version 2.0.0 is planned for a new demo game, _Mending Garden_, but development is currently paused while the author focuses on exam preparation. Updates will resume after the exam.
 
-> **Note**: If you want to avoid high-score save path collisions between different projects using this template, upgrade to this version (1.2.9) immediately.
+> **Note**: If you want to avoid high-score save path collisions between different projects using this template, upgrade to version 1.2.9 or later.
 
 ### Earlier 1.2.8 and 1.2.7 updates
 
@@ -71,7 +79,7 @@ The 1.2.8.x line also introduced:
 - safer exception handling around scheduled events and high-score load/save paths
 - a dependency update to `ModuleEventRaiser.Generator` 1.2.5.1
 
-The 1.2.7 line improved the blank template experience with letterboxing, tap/click input, cleaner rendering flow, iOS hosting support, shell-script fixes, and broader gamepad support.
+The 1.2.7.x line improved the blank template experience with letterboxing, tap/click input, cleaner rendering flow, iOS hosting support, shell-script fixes, and broader gamepad support.
 
 ### Script Usage Instructions
 
@@ -195,7 +203,7 @@ MonoGameStartKitVB/
 | **SoundManager** | Plays background music and sound effects | ✅ Working |
 | **Actor** | Base class for all game entities with inheritance | ✅ Working |
 
-> **Note:** On version 1.2.9, the `GameMain` class uses the `Viewport` constructor defaults for `MinDepth` (0.0) and `MaxDepth` (1.0) on Android - no need to explicitly write `With {.MinDepth = 0.0, .MaxDepth = 1.0}`.
+> **Note:** On version 1.2.9 and later, the `GameMain` class uses the `Viewport` constructor defaults for `MinDepth` (0.0) and `MaxDepth` (1.0) on Android - no need to explicitly write `With {.MinDepth = 0.0, .MaxDepth = 1.0}`.
 
 ---
 
@@ -333,17 +341,21 @@ All assets are processed through the MonoGame Content Pipeline:
 
 ## Version History
 
+### Version 1.2.10
+- **True Final 1.x**: This is the current recommended version and the ultimate 1.x release. Development is now paused until after the author's exam period.
+- **iOS compatibility fix**: Added the `OperatingSystem.IsIOS()` check in `GameMain.vb` for both templates.
+
 ### Version 1.2.9
-This is the real final polish release of the 1.x series. It keeps the release line stable while making the template easier to reuse, especially by storing high-score data in a project-specific folder instead of a shared template-wide location.
+- **High-score save path fix**: Stabilized the 1.x line and improved project reuse by resolving shared high-score save path collisions, so the template can be reused safely across different projects.
 
 ### Version 1.2.8.3
-This is the performance-focused release of the 1.x line. It reduces per-frame overhead, improves rendering and actor-loop efficiency, and includes a small internal cleanup pass.
+- **Performance-focused release**: Reduced per-frame overhead, improved renderer and actor-loop efficiency, and performed a small internal cleanup pass.
 
 ### Version 1.2.8.2
-This patch improved the HUD with real-time high score updates, highlighted new records in the display, upgraded the event generator dependency, and added logging for high-score load/save failures.
+- **HUD and save reliability**: Improved the HUD with real-time high score updates, highlighted new records in the display, upgraded the event generator dependency, and added logging for high-score load/save failures.
 
 ### Version 1.2.8.1
-This hotfix addressed the exception-swallowing flaw in the scheduled-event generator by upgrading the dependency to 1.2.5.1.
+- **Hotfix**: Addressed an exception-swallowing issue in the scheduled-event generator by upgrading the dependency to `ModuleEventRaiser.Generator` 1.2.5.1.
 
 ### Version 1.2.7
 The 1.2.7 line improved the blank template experience with letterboxing, tap/click input, cleaner rendering flow, iOS hosting support, shell-script fixes, and broader gamepad support.

@@ -28,7 +28,7 @@ Public NotInheritable Class GameMain
     End Sub
 
     Protected Overrides Sub Initialize()
-        If OperatingSystem.IsAndroid() Then
+        If OperatingSystem.IsAndroid() OrElse OperatingSystem.IsIOS() Then
             _graphics.IsFullScreen = True
             With GraphicsDevice.PresentationParameters
                 ' The Viewport constructor defaults `MinDepth` to 0.0 and `MaxDepth` to 1.0.
