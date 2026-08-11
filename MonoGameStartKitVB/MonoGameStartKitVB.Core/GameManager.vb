@@ -28,10 +28,19 @@ Public NotInheritable Class GameManager
 
     Private _previousKeyboardState As KeyboardState
     Private _previousGamePadState As GamePadState
+    Private ReadOnly _game As GameMain
 
-    Public Sub New()
+    Public Sub New(game As GameMain)
         HighScore = LoadHighScore()
         InitializeGame()
+        _game = game
+    End Sub
+
+    ''' <summary>
+    ''' Requests a normal shutdown through MonoGame.
+    ''' </summary>
+    Private Sub ExitGame()
+        _game.Exit()
     End Sub
 
     ''' <summary>
@@ -367,14 +376,14 @@ Public NotInheritable Class GameManager
                 ElseIf keyboardState.IsKeyDown(Keys.Escape) AndAlso
                        Not _previousKeyboardState.IsKeyDown(Keys.Escape) Then
                     ScheduleEvent_GameStateChanged(GameState.Title)
-                    Environment.Exit(0)
+                    ExitGame()
                 End If
 
                 If aPressed OrElse zPressed Then
                     GameState = GameState.Playing
                 ElseIf bPressed OrElse xPressed Then
                     ScheduleEvent_GameStateChanged(GameState.Title)
-                    Environment.Exit(0)
+                    ExitGame()
                 End If
 
                 For Each touchLoc In touchCollection
@@ -396,10 +405,10 @@ Public NotInheritable Class GameManager
                             GameState = GameState.Playing
                         ElseIf IsPointInRect(touchPos, exitButton) Then
                             ScheduleEvent_GameStateChanged(GameState.Title)
-                            Environment.Exit(0)
+                            ExitGame()
                         End If
                     End If
-                Next
+                Next touchLoc
 
                 If mouseState.LeftButton = ButtonState.Pressed Then
                     Dim mousePos As New Vector2(mouseState.X, mouseState.Y)
@@ -419,7 +428,7 @@ Public NotInheritable Class GameManager
                         GameState = GameState.Playing
                     ElseIf IsPointInRect(mousePos, exitButton) Then
                         ScheduleEvent_GameStateChanged(GameState.Title)
-                        Environment.Exit(0)
+                        ExitGame()
                     End If
                 End If
 

@@ -130,7 +130,7 @@ Public NotInheritable Class Renderer
     End Sub
 
     ''' <summary>
-    ''' Creates a new render target.
+    ''' Creates a new render target for the game screen.
     ''' </summary>
     Private Sub CreateRenderTarget()
         _renderTarget?.Dispose()
@@ -191,7 +191,7 @@ Public NotInheritable Class Renderer
         PauseButtonHeight = _pauseButton.Height
         _joystick = New VirtualJoystick(_joystickBase, _joystickKnob, New Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 100))
 
-        ' Precompute instruction text sizes to avoid per-frame `MeasureString` calls
+        ' Precompute UI instruction sizes once to avoid repeated MeasureString calls each frame.
         For i As Integer = 0 To _instructions.Length - 1
             _instructionSizes(i) = _gameFont.MeasureString(_instructions(i))
         Next i
@@ -285,7 +285,11 @@ Public NotInheritable Class Renderer
         Dim instrY As Integer = 700
         For i As Integer = 0 To _instructions.Length - 1
             Dim instr = _instructions(i)
-            Dim instrSize = If(_instructionSizes IsNot Nothing AndAlso i < _instructionSizes.Length, _instructionSizes(i), _gameFont.MeasureString(instr))
+            Dim instrSize = If(
+                _instructionSizes IsNot Nothing AndAlso i < _instructionSizes.Length,
+                _instructionSizes(i),
+                _gameFont.MeasureString(instr)
+            )
             Dim instructionPos As New Vector2(
                 (SCREEN_WIDTH - instrSize.X) / 2,
                 instrY
@@ -296,8 +300,12 @@ Public NotInheritable Class Renderer
     End Sub
 
     ''' <summary>
-    ''' Draws a button on the screen.
+    ''' Draws a button on the screen. Rendering is separate from input handling.
     ''' </summary>
+    ''' <remarks>
+    ''' If you add or change buttons, also update <see cref="GameManager.HandleInput"/> so the
+    ''' input zones stay in sync.
+    ''' </remarks>
     ''' <param name="text">The text to display on the button.</param>
     ''' <param name="centerX">The center X coordinate of the button.</param>
     ''' <param name="y">The Y coordinate of the button.</param>

@@ -3,11 +3,13 @@
 > ## ⚠️ Special Reminders
 >
 > **Extra edge-case fix for iOS users**:
-> - The 1.x line previously lacked the iOS platform check in `GameMain.vb`. If you are using version 1.2.9 or earlier and targeting iOS, add this line of code inside the `Initialize()` method:
+> - The 1.x line previously lacked the iOS platform check in `GameMain.vb`. If you are using version 1.2.9 or earlier and targeting iOS, add this line inside the `Initialize()` method:
 > ```vb
 > If OperatingSystem.IsAndroid() OrElse OperatingSystem.IsIOS() Then
 > ```
-> - This fix is included in version 1.2.10 for both templates (blank and full demo). _Direct iOS device validation is still limited because an iOS test device has not yet been available, so iOS support should be considered provisional._ No action is required if you only deploy to Android, Windows, Linux, or macOS.
+> - This fix is included in versions 1.2.10 and later for both templates (blank and full demo). Version 1.2.11 is the current recommended 1.x release. _Direct iOS device validation is still limited because no iOS test device has yet been available, so iOS support should be considered provisional._ No action is required if you only deploy to Android, Windows, Linux, or macOS.
+> 
+> **For patching `GameManager.vb`**: See [Important Notes on `GameManager.vb`](#important-notes-on-gamemanagervb) for concise guidance on safe shutdown and input handling.
 >
 > **For users of v1.2.5, v1.2.8, and v1.2.8.1**:
 > - v1.2.5 contains a critical **null-reference crash** that can occur when pausing, returning to the menu, and then restarting the demo game. If you are still using v1.2.5, add the following snippet at the top of the `Update()` method in `GameMain.vb`:
@@ -28,7 +30,7 @@
 
 A multi-platform game template built with **VB.NET** and [MonoGame](https://www.monogame.net/), featuring the demo game _**Seed-Scape: Forest Planting Quest**_ and a blank starter template for creating new projects.
 
-The 1.x line is now in its final release phase with the last edge-case fix. Version 1.2.10 is the current recommended release that includes the iOS platform check. Version 1.2.9 remains the previous polish release with the high-score save path fix.
+The 1.x line is now in its final release phase, and version 1.2.11 is the current recommended release. It includes a small fix on the demo game's exit flow, keeping the 1.x line stable for existing projects. Version 1.2.10 remains the previous recommended release with the iOS platform check, while version 1.2.9 is the earlier polish release with the high-score save path fix.
 
 Version 2.0.0, which will introduce the new demo game _Mending Garden_, is planned but currently paused while the author prepares for the Postgraduate Entrance Exam. See [Roadmap → Version 2.0.0](#version-200-mending-garden-upcoming---development-paused) for details.
 
@@ -64,9 +66,10 @@ Versions 1.2.0 through 1.2.3 had template ID collisions that made the blank temp
 
 ## Release Status and Chronology
 
-_The 1.x line is now in its final release phase._ The current recommended version is **1.2.10**, the definitive 1.x release with the last edge case resolved. Version 1.2.9 is the prior polish release and remains a stable choice if you do not need the iOS support.
+_The 1.x line is now in its final release phase._ The current recommended version is **1.2.11**, a small patch release that keeps the line stable while closing one more edge case around the exit flow. Version 1.2.10 remains the previous recommended release for the iOS compatibility check, and version 1.2.9 is the earlier polish release if you do not need that platform-specific fix.
 
-- Version 1.2.10 includes the iOS adapter fix in `GameMain.vb`, which is the ultimate cleanup pass for the 1.x line, along with high-score save path resolution in v1.2.9.
+- Version 1.2.11 includes a small exit-flow fix in `GameManager.vb` so the game closes through the normal MonoGame shutdown path rather than relying on the abrupt `Environment.Exit(0)` fallback. It is a conservative patch release for existing projects.
+- Version 1.2.10 includes the iOS adapter fix in `GameMain.vb`, which was the last major cleanup pass for the 1.x line, along with high-score save path resolution in v1.2.9.
 - **Version 1.2.8.3 is the previous performance-focused release.** It improves runtime efficiency, reduces overhead in the renderer and actor loop, and includes a small internal cleanup pass, but it does not include the project-specific high-score storage fix.
 - Version 2.0.0 is planned for a new demo game, _Mending Garden_, but development is currently paused while the author focuses on exam preparation. Updates will resume after the exam.
 
@@ -114,6 +117,34 @@ chmod +x scripts/*.sh
 ```
 
 > **Note**: Shell scripts require the macOS `sips` command. Python scripts are recommended for cross-platform use because they provide better portability and more predictable behavior on Windows and Linux.
+
+### Important Notes on `GameManager.vb`
+
+Version 1.2.11 already includes a safer exit flow for `GameManager.vb` if you're upgrading from an earlier 1.x release. _To patch older code manually, make these changes and then ensure `GameMain.vb` passes `Me` into the `GameManager` constructor:_
+
+```vb
+' In GameManager.vb:
+Private ReadOnly _game As GameMain
+
+Public Sub New(game As GameMain)
+    HighScore = LoadHighScore()
+    InitializeGame()
+    _game = game
+End Sub
+
+Private Sub ExitGame()
+    _game.Exit()
+End Sub
+
+Public Sub HandleInput()
+    ' Replace any direct `Environment.Exit(0)` calls with `ExitGame()`.
+End Sub
+
+' Then update `Initialize()` in GameMain.vb with this line:
+_gameManager = New GameManager(Me)
+```
+
+Additionally, because the button rendering in `Renderer.vb` is separate from input handling in `GameManager.vb`, keep shutdown and menu controls centralized in `HandleInput()` whenever you add or change buttons.
 
 ---
 
@@ -341,8 +372,12 @@ All assets are processed through the MonoGame Content Pipeline:
 
 ## Version History
 
+### Version 1.2.11
+- **Small patch release**: This is the current recommended version and keeps the 1.x line stable with one more edge-case fix around the exit flow.
+- **Exit-flow cleanup**: Adjusted the shutdown path in `GameManager.vb` so the game closes through the normal MonoGame exit flow instead of relying on the abrupt `Environment.Exit(0)` fallback.
+
 ### Version 1.2.10
-- **True Final 1.x**: This is the current recommended version and the ultimate 1.x release. Development is now paused until after the author's exam period.
+- **Final 1.x cleanup**: This was the last major 1.x release and includes the iOS compatibility fix, along with the earlier high-score save path work.
 - **iOS compatibility fix**: Added the `OperatingSystem.IsIOS()` check in `GameMain.vb` for both templates.
 
 ### Version 1.2.9

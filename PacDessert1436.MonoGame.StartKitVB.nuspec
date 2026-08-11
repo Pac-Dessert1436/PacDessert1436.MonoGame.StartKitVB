@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>PacDessert1436.MonoGame.StartKitVB</id>
-    <version>1.2.10</version>
+    <version>1.2.11</version>
     <title>MonoGame 2D StartKit VB.NET</title>
     <authors>Pac-Dessert1436</authors>
     <owners>Pac-Dessert1436</owners>

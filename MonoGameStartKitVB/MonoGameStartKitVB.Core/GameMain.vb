@@ -21,7 +21,7 @@ Public NotInheritable Class GameMain
     End Sub
 
     Protected Overrides Sub Initialize()
-        If OperatingSystem.IsAndroid() OrElse OperatingSystem.IsIOS() Then
+        If OperatingSystem.IsAndroid() OrElse OperatingSystem.IsIOS() Then  ' Experimental for iOS
             _graphics.IsFullScreen = True
             With GraphicsDevice.PresentationParameters
                 ' The Viewport constructor defaults `MinDepth` to 0.0 and `MaxDepth` to 1.0.
@@ -35,7 +35,7 @@ Public NotInheritable Class GameMain
         End If
         _graphics.ApplyChanges()
 
-        _gameManager = New GameManager
+        _gameManager = New GameManager(Me)
         _renderer = New Renderer(GraphicsDevice, Content)
         _soundManager = New SoundManager(Content)
 
