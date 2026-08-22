@@ -88,15 +88,15 @@ Public MustInherit Class Actor
     Public Shared Function ValidDirections(currDir As Direction) As Direction()
         Select Case currDir
             Case Direction.Up
-                Return {Direction.Left, Direction.Right, Direction.Down}
-            Case Direction.Down
                 Return {Direction.Left, Direction.Right, Direction.Up}
+            Case Direction.Down
+                Return {Direction.Left, Direction.Right, Direction.Down}
             Case Direction.Left
-                Return {Direction.Up, Direction.Down, Direction.Right}
+                Return {Direction.Up, Direction.Down, Direction.Left}
             Case Direction.Right
-                Return {Direction.Up, Direction.Down, Direction.Left}
+                Return {Direction.Up, Direction.Down, Direction.Right}
             Case Else
-                Return {Direction.Up, Direction.Down, Direction.Left}
+                Return {Direction.Up, Direction.Down, Direction.Left, Direction.Right}
         End Select
     End Function
 
@@ -602,10 +602,7 @@ Public MustInherit Class Actor
             If IsRespawning Then
                 RespawnTimer += deltaTime
                 If RespawnTimer >= ENEMY_RESPAWN_TIME Then
-                    IsRespawning = False
-                    RespawnTimer = 0.0F
-                    IsActive = True
-                    GracePeriodTimer = ENEMY_GRACE_PERIOD
+                    RespawnAt(SpawnPoint)
                     ScheduleEvent_EnemyRespawned(Me)
                 End If
                 Exit Sub
@@ -744,14 +741,14 @@ Public MustInherit Class Actor
         End Sub
 
         ''' <summary>
-        ''' Immediately respawns the enemy at a new position.
+        ''' Immediately respawns the enemy at a specified position.
         ''' </summary>
-        ''' <param name="newPosition">The position to respawn at.</param>
-        Public Sub RespawnAt(newPosition As Point)
-            GridPosition = newPosition
+        ''' <param name="position">The position to respawn at.</param>
+        Public Sub RespawnAt(position As Point)
+            GridPosition = position
             PixelPosition = New Vector2(
-                newPosition.X * CELL_SIZE + CELL_SIZE \ 2,
-                newPosition.Y * CELL_SIZE + CELL_SIZE \ 2
+                position.X * CELL_SIZE + CELL_SIZE \ 2,
+                position.Y * CELL_SIZE + CELL_SIZE \ 2
             )
             IsActive = True
             IsRespawning = False

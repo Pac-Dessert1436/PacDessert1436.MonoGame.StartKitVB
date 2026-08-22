@@ -59,14 +59,14 @@ Public NotInheritable Class SpriteSheet
     ''' <param name="frameIndex">The index of the frame to draw.</param>
     ''' <param name="position">The position to draw the sprite at.</param>
     ''' <param name="scale">The scale to apply to the sprite.</param>
-    ''' <param name="color">The color to tint the sprite.</param>
+    ''' <param name="tintColor">The color to tint the sprite.</param>
     Public Sub DrawFrame(spriteBatch As SpriteBatch, frameIndex As Integer, position As Vector2,
-                         Optional scale As Single = 1.0F, Optional drawColor As Color? = Nothing)
+                         Optional scale As Single = 1.0F, Optional tintColor As Color? = Nothing)
         spriteBatch.Draw(
             _texture,
             position,
             GetFrameRectangle(frameIndex),
-            If(drawColor, Color.White),
+            If(tintColor, Color.White),
             0.0F,
             Vector2.Zero,
             scale,
@@ -75,18 +75,30 @@ Public NotInheritable Class SpriteSheet
         )
     End Sub
 
+    ''' <summary>
+    ''' Gets the texture used by the sprite sheet.
+    ''' </summary>
+    ''' <returns>The texture object.</returns>
     Public ReadOnly Property Texture As Texture2D
         Get
             Return _texture
         End Get
     End Property
-    
+
+    ''' <summary>
+    ''' Gets the number of columns in the sprite sheet.
+    ''' </summary>
+    ''' <returns>The number of columns in the sprite sheet.</returns>
     Public ReadOnly Property Columns As Integer
         Get
             Return _columns
         End Get
     End Property
-    
+
+    ''' <summary>
+    ''' Gets the number of rows in the sprite sheet.
+    ''' </summary>
+    ''' <returns>The number of rows in the sprite sheet.</returns>
     Public ReadOnly Property Rows As Integer
         Get
             Return _rows
@@ -106,10 +118,16 @@ Public NotInheritable Class Animation
 
     Public Sub New(spriteSheet As SpriteSheet, frameIndices As Integer(), frameDuration As Single)
         _spriteSheet = spriteSheet
+        ' Use the first frame if `frameIndices` is empty
         _frameIndices = If(frameIndices Is Nothing OrElse frameIndices.Length = 0, {0}, frameIndices)
+        ' Clamp the frame duration to a minimum value of 0.001 seconds
         Me.FrameDuration = Math.Max(0.001F, frameDuration)
     End Sub
 
+    ''' <summary>
+    ''' Gets the rectangle for the current frame in the animation.
+    ''' </summary>
+    ''' <returns>The rectangle defining the current frame's position in the sprite sheet.</returns>
     Public ReadOnly Property CurrentFrame As Rectangle
         Get
             If _frameIndices Is Nothing OrElse _frameIndices.Length = 0 Then
@@ -119,6 +137,14 @@ Public NotInheritable Class Animation
         End Get
     End Property
 
+    ''' <summary>
+    ''' Updates the animation state based on the specified delta time.
+    ''' </summary>
+    ''' <remarks>
+    ''' The animation is advanced to the next frame when the current frame duration is reached.
+    ''' If the animation reaches the end of the sequence, it loops back to the first frame.
+    ''' </remarks>
+    ''' <param name="deltaTime">The time interval in seconds since the last update.</param>
     Public Sub Update(deltaTime As Single)
         If _frameIndices.Length <= 1 Then Exit Sub
 
@@ -129,17 +155,28 @@ Public NotInheritable Class Animation
         End If
     End Sub
 
+    ''' <summary>
+    ''' Resets the animation to the first frame.
+    ''' </summary>
     Public Sub Reset()
         _currentFrameIndex = 0
         _frameTimer = 0
     End Sub
 
+    ''' <summary>
+    ''' Gets the current frame index in the animation.
+    ''' </summary>
+    ''' <returns>The index of the current frame in the animation.</returns>
     Public ReadOnly Property SpriteSheet As SpriteSheet
         Get
             Return _spriteSheet
         End Get
     End Property
-        
+
+    ''' <summary>
+    ''' Gets the current frame index in the animation.
+    ''' </summary>
+    ''' <returns>The index of the current frame in the animation.</returns>
     Public ReadOnly Property CurrentFrameIndex As Integer
         Get
             Return _frameIndices(_currentFrameIndex)

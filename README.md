@@ -7,7 +7,7 @@
 > ```vb
 > If OperatingSystem.IsAndroid() OrElse OperatingSystem.IsIOS() Then
 > ```
-> - This fix is included in versions 1.2.10 and later for both templates (blank and full demo). Version 1.2.11 is the current recommended 1.x release. _Direct iOS device validation is still limited because no iOS test device has yet been available, so iOS support should be considered provisional._ No action is required if you only deploy to Android, Windows, Linux, or macOS.
+> - This fix is included in versions 1.2.10 and later for both templates (blank and full demo). Version 1.2.12 is the current recommended 1.x release. _Direct iOS device validation is still limited because no iOS test device has yet been available, so iOS support should be considered provisional._ No action is required if you only deploy to Android, Windows, Linux, or macOS.
 > 
 > **For patching `GameManager.vb`**: See [Important Notes on `GameManager.vb`](#important-notes-on-gamemanagervb) for concise guidance on safe shutdown and input handling.
 >
@@ -30,7 +30,7 @@
 
 A multi-platform game template built with **VB.NET** and [MonoGame](https://www.monogame.net/), featuring the demo game _**Seed-Scape: Forest Planting Quest**_ and a blank starter template for creating new projects.
 
-The 1.x line is now in its final release phase, and version 1.2.11 is the current recommended release. It includes a small fix on the demo game's exit flow, keeping the 1.x line stable for existing projects. Version 1.2.10 remains the previous recommended release with the iOS platform check, while version 1.2.9 is the earlier polish release with the high-score save path fix.
+The 1.x line is now in its final release phase, and version 1.2.12 is the current recommended release. It mitigates the enemy 180° direction-flip bug and polishes documentation and respawn logic, keeping the 1.x line stable for existing projects. Version 1.2.11 remains the previous recommended release with the exit-flow fix, the iOS platform check, and the high-score save path resolution.
 
 Version 2.0.0, which will introduce the new demo game _Mending Garden_, is planned but currently paused while the author prepares for the Postgraduate Entrance Exam. See [Roadmap → Version 2.0.0](#version-200-mending-garden-upcoming---development-paused) for details.
 
@@ -66,12 +66,13 @@ Versions 1.2.0 through 1.2.3 had template ID collisions that made the blank temp
 
 ## Release Status and Chronology
 
-_The 1.x line is now in its final release phase._ The current recommended version is **1.2.11**, a small patch release that keeps the line stable while closing one more edge case around the exit flow. Version 1.2.10 remains the previous recommended release for the iOS compatibility check, and version 1.2.9 is the earlier polish release if you do not need that platform-specific fix.
+_The 1.x line is now in its final release phase._ The current recommended version is **1.2.12**, which is the latest edge-case fix — another patch release that keeps the line stable while mitigating the enemy 180° direction-flip bug and polishing XML documentation and respawn logic. This patch release also completes and corrects the XML documentation in `SpriteSheet.vb` and simplifies the enemy respawn logic by centralizing position resetting through `Enemy.RespawnAt()`. No other parts of the game logic are affected.
 
+- Version 1.2.12 mitigates the enemy 180° direction-flip bug by adjusting `Actor.ValidDirections()` in `Actor.vb` so the opposite direction is never offered as a valid choice; enemies may only continue forward or turn sideways.
 - Version 1.2.11 includes a small exit-flow fix in `GameManager.vb` so the game closes through the normal MonoGame shutdown path rather than relying on the abrupt `Environment.Exit(0)` fallback. It is a conservative patch release for existing projects.
 - Version 1.2.10 includes the iOS adapter fix in `GameMain.vb`, which was the last major cleanup pass for the 1.x line, along with high-score save path resolution in v1.2.9.
-- **Version 1.2.8.3 is the previous performance-focused release.** It improves runtime efficiency, reduces overhead in the renderer and actor loop, and includes a small internal cleanup pass, but it does not include the project-specific high-score storage fix.
-- Version 2.0.0 is planned for a new demo game, _Mending Garden_, but development is currently paused while the author focuses on exam preparation. Updates will resume after the exam.
+- Version 1.2.8.3 is the performance-focused release. It improves runtime efficiency, reduces overhead in the renderer and actor loop, and includes a small internal cleanup pass, but it does not include the project-specific high-score storage fix.
+- **Version 2.0.0 is planned for a new demo game, _Mending Garden_**, but development is currently paused while the author focuses on exam preparation. Updates will resume after the exam.
 
 > **Note**: If you want to avoid high-score save path collisions between different projects using this template, upgrade to version 1.2.9 or later.
 
@@ -338,6 +339,7 @@ dotnet new mgblank2dstartkitvb -n YourGameName
 ### Known Issues in 1.2.x
 - DesktopGL high DPI mode unavailable (game window may exceed screen height)
 - iOS compatibility untested on physical devices
+- _(Mitigated in 1.2.12 — see Version History)_ Previous 1.x releases allowed enemies to make a 180° turn via two fast consecutive direction switches. This is no longer possible as the opposite direction is now excluded from `ValidDirections`; enemies may only continue forward or turn sideways.
 
 ### Version 2.0.0: _Mending Garden_ (Upcoming - Development Paused)
 > **Important Note**: Development will be paused starting from August 1st 2026, since I focus on preparing for the Postgraduate Entrance Exam. **This pause will continue until the end of 2026, when the exam is complete.** Updates will resume afterward, though plans for this new game template may evolve depending on my focus at that time. Thank you for your understanding!
@@ -372,8 +374,13 @@ All assets are processed through the MonoGame Content Pipeline:
 
 ## Version History
 
+### Version 1.2.12 (Definitive Patch Release)
+- **Enemy 180° direction-flip mitigation**: Adjusted `Actor.ValidDirections()` in `Actor.vb` so the opposite direction is excluded from the valid set; enemies may only continue forward or turn sideways. This prevents two consecutive same-frame direction changes from producing an apparent 180° reversal.
+- **XML documentation cleanup in `SpriteSheet.vb`**: Completed missing `<summary>` entries for public fields (`FrameWidth`, `FrameHeight`, `FrameCount`, `FrameDuration`) and both constructors, corrected the duplicated summary on `Animation.SpriteSheet` (was mislabeled as a frame index), and documented edge-case behavior such as `frameIndex` clamping, empty `frameIndices` fallback to frame 0, and `frameDuration` minimum of 0.001 s.
+- **Enemy respawn logic simplification**: Removed the duplicated position-reset math from `Enemy.Die()` in `Actor.vb` and now rely entirely on `Enemy.RespawnAt(SpawnPoint)` (called automatically at the end of the respawn timer, and also from `GameManager.ResetPositionsAfterDeath()`), centralizing position/state reset into one method.
+
 ### Version 1.2.11
-- **Small patch release**: This is the current recommended version and keeps the 1.x line stable with one more edge-case fix around the exit flow.
+- **Patch release**: Previous recommended 1.x version, kept as a stable reference for projects upgraded before 1.2.12.
 - **Exit-flow cleanup**: Adjusted the shutdown path in `GameManager.vb` so the game closes through the normal MonoGame exit flow instead of relying on the abrupt `Environment.Exit(0)` fallback.
 
 ### Version 1.2.10

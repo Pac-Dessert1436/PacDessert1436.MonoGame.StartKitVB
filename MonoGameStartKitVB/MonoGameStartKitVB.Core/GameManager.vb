@@ -321,12 +321,7 @@ Public NotInheritable Class GameManager
 
         For Each enemy As Actor.Enemy In Enemies
             If enemy.IsActive AndAlso Not enemy.IsRespawning Then
-                enemy.GridPosition = enemy.SpawnPoint
-                enemy.PixelPosition = New Vector2(
-                    enemy.SpawnPoint.X * CELL_SIZE + CELL_SIZE \ 2,
-                    enemy.SpawnPoint.Y * CELL_SIZE + CELL_SIZE \ 2
-                )
-                enemy.SetRandomDirection()
+                enemy.RespawnAt(enemy.SpawnPoint)
             End If
         Next enemy
     End Sub
