@@ -120,7 +120,7 @@ Public MustInherit Class Actor
                 Case Direction.Right
                     Return Direction.Left
                 Case Else
-                    Return Direction.Down
+                    Return currDir
             End Select
         End Get
     End Property
@@ -579,6 +579,11 @@ Public MustInherit Class Actor
         Private ReadOnly random As Random = Random.Shared
         Private _previousDirection As Direction
 
+        ' List of all possible directions
+        Private ReadOnly _directions As Direction() = {
+            Direction.Up, Direction.Down, Direction.Left, Direction.Right
+        }
+
         ''' <summary>
         ''' Initializes a new instance of the Enemy class.
         ''' </summary>
@@ -657,7 +662,8 @@ Public MustInherit Class Actor
 
             ' Change enemies' direction randomly at a 5% chance
             If random.Next(100) < 5 Then ChangeDirection()
-            _previousDirection = Direction
+            ' Set previous direction only when current direction is different
+            If Direction <> _previousDirection Then _previousDirection = Direction
         End Sub
 
         ''' <summary>
@@ -689,11 +695,6 @@ Public MustInherit Class Actor
             Return True
         End Function
 
-        ' List of all possible directions
-        Private ReadOnly _directions As Direction() = {
-            Direction.Up, Direction.Down, Direction.Left, Direction.Right
-        }
-
         ''' <summary>
         ''' Sets a random valid direction for the enemy.
         ''' </summary>
@@ -712,8 +713,16 @@ Public MustInherit Class Actor
         ''' </summary>
         Private Sub ChangeDirection()
             Dim validDirections = Actor.ValidDirections(Direction)
+            Dim currOpposite = OppositeDirection(Direction)
+            Dim prevOpposite = OppositeDirection(_previousDirection)
             If validDirections IsNot Nothing AndAlso validDirections.Length > 0 Then
-                Direction = validDirections(random.Next(validDirections.Length))
+                Dim nextDirection = validDirections(random.Next(validDirections.Length))
+                If nextDirection = prevOpposite Then
+                    ' Maintain the same direction if it's the opposite of the previous one
+                    Direction = _previousDirection
+                ElseIf nextDirection <> currOpposite Then
+                    Direction = nextDirection
+                End If
             End If
         End Sub
 
