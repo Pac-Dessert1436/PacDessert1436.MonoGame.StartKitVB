@@ -7,12 +7,31 @@ Imports Microsoft.Xna.Framework.Content
 ''' </summary>
 Public NotInheritable Class SpriteSheet
     Private ReadOnly _texture As Texture2D
+
+    ''' <summary>
+    ''' Gets the width of a single frame in pixels.
+    ''' </summary>
     Public ReadOnly FrameWidth As Integer
+
+    ''' <summary>
+    ''' Gets the height of a single frame in pixels.
+    ''' </summary>
     Public ReadOnly FrameHeight As Integer
+
+    ''' <summary>
+    ''' Gets the total number of frames in the sprite sheet.
+    ''' </summary>
     Public ReadOnly FrameCount As Integer
     Private ReadOnly _columns As Integer
     Private ReadOnly _rows As Integer
 
+    ''' <summary>
+    ''' Initializes a new instance of the <see cref="SpriteSheet"/> class.
+    ''' </summary>
+    ''' <param name="content">The content manager used to load the texture.</param>
+    ''' <param name="path">The asset path of the texture.</param>
+    ''' <param name="frameWidth">The width of a single frame in pixels.</param>
+    ''' <param name="frameHeight">The height of a single frame in pixels.</param>
     Public Sub New(content As ContentManager, path As String, frameWidth As Integer, frameHeight As Integer)
         _texture = content.Load(Of Texture2D)(path)
 
@@ -35,6 +54,7 @@ Public NotInheritable Class SpriteSheet
 
     ''' <summary>
     ''' Gets the rectangle for a specific frame in the sprite sheet.
+    ''' The <paramref name="frameIndex"/> is clamped to the valid range [0, <see cref="FrameCount"/> - 1].
     ''' </summary>
     ''' <param name="frameIndex">The index of the frame to retrieve.</param>
     ''' <returns>The rectangle defining the frame's position in the sprite sheet.</returns>
@@ -114,8 +134,18 @@ Public NotInheritable Class Animation
     Private ReadOnly _frameIndices As Integer()
     Private _currentFrameIndex As Integer = 0
     Private _frameTimer As Single = 0
+
+    ''' <summary>
+    ''' Gets the duration of each frame in seconds. Clamped to a minimum of 0.001 s.
+    ''' </summary>
     Public ReadOnly FrameDuration As Single
 
+    ''' <summary>
+    ''' Initializes a new instance of the <see cref="Animation"/> class.
+    ''' </summary>
+    ''' <param name="spriteSheet">The sprite sheet containing the animation frames.</param>
+    ''' <param name="frameIndices">The indices of the frames to include in the animation. Falls back to {0} if empty.</param>
+    ''' <param name="frameDuration">The duration of each frame in seconds. Clamped to a minimum of 0.001 s.</param>
     Public Sub New(spriteSheet As SpriteSheet, frameIndices As Integer(), frameDuration As Single)
         _spriteSheet = spriteSheet
         ' Use the first frame if `frameIndices` is empty
@@ -164,9 +194,9 @@ Public NotInheritable Class Animation
     End Sub
 
     ''' <summary>
-    ''' Gets the current frame index in the animation.
+    ''' Gets the sprite sheet used by this animation.
     ''' </summary>
-    ''' <returns>The index of the current frame in the animation.</returns>
+    ''' <returns>The sprite sheet containing the animation frames.</returns>
     Public ReadOnly Property SpriteSheet As SpriteSheet
         Get
             Return _spriteSheet
@@ -174,9 +204,9 @@ Public NotInheritable Class Animation
     End Property
 
     ''' <summary>
-    ''' Gets the current frame index in the animation.
+    ''' Gets the index of the current frame in the sprite sheet.
     ''' </summary>
-    ''' <returns>The index of the current frame in the animation.</returns>
+    ''' <returns>The zero-based index of the current frame within the sprite sheet.</returns>
     Public ReadOnly Property CurrentFrameIndex As Integer
         Get
             Return _frameIndices(_currentFrameIndex)

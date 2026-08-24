@@ -32,7 +32,7 @@ Welcome to MonoGame! If you're coming from `vbPixelGameEngine`, this guide will 
 
 ## 2. Project Structure
 
-A typical MonoGame project utilizing VB.NET has these key components in its core layer:
+A typical MonoGame project built with VB.NET has these key components in its core layer:
 
 ```
 YourGame.Core/
@@ -54,18 +54,31 @@ Imports Microsoft.Xna.Framework.Input
 Public Class GameMain
     Inherits Game
     
-    Private _graphics As GraphicsDeviceManager
+    Private ReadOnly _graphics As GraphicsDeviceManager
     Private _spriteBatch As SpriteBatch
+
+    Public Const SCREEN_WIDTH As Integer = 800
+    Public Const SCREEN_HEIGHT As Integer = 600
     
     Public Sub New()
         _graphics = New GraphicsDeviceManager(Me)
         Content.RootDirectory = "Content"
         IsMouseVisible = True
     End Sub
+
+    Protected Overrides Sub Initialize()
+        ' Component initialization here
+        _graphics.PreferredBackBufferWidth = SCREEN_WIDTH
+        _graphics.PreferredBackBufferHeight = SCREEN_HEIGHT
+        _graphics.ApplyChanges()
+
+        MyBase.Initialize()
+    End Sub
     
     Protected Overrides Sub LoadContent()
         _spriteBatch = New SpriteBatch(GraphicsDevice)
         ' Load your assets here
+        MyBase.LoadContent()
     End Sub
     
     Protected Overrides Sub Update(gameTime As GameTime)
@@ -98,7 +111,7 @@ DrawRect(New Vi2d(10, 10), New Vi2d(100, 50), Presets.Red)
 
 **⭐ MonoGame:**
 ```vb
-' Create a 1x1 white texture for drawing rectangles
+' Create a 1x1 white texture for drawing rectangles (do this once in LoadContent)
 Dim pixelTexture As New Texture2D(GraphicsDevice, 1, 1)
 pixelTexture.SetData({Color.White})
 
@@ -107,6 +120,7 @@ _spriteBatch.Draw(pixelTexture,
                   New Rectangle(10, 10, 100, 50), 
                   Color.Red)
 ```
+> **Tip**: Create the `pixelTexture` once in `LoadContent` and store it as a field — never create textures inside your draw loop, as that would allocate GPU resources every frame.
 
 ### Drawing Lines
 
@@ -117,8 +131,35 @@ DrawLine(New Vi2d(10, 10), New Vi2d(100, 100), Presets.Blue)
 
 **⭐ MonoGame:**
 ```vb
-' Use the pixel texture and draw multiple horizontal/vertical lines
-' or create a line drawing helper function
+' MonoGame has no built-in line primitive; create the `_pixelTexture` (a 1×1 white 
+' `Texture2D`) once in `LoadContent` and reuse it for all primitive drawing.
+
+Private _pixelTexture As Texture2D
+Private _spriteBatch As SpriteBatch
+
+Protected Overrides Sub LoadContent()
+    _spriteBatch = New SpriteBatch(GraphicsDevice)
+    _pixelTexture = New Texture2D(GraphicsDevice, 1, 1)
+    _pixelTexture.SetData({Color.White})
+End Sub
+
+' Define a helper method that stretches a 1×1 white pixel texture into a thin
+' rectangle between two points.
+Private Sub DrawLine(start As Vector2, [end] As Vector2, color As Color, thickness As Single)
+    Dim delta = [end] - start
+    Dim angle = CSng(Math.Atan2(delta.Y, delta.X))
+    Dim length = delta.Length()
+
+    _spriteBatch.Draw(_pixelTexture,
+        position:=start,
+        sourceRectangle:=Nothing,
+        color:=color,
+        rotation:=angle,
+        origin:=Vector2.Zero,
+        scale:=New Vector2(length, thickness),
+        effects:=SpriteEffects.None,
+        layerDepth:=0)
+End Sub
 ```
 
 ### Drawing Text
@@ -214,7 +255,7 @@ Dim vel As New Vf2d(2.5F, 1.0F)
 Dim pos As New Vector2(100, 200)   ' Use Vector2 instead of Point
 Dim vel As New Vector2(2.5F, 1.0F)
 ```
-> **Note**: In MonoGame, `Point` is used for integer coordinates only, while `Vector2` is used for general-purpose vector math. These two structures are not compatible with each other.
+> **Note**: In MonoGame, `Point` is used for integer coordinates only, while `Vector2` is used for general-purpose vector math. These two structures are not implicitly convertible — you must construct one from the other explicitly (e.g., `New Vector2(myPoint.X, myPoint.Y)`).
 
 ### Common Operations
 
@@ -330,8 +371,8 @@ End Sub
 ' Call this when you want to shake the screen
 Private Sub ScreenShake(intensity As Single)
     _shakeOffset = New Vector2(
-        CSng((Random.NextDouble() - 0.5) * intensity),
-        CSng((Random.NextDouble() - 0.5) * intensity)
+        CSng((Random.Shared.NextDouble() - 0.5) * intensity),
+        CSng((Random.Shared.NextDouble() - 0.5) * intensity)
     )
 End Sub
 ```
@@ -450,13 +491,15 @@ End If
 
 ### Adding Assets
 
-1. Right-click your Content project → Add → Existing Item
-2. Select your image/font/sound file
-3. In Properties:
+1. Place your image/font/sound file in the `Content/` directory of your project
+2. If using the MonoGame Content Pipeline (`.mgcb` file), add the asset via the MGCB Editor or edit the `.mgcb` file directly
+3. For raw file copying (no pipeline processing), set the file properties in your IDE:
    - Build Action: `Content`
    - Copy to Output Directory: `Copy if newer`
 
 ### Loading Assets
+
+Assets must be loaded in the `LoadContent` phase. Here's how to load common types of assets:
 
 ```vb
 ' Textures
@@ -493,6 +536,7 @@ Dim backgroundMusic = Content.Load(Of Song)("Music/background")
       MyBase.Dispose(disposing)
   End Sub
   ```
+  > **Note**: Always call `MyBase.Dispose(disposing)` to ensure the base `Game` class also cleans up its resources.
 
 ### 3. Manage State
 - Use enums to manage game states (Title, Playing, Paused, GameOver)

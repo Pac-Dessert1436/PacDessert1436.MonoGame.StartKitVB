@@ -35,11 +35,17 @@ Public NotInheritable Class GameMain
         End If
         _graphics.ApplyChanges()
 
+        MyBase.Initialize()
+    End Sub
+
+    Protected Overrides Sub LoadContent()
+        ' Game systems must be initialized right after the `Initialize` phase, so 
+        ' they have access to the graphics device and content manager.
         _gameManager = New GameManager(Me)
         _renderer = New Renderer(GraphicsDevice, Content)
         _soundManager = New SoundManager(Content)
 
-        MyBase.Initialize()
+        MyBase.LoadContent()
     End Sub
 
     Protected Overrides Sub Update(gameTime As GameTime)

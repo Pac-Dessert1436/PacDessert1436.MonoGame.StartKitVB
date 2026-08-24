@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>PacDessert1436.MonoGame.StartKitVB</id>
-    <version>1.2.13</version>
+    <version>1.3.0</version>
     <title>MonoGame 2D StartKit VB.NET</title>
     <authors>Pac-Dessert1436</authors>
     <owners>Pac-Dessert1436</owners>
@@ -22,6 +22,8 @@
   <files>
     <file src="Blank2DStartKitVB/**/*" target="content" exclude="**/.vs/**/*;**/bin/**/*;**/obj/**/*;**/Content/bin/**/*;**/Content/obj/**/*" />
     <file src="MonoGameStartKitVB/**/*" target="content" exclude="**/.vs/**/*;**/bin/**/*;**/obj/**/*;**/Content/bin/**/*;**/Content/obj/**/*" />
+    <file src="BEGINNER_GUIDE.md" target="content/Blank2DStartKitVB/BEGINNER_GUIDE.md" />
+    <file src="BEGINNER_GUIDE.md" target="content/MonoGameStartKitVB/BEGINNER_GUIDE.md" />
     <file src="README.md" target="README.md" />
   </files>
 </package>
