@@ -394,9 +394,9 @@ This version is the definitive, recommended 1.x release with a critical edge-cas
 - **MonoGame dependency update**: Both the blank template and the demo game now have MonoGame packages pinned to version 3.8.5.1, which is the latest stable version as of this release. `MonoGame.Framework.Native` is now introduced in both templates.
 - **`BEGINNER_GUIDE` documentation polishing**: Improved the clarity and completeness of the beginner guide, adding more details on project structure, rendering concepts, and common pitfalls.
 
+> **Optional**: Change the original `MonoGame.Framework.DesktopGL` to this library in your project's `.csproj` file on prior versions.
 ```xml
 <ItemGroup>
-  <!-- Optional: Change the original `MonoGame.Framework.DesktopGL` to this library -->
   <PackageReference Include="MonoGame.Framework.Native" Version="3.8.5.1">
     <PrivateAssets>All</PrivateAssets>
   </PackageReference>

@@ -39,7 +39,7 @@ Public NotInheritable Class GameMain
     End Sub
 
     Protected Overrides Sub LoadContent()
-        ' Game systems must be initialized right after the `Initialize` phase, so 
+        ' Game systems must be initialized during the `LoadContent` phase, so
         ' they have access to the graphics device and content manager.
         _gameManager = New GameManager(Me)
         _renderer = New Renderer(GraphicsDevice, Content)
@@ -61,6 +61,8 @@ Public NotInheritable Class GameMain
     Protected Overrides Sub Draw(gameTime As GameTime)
         Dim deltaTime As Single = CSng(gameTime.ElapsedGameTime.TotalSeconds)
         _renderer.Render(_gameManager, _gameManager.GameState, deltaTime)
+
+        ' Raise any scheduled events on `Draw` phase
         EventScheduler.RaiseScheduledEvents()
         MyBase.Draw(gameTime)
     End Sub

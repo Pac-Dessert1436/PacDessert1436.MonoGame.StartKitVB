@@ -363,5 +363,51 @@ Partial Public Module Essentials
         End Try
         Return 0
     End Function
+
+    ''' <summary>
+    ''' Gets the valid directions for the actor to move in.
+    ''' </summary>
+    ''' <param name="currDir">The current direction of the actor.</param>
+    ''' <returns>An array of valid directions for the actor to move in.</returns>
+    ''' <remarks>
+    ''' This property is used to filter out invalid directions, such as the opposite direction.
+    ''' </remarks>
+    <Extension> Public Function GetValidDirections(currDir As Direction) As Direction()
+        Select Case currDir
+            Case Direction.Up
+                Return {Direction.Left, Direction.Right, Direction.Up}
+            Case Direction.Down
+                Return {Direction.Left, Direction.Right, Direction.Down}
+            Case Direction.Left
+                Return {Direction.Up, Direction.Down, Direction.Left}
+            Case Direction.Right
+                Return {Direction.Up, Direction.Down, Direction.Right}
+            Case Else
+                Return {Direction.Up, Direction.Down, Direction.Left, Direction.Right}
+        End Select
+    End Function
+
+    ''' <summary>
+    ''' Gets the opposite direction of the current direction.
+    ''' </summary>
+    ''' <param name="currDir">The current direction of the actor.</param>
+    ''' <returns>The opposite direction of the current direction.</returns>
+    ''' <remarks>
+    ''' This property is used to check for collisions with other actors.
+    ''' </remarks>
+    <Extension> Public Function GetOppositeDirection(currDir As Direction) As Direction
+        Select Case currDir
+            Case Direction.Up
+                Return Direction.Down
+            Case Direction.Down
+                Return Direction.Up
+            Case Direction.Left
+                Return Direction.Right
+            Case Direction.Right
+                Return Direction.Left
+            Case Else
+                Return currDir
+        End Select
+    End Function
 #End Region
 End Module

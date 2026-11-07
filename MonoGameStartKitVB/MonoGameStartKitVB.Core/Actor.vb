@@ -78,54 +78,6 @@ Public MustInherit Class Actor
     End Sub
 
     ''' <summary>
-    ''' Gets the valid directions for the actor to move in.
-    ''' </summary>
-    ''' <param name="currDir">The current direction of the actor.</param>
-    ''' <returns>An array of valid directions for the actor to move in.</returns>
-    ''' <remarks>
-    ''' This property is used to filter out invalid directions, such as the opposite direction.
-    ''' </remarks>
-    Public Shared Function ValidDirections(currDir As Direction) As Direction()
-        Select Case currDir
-            Case Direction.Up
-                Return {Direction.Left, Direction.Right, Direction.Up}
-            Case Direction.Down
-                Return {Direction.Left, Direction.Right, Direction.Down}
-            Case Direction.Left
-                Return {Direction.Up, Direction.Down, Direction.Left}
-            Case Direction.Right
-                Return {Direction.Up, Direction.Down, Direction.Right}
-            Case Else
-                Return {Direction.Up, Direction.Down, Direction.Left, Direction.Right}
-        End Select
-    End Function
-
-    ''' <summary>
-    ''' Gets the opposite direction of the current direction.
-    ''' </summary>
-    ''' <param name="currDir">The current direction of the actor.</param>
-    ''' <returns>The opposite direction of the current direction.</returns>
-    ''' <remarks>
-    ''' This property is used to check for collisions with other actors.
-    ''' </remarks>
-    Public Shared ReadOnly Property OppositeDirection(currDir As Direction) As Direction
-        Get
-            Select Case currDir
-                Case Direction.Up
-                    Return Direction.Down
-                Case Direction.Down
-                    Return Direction.Up
-                Case Direction.Left
-                    Return Direction.Right
-                Case Direction.Right
-                    Return Direction.Left
-                Case Else
-                    Return currDir
-            End Select
-        End Get
-    End Property
-
-    ''' <summary>
     ''' Represents the player character in the game.
     ''' </summary>
     ''' <remarks>
@@ -699,7 +651,7 @@ Public MustInherit Class Actor
         ''' Sets a random valid direction for the enemy.
         ''' </summary>
         Public Sub SetRandomDirection()
-            Dim validDirections = Actor.ValidDirections(_previousDirection)
+            Dim validDirections = Direction.GetValidDirections()
 
             If validDirections IsNot Nothing AndAlso validDirections.Length > 0 Then
                 Direction = validDirections(random.Next(validDirections.Length))
@@ -712,9 +664,9 @@ Public MustInherit Class Actor
         ''' Changes the enemy's direction to a new valid direction.
         ''' </summary>
         Private Sub ChangeDirection()
-            Dim validDirections = Actor.ValidDirections(Direction)
-            Dim currOpposite = OppositeDirection(Direction)
-            Dim prevOpposite = OppositeDirection(_previousDirection)
+            Dim validDirections = Direction.GetValidDirections()
+            Dim currOpposite = Direction.GetOppositeDirection()
+            Dim prevOpposite = _previousDirection.GetOppositeDirection()
             If validDirections IsNot Nothing AndAlso validDirections.Length > 0 Then
                 Dim nextDirection = validDirections(random.Next(validDirections.Length))
                 If nextDirection = prevOpposite Then
